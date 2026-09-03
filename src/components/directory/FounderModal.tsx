@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Founder } from "@/context/AdminContext";
 import { motion } from "framer-motion";
 import { X, Sparkles, AlertCircle, Upload, ImageIcon, Check, Plus, Trash2 } from "lucide-react";
@@ -15,51 +15,41 @@ interface Props {
 type FormState = Omit<Founder, "_id"> & { _id?: string };
 
 /* ─────────────────────────────────────────────────────────────────────────── */
-/*  Photo upload widget (Light Mode)                                          */
+/*  Photo upload widget (Light Mode - Deferred Upload)                         */
 /* ─────────────────────────────────────────────────────────────────────────── */
 function PhotoUploader({
-  value,
-  onChange,
+  previewUrl,
+  urlValue,
+  onSelectFile,
+  onUrlChange,
+  isSaving,
 }: {
-  value: string;
-  onChange: (url: string) => void;
+  previewUrl: string;
+  urlValue: string;
+  onSelectFile: (file: File) => void;
+  onUrlChange: (url: string) => void;
+  isSaving: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState("");
   const [dragOver, setDragOver] = useState(false);
+  const [fileError, setFileError] = useState("");
 
-  const doUpload = useCallback(async (file: File) => {
-    setUploadError("");
+  const handleFile = (file: File) => {
+    setFileError("");
     if (!file.type.startsWith("image/")) {
-      setUploadError("Only image files are allowed.");
+      setFileError("Only image files are allowed.");
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setUploadError("File too large (max 10 MB).");
+      setFileError("File too large (max 10 MB).");
       return;
     }
-
-    setUploading(true);
-    try {
-      const webpFile = await convertToWebP(file, 0.9);
-      const fd = new FormData();
-      fd.append("file", webpFile);
-      fd.append("folder", "nexus-founders/founders");
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error || "Upload failed");
-      onChange(json.url);
-    } catch (err: any) {
-      setUploadError(err?.message || "Upload failed. Try again.");
-    } finally {
-      setUploading(false);
-    }
-  }, [onChange]);
+    onSelectFile(file);
+  };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) doUpload(file);
+    if (file) handleFile(file);
     e.target.value = "";
   };
 
@@ -67,7 +57,7 @@ function PhotoUploader({
     e.preventDefault();
     setDragOver(false);
     const file = e.dataTransfer.files?.[0];
-    if (file) doUpload(file);
+    if (file) handleFile(file);
   };
 
   return (
@@ -82,7 +72,7 @@ function PhotoUploader({
 
       {/* Preview + drop zone */}
       <div
-        onClick={() => !uploading && inputRef.current?.click()}
+        onClick={() => !isSaving && inputRef.current?.click()}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
@@ -91,13 +81,13 @@ function PhotoUploader({
           width: "100%",
           height: "180px",
           borderRadius: "12px",
-          border: `2px dashed ${dragOver ? "#0284c7" : value ? "#0284c7" : "#cbd5e1"}`,
+          border: `2px dashed ${dragOver ? "#0284c7" : previewUrl ? "#0284c7" : "#cbd5e1"}`,
           background: dragOver
             ? "rgba(2, 132, 199, 0.08)"
-            : value
+            : previewUrl
               ? "transparent"
               : "#f8fafc",
-          cursor: uploading ? "wait" : "pointer",
+          cursor: isSaving ? "wait" : "pointer",
           overflow: "hidden",
           display: "flex",
           alignItems: "center",
@@ -106,10 +96,10 @@ function PhotoUploader({
         }}
       >
         {/* Current photo preview */}
-        {value && !uploading && (
+        {previewUrl && !isSaving && (
           <>
             <img
-              src={value}
+              src={previewUrl}
               alt="Preview"
               style={{
                 width: "100%", height: "100%",
@@ -133,7 +123,7 @@ function PhotoUploader({
         )}
 
         {/* Upload placeholder */}
-        {!value && !uploading && (
+        {!previewUrl && !isSaving && (
           <div style={{ textAlign: "center", pointerEvents: "none" }}>
             <ImageIcon size={36} color="#0284c7" style={{ marginBottom: "0.6rem", opacity: 0.7 }} />
             <p style={{ color: "#334155", fontSize: "0.88rem", fontWeight: 600, margin: 0 }}>
@@ -146,7 +136,7 @@ function PhotoUploader({
         )}
 
         {/* Uploading spinner */}
-        {uploading && (
+        {isSaving && (
           <div style={{ textAlign: "center" }}>
             <div style={{
               width: "36px", height: "36px",
@@ -156,12 +146,12 @@ function PhotoUploader({
               animation: "spin 0.8s linear infinite",
               margin: "0 auto 0.6rem",
             }} />
-            <p style={{ color: "#0284c7", fontSize: "0.85rem", fontWeight: 600, margin: 0 }}>Uploading image…</p>
+            <p style={{ color: "#0284c7", fontSize: "0.85rem", fontWeight: 600, margin: 0 }}>Uploading to S3 & saving…</p>
           </div>
         )}
 
         {/* Success tick */}
-        {value && !uploading && (
+        {previewUrl && !isSaving && (
           <div style={{
             position: "absolute", top: "8px", right: "8px",
             background: "#10b981", borderRadius: "50%",
@@ -187,8 +177,8 @@ function PhotoUploader({
       <input
         type="text"
         placeholder="…or paste image URL directly"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        value={urlValue}
+        onChange={(e) => onUrlChange(e.target.value)}
         style={{
           width: "100%",
           marginTop: "0.5rem",
@@ -205,9 +195,9 @@ function PhotoUploader({
         onBlur={(e) => { e.currentTarget.style.borderColor = "#e2e8f0"; }}
       />
 
-      {uploadError && (
+      {fileError && (
         <p style={{ color: "#ef4444", fontSize: "0.8rem", marginTop: "0.4rem", display: "flex", alignItems: "center", gap: "0.3rem" }}>
-          <AlertCircle size={13} /> {uploadError}
+          <AlertCircle size={13} /> {fileError}
         </p>
       )}
 
@@ -241,6 +231,8 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
     name: "", role: "Founder", company: "", photo: "",
     linkedin: "", instagram: "", googleplus: "", twitter: "", facebook: "", youtube: "", order: 0,
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>(founder?.photo || "");
   const [saving, setSaving] = useState(false);
   const [validationError, setValidationError] = useState("");
 
@@ -259,6 +251,8 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
   useEffect(() => {
     if (founder) {
       setForm({ ...founder });
+      setPreviewUrl(founder.photo || "");
+      setSelectedFile(null);
       const filled = new Set<keyof FormState>();
       ALL_SOCIAL.forEach(({ key }) => {
         if ((founder as any)[key] && String((founder as any)[key]).trim() !== "") {
@@ -271,6 +265,8 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
         name: "", role: "Founder", company: "", photo: "",
         linkedin: "", instagram: "", googleplus: "", twitter: "", facebook: "", youtube: "", order: 0,
       });
+      setPreviewUrl("");
+      setSelectedFile(null);
       setActiveSocials(new Set());
     }
   }, [founder]);
@@ -278,6 +274,20 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValidationError("");
     setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+  };
+
+  const handleSelectFile = (file: File) => {
+    setValidationError("");
+    setSelectedFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+  };
+
+  const handleUrlChange = (url: string) => {
+    setValidationError("");
+    setSelectedFile(null);
+    setPreviewUrl(url);
+    setForm((p) => ({ ...p, photo: url }));
   };
 
   const addSocialField = (key: keyof FormState) => {
@@ -303,10 +313,29 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
       return;
     }
     setSaving(true);
+    setValidationError("");
     try {
-      await onSave(form as any);
-    } catch {
-      // error shown via saveError prop
+      let finalPhotoUrl = form.photo;
+
+      // 1. If an image file was selected by the admin, upload it to S3 first!
+      if (selectedFile) {
+        const webpFile = await convertToWebP(selectedFile, 0.9);
+        const fd = new FormData();
+        fd.append("file", webpFile);
+        fd.append("folder", "nexus-founders/founders");
+
+        const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
+        const uploadJson = await uploadRes.json();
+        if (!uploadJson.success) {
+          throw new Error(uploadJson.error || "Failed to upload image to S3");
+        }
+        finalPhotoUrl = uploadJson.url;
+      }
+
+      // 2. Both /api/upload and /api/founders run when Add to Directory is clicked
+      await onSave({ ...form, photo: finalPhotoUrl } as any);
+    } catch (err: any) {
+      setValidationError(err?.message || "Failed to save founder.");
     } finally {
       setSaving(false);
     }
@@ -429,8 +458,11 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
 
           {/* Photo upload widget */}
           <PhotoUploader
-            value={form.photo ?? ""}
-            onChange={(url) => setForm((p) => ({ ...p, photo: url }))}
+            previewUrl={previewUrl}
+            urlValue={form.photo ?? ""}
+            onSelectFile={handleSelectFile}
+            onUrlChange={handleUrlChange}
+            isSaving={saving}
           />
 
           {/* Active Social Links */}
@@ -575,7 +607,7 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
             onMouseEnter={(e) => e.currentTarget.style.opacity = "0.95"}
             onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
           >
-            {saving ? "Saving…" : isEdit ? "Save Changes" : "Add to Directory"}
+            {saving ? "Uploading to S3 & Saving…" : isEdit ? "Save Changes" : "Add to Directory"}
           </button>
         </div>
       </motion.div>

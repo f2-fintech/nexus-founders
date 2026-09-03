@@ -88,35 +88,27 @@ export default function TeamModal({ member, onSave, onClose, saveError }: TeamMo
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
-    setError("");
-
-    try {
-      // Convert image to WebP in browser first
-      const webpFile = await convertToWebP(file, 0.9);
-      const formData = new FormData();
-      formData.append("file", webpFile);
-      formData.append("folder", "nexus-founders/team");
-
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error || "Upload failed");
-      setPhoto(json.url);
-    } catch (err: any) {
-      setError(err?.message || "Failed to upload image.");
-    } finally {
-      setUploading(false);
+    if (!file.type.startsWith("image/")) {
+      setError("Only image files are allowed.");
+      return;
     }
+    if (file.size > 10 * 1024 * 1024) {
+      setError("File too large (max 10 MB).");
+      return;
+    }
+
+    setError("");
+    setSelectedFile(file);
+    const localUrl = URL.createObjectURL(file);
+    setPhoto(localUrl);
+    e.target.value = "";
   };
 
   const handleAddSocialField = (key: string) => {
@@ -154,6 +146,27 @@ export default function TeamModal({ member, onSave, onClose, saveError }: TeamMo
     setError("");
 
     try {
+      let finalPhoto = photo;
+
+      // 1. If a local file was selected, upload to S3 now on form submission
+      if (selectedFile) {
+        setUploading(true);
+        const webpFile = await convertToWebP(selectedFile, 0.9);
+        const formData = new FormData();
+        formData.append("file", webpFile);
+        formData.append("folder", "nexus-founders/team");
+
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error || "Upload failed");
+        finalPhoto = json.url;
+        setPhoto(json.url);
+      }
+
       const cleanSocial: Record<string, string> = {};
       Object.entries(socialLinks).forEach(([k, v]) => {
         if (typeof v === "string" && v.trim()) {
@@ -166,18 +179,20 @@ export default function TeamModal({ member, onSave, onClose, saveError }: TeamMo
         }
       });
 
+      // 2. Both /api/upload and /api/team run when Save Member is clicked
       await onSave({
         ...(member?._id ? { _id: member._id } : {}),
         name: name.trim(),
         designation: designation.trim(),
         description: description.trim(),
-        photo: photo.trim() || "/images/avatar-placeholder.webp",
+        photo: finalPhoto.trim() || "/images/avatar-placeholder.webp",
         socialLinks: cleanSocial,
         order: member?.order ?? 0,
       });
     } catch (err: any) {
       setError(err?.message || "Failed to save team member.");
     } finally {
+      setUploading(false);
       setSaving(false);
     }
   };
