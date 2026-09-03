@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import sharp from "sharp";
 
 export const dynamic = "force-dynamic";
@@ -33,29 +31,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "File too large (max 10 MB)" }, { status: 400 });
     }
 
-    // Build a safe filename: timestamp + sanitised original name + .webp
-    const ext = path.extname(file.name);
-    const baseName = path
-      .basename(file.name, ext)
-      .replace(/[^a-z0-9_\-]/gi, "_")
-      .slice(0, 40);
-    const fileName = `${Date.now()}_${baseName}.webp`;
-
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "founders");
-    await mkdir(uploadDir, { recursive: true });
-
     const bytes = await file.arrayBuffer();
     const inputBuffer = Buffer.from(bytes);
 
-    // Convert to WebP using sharp
+    // Convert and compress to optimized WebP buffer (max 600x600, ~20-35 KB)
     const webpBuffer = await sharp(inputBuffer)
-      .webp({ quality: 85 })
+      .resize({ width: 600, height: 600, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 82 })
       .toBuffer();
 
-    await writeFile(path.join(uploadDir, fileName), webpBuffer);
+    // Store as Base64 data URL directly into database
+    const base64Data = `data:image/webp;base64,${webpBuffer.toString("base64")}`;
 
-    const publicUrl = `/uploads/founders/${fileName}`;
-    return NextResponse.json({ success: true, url: publicUrl });
+    return NextResponse.json({ success: true, url: base64Data });
   } catch (error: any) {
     console.error("Upload error:", error);
     return NextResponse.json(
