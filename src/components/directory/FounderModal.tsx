@@ -15,7 +15,7 @@ interface Props {
 type FormState = Omit<Founder, "_id"> & { _id?: string };
 
 /* ─────────────────────────────────────────────────────────────────────────── */
-/*  Photo upload widget                                                        */
+/*  Photo upload widget (Light Mode)                                          */
 /* ─────────────────────────────────────────────────────────────────────────── */
 function PhotoUploader({
   value,
@@ -42,7 +42,6 @@ function PhotoUploader({
 
     setUploading(true);
     try {
-      // Convert image to WebP in browser first
       const webpFile = await convertToWebP(file, 0.9);
       const fd = new FormData();
       fd.append("file", webpFile);
@@ -74,7 +73,7 @@ function PhotoUploader({
     <div>
       <label style={{
         display: "block", fontSize: "0.8rem", fontWeight: 600,
-        color: "#94a3b8", marginBottom: "0.5rem",
+        color: "#475569", marginBottom: "0.45rem",
         textTransform: "uppercase", letterSpacing: "0.04em",
       }}>
         Founder Photo
@@ -91,12 +90,12 @@ function PhotoUploader({
           width: "100%",
           height: "180px",
           borderRadius: "12px",
-          border: `2px dashed ${dragOver ? "#22d3ee" : value ? "rgba(34,211,238,0.4)" : "rgba(99,102,241,0.35)"}`,
+          border: `2px dashed ${dragOver ? "#0284c7" : value ? "#0284c7" : "#cbd5e1"}`,
           background: dragOver
-            ? "rgba(34,211,238,0.08)"
+            ? "rgba(2, 132, 199, 0.08)"
             : value
               ? "transparent"
-              : "rgba(30,41,59,0.5)",
+              : "#f8fafc",
           cursor: uploading ? "wait" : "pointer",
           overflow: "hidden",
           display: "flex",
@@ -119,7 +118,7 @@ function PhotoUploader({
             {/* Hover overlay */}
             <div style={{
               position: "absolute", inset: 0,
-              background: "rgba(0,0,0,0.6)",
+              background: "rgba(15, 23, 42, 0.65)",
               display: "flex", flexDirection: "column",
               alignItems: "center", justifyContent: "center", gap: "0.4rem",
               opacity: 0, transition: "opacity 0.2s",
@@ -135,11 +134,11 @@ function PhotoUploader({
         {/* Upload placeholder */}
         {!value && !uploading && (
           <div style={{ textAlign: "center", pointerEvents: "none" }}>
-            <ImageIcon size={36} color="rgba(99,102,241,0.5)" style={{ marginBottom: "0.6rem" }} />
-            <p style={{ color: "#64748b", fontSize: "0.88rem", margin: 0 }}>
+            <ImageIcon size={36} color="#0284c7" style={{ marginBottom: "0.6rem", opacity: 0.7 }} />
+            <p style={{ color: "#334155", fontSize: "0.88rem", fontWeight: 600, margin: 0 }}>
               Click or drag & drop an image
             </p>
-            <p style={{ color: "#475569", fontSize: "0.76rem", marginTop: "0.25rem" }}>
+            <p style={{ color: "#64748b", fontSize: "0.76rem", marginTop: "0.25rem" }}>
               JPG, PNG, WEBP, GIF, etc. (up to 10 MB)
             </p>
           </div>
@@ -150,13 +149,13 @@ function PhotoUploader({
           <div style={{ textAlign: "center" }}>
             <div style={{
               width: "36px", height: "36px",
-              border: "3px solid rgba(34,211,238,0.2)",
-              borderTop: "3px solid #22d3ee",
+              border: "3px solid #e2e8f0",
+              borderTop: "3px solid #0284c7",
               borderRadius: "50%",
               animation: "spin 0.8s linear infinite",
               margin: "0 auto 0.6rem",
             }} />
-            <p style={{ color: "#94a3b8", fontSize: "0.85rem", margin: 0 }}>Uploading image…</p>
+            <p style={{ color: "#0284c7", fontSize: "0.85rem", fontWeight: 600, margin: 0 }}>Uploading image…</p>
           </div>
         )}
 
@@ -167,7 +166,7 @@ function PhotoUploader({
             background: "#10b981", borderRadius: "50%",
             width: "24px", height: "24px",
             display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.3)"
+            boxShadow: "0 2px 8px rgba(0,0,0,0.2)"
           }}>
             <Check size={14} color="#fff" />
           </div>
@@ -192,21 +191,21 @@ function PhotoUploader({
         style={{
           width: "100%",
           marginTop: "0.5rem",
-          padding: "0.6rem 0.9rem",
-          background: "rgba(30,41,59,0.6)",
-          border: "1px solid rgba(99,102,241,0.2)",
+          padding: "0.65rem 0.9rem",
+          background: "#ffffff",
+          border: "1.5px solid #e2e8f0",
           borderRadius: "8px",
-          color: "#94a3b8",
-          fontSize: "0.8rem",
+          color: "#0f172a",
+          fontSize: "0.82rem",
           outline: "none",
           boxSizing: "border-box",
         }}
-        onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(6,182,212,0.5)"; }}
-        onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(99,102,241,0.2)"; }}
+        onFocus={(e) => { e.currentTarget.style.borderColor = "#0284c7"; }}
+        onBlur={(e) => { e.currentTarget.style.borderColor = "#e2e8f0"; }}
       />
 
       {uploadError && (
-        <p style={{ color: "#f87171", fontSize: "0.8rem", marginTop: "0.4rem", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+        <p style={{ color: "#ef4444", fontSize: "0.8rem", marginTop: "0.4rem", display: "flex", alignItems: "center", gap: "0.3rem" }}>
           <AlertCircle size={13} /> {uploadError}
         </p>
       )}
@@ -233,7 +232,7 @@ const ALL_SOCIAL: { key: keyof FormState; label: string; placeholder: string; ba
 ];
 
 /* ─────────────────────────────────────────────────────────────────────────── */
-/*  Main modal                                                                 */
+/*  Main modal (Clean Light Mode)                                              */
 /* ─────────────────────────────────────────────────────────────────────────── */
 export default function FounderModal({ founder, onSave, onClose, saveError }: Props) {
   const isEdit = !!founder;
@@ -244,7 +243,6 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
   const [saving, setSaving] = useState(false);
   const [validationError, setValidationError] = useState("");
 
-  // Only show social inputs if they are already filled or manually activated
   const [activeSocials, setActiveSocials] = useState<Set<keyof FormState>>(() => {
     const filled = new Set<keyof FormState>();
     if (founder) {
@@ -321,8 +319,8 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
     <div
       style={{
         position: "fixed", inset: 0,
-        background: "rgba(3, 7, 18, 0.82)",
-        backdropFilter: "blur(12px)",
+        background: "rgba(15, 23, 42, 0.6)",
+        backdropFilter: "blur(8px)",
         zIndex: 2000,
         display: "flex", alignItems: "center", justifyContent: "center",
         padding: "1.5rem",
@@ -330,16 +328,16 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
       onClick={onClose}
     >
       <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ duration: 0.28 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.22 }}
         style={{
-          background: "rgba(15, 23, 42, 0.97)",
-          border: "1px solid rgba(6, 182, 212, 0.35)",
-          boxShadow: "0 25px 80px rgba(0,0,0,0.9), 0 0 40px rgba(6,182,212,0.15)",
+          background: "#ffffff",
+          border: "1px solid rgba(2, 132, 199, 0.2)",
+          boxShadow: "0 25px 60px rgba(0, 0, 0, 0.2)",
           borderRadius: "20px",
-          padding: "2.5rem",
+          padding: "2rem",
           width: "100%",
           maxWidth: "560px",
           maxHeight: "90vh",
@@ -348,14 +346,28 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.75rem" }}>
-          <h2 style={{ fontSize: "1.4rem", fontWeight: 800, color: "#fff", display: "flex", alignItems: "center", gap: "0.5rem", margin: 0 }}>
-            <Sparkles size={20} style={{ color: "#22d3ee" }} />
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+          <h2 style={{ fontSize: "1.35rem", fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: "0.5rem", margin: 0 }}>
+            <Sparkles size={20} style={{ color: "#0284c7" }} />
             {isEdit ? "Edit Founder" : "Add New Founder"}
           </h2>
           <button
             onClick={onClose}
-            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", cursor: "pointer", borderRadius: "8px", padding: "0.4rem", display: "flex" }}
+            style={{
+              background: "#f1f5f9",
+              border: "none",
+              color: "#64748b",
+              cursor: "pointer",
+              borderRadius: "50%",
+              width: "32px",
+              height: "32px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "background 0.2s, color 0.2s",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "#e2e8f0"; e.currentTarget.style.color = "#0f172a"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "#f1f5f9"; e.currentTarget.style.color = "#64748b"; }}
           >
             <X size={18} />
           </button>
@@ -365,16 +377,16 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
         {error && (
           <div style={{
             display: "flex", alignItems: "center", gap: "0.6rem",
-            background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.35)",
+            background: "#fef2f2", border: "1px solid #fca5a5",
             borderRadius: "10px", padding: "0.75rem 1rem", marginBottom: "1.25rem",
-            color: "#fca5a5", fontSize: "0.88rem",
+            color: "#b91c1c", fontSize: "0.88rem",
           }}>
             <AlertCircle size={16} style={{ flexShrink: 0 }} />
             {error}
           </div>
         )}
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
           {/* Required text fields */}
           {[
             { key: "name",    label: "Full Name",   placeholder: "e.g. Harpreet Singh" },
@@ -382,8 +394,8 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
             { key: "company", label: "Company",      placeholder: "e.g. Nexus Founders" },
           ].map(({ key, label, placeholder }) => (
             <div key={key}>
-              <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "#94a3b8", marginBottom: "0.35rem", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                {label}<span style={{ color: "#f87171", marginLeft: "2px" }}>*</span>
+              <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "#475569", marginBottom: "0.4rem", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                {label}<span style={{ color: "#ef4444", marginLeft: "2px" }}>*</span>
               </label>
               <input
                 name={key}
@@ -392,14 +404,24 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
                 placeholder={placeholder}
                 style={{
                   width: "100%",
-                  padding: "0.7rem 1rem",
-                  background: "rgba(30,41,59,0.7)",
-                  border: `1px solid ${key !== "name" ? "rgba(99,102,241,0.25)" : !(form as any)[key]?.trim() && validationError ? "rgba(239,68,68,0.5)" : "rgba(99,102,241,0.25)"}`,
-                  borderRadius: "10px", color: "#e2e8f0", outline: "none",
-                  fontSize: "0.9rem", boxSizing: "border-box",
+                  padding: "0.75rem 1rem",
+                  background: "#ffffff",
+                  border: `1.5px solid ${!(form as any)[key]?.trim() && validationError ? "#ef4444" : "#e2e8f0"}`,
+                  borderRadius: "10px",
+                  color: "#0f172a",
+                  outline: "none",
+                  fontSize: "0.92rem",
+                  boxSizing: "border-box",
+                  transition: "border-color 0.2s, box-shadow 0.2s",
                 }}
-                onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(6,182,212,0.6)"; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(99,102,241,0.25)"; }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "#0284c7";
+                  e.currentTarget.style.boxShadow = "0 0 0 3px rgba(2, 132, 199, 0.12)";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = !(form as any)[key]?.trim() && validationError ? "#ef4444" : "#e2e8f0";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
               />
             </div>
           ))}
@@ -416,7 +438,7 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
               {activeList.map(({ key, label, placeholder }) => (
                 <div key={key}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.35rem" }}>
-                    <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                    <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "#475569", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                       {label}
                     </label>
                     <button
@@ -432,6 +454,7 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
                         gap: "0.25rem",
                         fontSize: "0.75rem",
                         padding: "0.1rem 0.3rem",
+                        fontWeight: 600,
                       }}
                       title="Remove field"
                     >
@@ -445,14 +468,21 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
                     onChange={handleChange}
                     placeholder={placeholder}
                     style={{
-                      width: "100%", padding: "0.7rem 1rem",
-                      background: "rgba(30,41,59,0.7)",
-                      border: "1px solid rgba(99,102,241,0.25)",
-                      borderRadius: "10px", color: "#e2e8f0",
-                      outline: "none", fontSize: "0.9rem", boxSizing: "border-box",
+                      width: "100%", padding: "0.75rem 1rem",
+                      background: "#ffffff",
+                      border: "1.5px solid #e2e8f0",
+                      borderRadius: "10px", color: "#0f172a",
+                      outline: "none", fontSize: "0.92rem", boxSizing: "border-box",
+                      transition: "border-color 0.2s, box-shadow 0.2s",
                     }}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(6,182,212,0.6)"; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(99,102,241,0.25)"; }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = "#0284c7";
+                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(2, 132, 199, 0.12)";
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = "#e2e8f0";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
                   />
                 </div>
               ))}
@@ -472,12 +502,12 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
                     type="button"
                     onClick={() => addSocialField(key)}
                     style={{
-                      background: "rgba(30, 41, 59, 0.8)",
-                      border: "1px dashed rgba(6, 182, 212, 0.4)",
-                      color: "#38bdf8",
+                      background: "#f8fafc",
+                      border: "1.5px dashed #0284c7",
+                      color: "#0284c7",
                       borderRadius: "8px",
-                      padding: "0.4rem 0.75rem",
-                      fontSize: "0.8rem",
+                      padding: "0.45rem 0.8rem",
+                      fontSize: "0.82rem",
                       fontWeight: 600,
                       cursor: "pointer",
                       display: "flex",
@@ -486,12 +516,12 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
                       transition: "all 0.15s ease",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "rgba(6, 182, 212, 0.15)";
-                      e.currentTarget.style.borderColor = "#22d3ee";
+                      e.currentTarget.style.background = "rgba(2, 132, 199, 0.1)";
+                      e.currentTarget.style.borderColor = "#0284c7";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "rgba(30, 41, 59, 0.8)";
-                      e.currentTarget.style.borderColor = "rgba(6, 182, 212, 0.4)";
+                      e.currentTarget.style.background = "#f8fafc";
+                      e.currentTarget.style.borderColor = "#0284c7";
                     }}
                   >
                     <Plus size={13} />
@@ -505,10 +535,45 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
 
         {/* Actions */}
         <div style={{ display: "flex", gap: "0.75rem", marginTop: "2rem" }}>
-          <button onClick={onClose} disabled={saving} className="btn-neon-secondary" style={{ flex: 1, justifyContent: "center" }}>
+          <button
+            onClick={onClose}
+            disabled={saving}
+            style={{
+              flex: 1,
+              padding: "0.75rem 1.5rem",
+              borderRadius: "10px",
+              background: "#f1f5f9",
+              border: "none",
+              color: "#475569",
+              fontWeight: 600,
+              fontSize: "0.95rem",
+              cursor: "pointer",
+              transition: "background 0.2s",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#e2e8f0"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#f1f5f9"}
+          >
             Cancel
           </button>
-          <button onClick={handleSave} disabled={saving} className="btn-neon-primary" style={{ flex: 2, justifyContent: "center" }}>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            style={{
+              flex: 2,
+              padding: "0.75rem 1.5rem",
+              borderRadius: "10px",
+              background: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)",
+              border: "none",
+              color: "#ffffff",
+              fontWeight: 700,
+              fontSize: "0.95rem",
+              cursor: saving ? "wait" : "pointer",
+              boxShadow: "0 4px 14px rgba(2, 132, 199, 0.25)",
+              transition: "opacity 0.2s, transform 0.2s",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = "0.95"}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
+          >
             {saving ? "Saving…" : isEdit ? "Save Changes" : "Add to Directory"}
           </button>
         </div>
