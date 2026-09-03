@@ -19,7 +19,7 @@ import {
 export default function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
-  const { isEditMode, toggleEditMode } = useAdmin();
+  const { isEditMode, toggleEditMode, setEditModeOff } = useAdmin();
   const role = (session?.user as any)?.role || "User";
   const userEmail = session?.user?.email || "admin@nexusfounders.com";
   const [profileOpen, setProfileOpen] = useState(false);
@@ -35,6 +35,13 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // When admin logs out or session is absent, turn edit mode OFF and clear storage
+  useEffect(() => {
+    if (!session || (session.user as any)?.role !== "admin") {
+      setEditModeOff();
+    }
+  }, [session, setEditModeOff]);
 
   const baseLinks = [
     { href: "/", label: "Home Page" },
@@ -227,7 +234,10 @@ export default function Navbar() {
                     {/* Logout Button */}
                     <button
                       type="button"
-                      onClick={() => signOut({ callbackUrl: "/login" })}
+                      onClick={() => {
+                        setEditModeOff();
+                        signOut({ callbackUrl: "/login" });
+                      }}
                       style={{
                         width: "100%",
                         display: "flex",

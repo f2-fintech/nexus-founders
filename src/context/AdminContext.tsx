@@ -19,6 +19,7 @@ export interface Founder {
 interface AdminContextType {
   isEditMode: boolean;
   toggleEditMode: () => void;
+  setEditModeOff: () => void;
   founders: Founder[];
   loadingFounders: boolean;
   addFounder: (f: Omit<Founder, "_id">) => Promise<void>;
@@ -34,6 +35,37 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const [founders, setFounders] = useState<Founder[]>([]);
   const [loadingFounders, setLoadingFounders] = useState(true);
 
+  // Read edit mode state from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("nexus_admin_edit_mode");
+      if (saved === "true") {
+        setIsEditMode(true);
+      }
+    } catch (e) {}
+  }, []);
+
+  const toggleEditMode = () => {
+    setIsEditMode((prev) => {
+      const next = !prev;
+      try {
+        if (next) {
+          localStorage.setItem("nexus_admin_edit_mode", "true");
+        } else {
+          localStorage.removeItem("nexus_admin_edit_mode");
+        }
+      } catch (e) {}
+      return next;
+    });
+  };
+
+  const setEditModeOff = () => {
+    setIsEditMode(false);
+    try {
+      localStorage.removeItem("nexus_admin_edit_mode");
+    } catch (e) {}
+  };
+
   const fetchFounders = async () => {
     try {
       setLoadingFounders(true);
@@ -48,8 +80,6 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => { fetchFounders(); }, []);
-
-  const toggleEditMode = () => setIsEditMode((p) => !p);
 
   const addFounder = async (f: Omit<Founder, "_id">) => {
     const res = await fetch("/api/founders", {
@@ -81,7 +111,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AdminContext.Provider value={{ isEditMode, toggleEditMode, founders, loadingFounders, addFounder, updateFounder, deleteFounder, refreshFounders: fetchFounders }}>
+    <AdminContext.Provider value={{ isEditMode, toggleEditMode, setEditModeOff, founders, loadingFounders, addFounder, updateFounder, deleteFounder, refreshFounders: fetchFounders }}>
       {children}
     </AdminContext.Provider>
   );
