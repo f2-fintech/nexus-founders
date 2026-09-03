@@ -138,6 +138,13 @@ export default function ThreePhotoCard({ photoUrl, name }: Props) {
     };
   }, [handleMouseEnter, handleMouseMove, handleMouseLeave]);
 
+  const [currentSrc, setCurrentSrc] = useState(photoUrl);
+
+  useEffect(() => {
+    setCurrentSrc(photoUrl);
+    setIsLoaded(false);
+  }, [photoUrl]);
+
   return (
     <div ref={containerRef} style={{ position: "relative", width: "100%", height: "100%", background: "#f1f5f9", overflow: "hidden" }}>
       {/* Skeleton Shimmer while loading */}
@@ -154,11 +161,15 @@ export default function ThreePhotoCard({ photoUrl, name }: Props) {
 
       {/* Static image — with lazy loading & async decoding */}
       <img
-        src={photoUrl}
+        src={currentSrc}
         alt={name}
         loading="lazy"
         decoding="async"
         onLoad={() => setIsLoaded(true)}
+        onError={() => {
+          setCurrentSrc("/images/logo.webp");
+          setIsLoaded(true);
+        }}
         style={{
           width: "100%",
           height: "100%",
