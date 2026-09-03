@@ -4,7 +4,6 @@ import { Founder, useAdmin } from "@/context/AdminContext";
 import { motion } from "framer-motion";
 import { Globe, Edit2, Trash2 } from "lucide-react";
 import { GmailIcon, MailIcon } from "@/components/common/SocialIcons";
-import ThreePhotoCard from "./ThreePhotoCard";
 
 function LinkedinIcon({ size = 15 }: { size?: number }) {
   return (
@@ -158,17 +157,22 @@ export default function FounderCard({ founder, onEdit, index }: Props) {
         </div>
       )}
 
-      {/* ── 3D Photo (Three.js on hover) ─────────────────────── */}
+      {/* ── Founder Photo ───────────────────────────────────── */}
       <div className="founder-photo-container">
-        {imgError || !founder.photo ? (
-          <img
-            src="/images/logo.webp"
-            alt={founder.name}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
-        ) : (
-          <ThreePhotoCard photoUrl={photoSrc} name={founder.name} />
-        )}
+        <img
+          src={photoSrc}
+          alt={founder.name}
+          loading="lazy"
+          decoding="async"
+          onError={() => setImgError(true)}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "top center",
+            display: "block",
+          }}
+        />
       </div>
 
       {/* ── Card body ────────────────────────────────────────── */}

@@ -98,7 +98,7 @@ export function MentorshipSection() {
           }}
         >
           <img
-            src="https://nexusfounders.com/wp-content/uploads/2024/12/Nexus-Founders-F2-Fintech--1024x682.jpg"
+            src="/images/eco3.webp"
             alt="Mentorship and Networking"
             loading="lazy"
             decoding="async"
@@ -173,7 +173,7 @@ export function KnowledgeSection() {
           }}
         >
           <img
-            src="https://nexusfounders.com/wp-content/uploads/2024/11/Nexus-Founders-images-1024x767.jpg"
+            src="/images/eco1.webp"
             alt="Knowledge Sharing Workshop"
             loading="lazy"
             decoding="async"
@@ -248,7 +248,7 @@ export function InvestmentSection() {
           }}
         >
           <img
-            src="https://nexusfounders.com/wp-content/uploads/2024/11/Nexus-Founder-Event-1024x683.jpg"
+            src="/images/eco2.webp"
             alt="Investment Opportunities"
             loading="lazy"
             decoding="async"
@@ -323,7 +323,7 @@ export function CommunitySection() {
           }}
         >
           <img
-            src="https://nexusfounders.com/wp-content/uploads/2024/11/Nexus-Founders-1024x766.jpg"
+            src="/images/eco3.webp"
             alt="Community Engagement"
             loading="lazy"
             decoding="async"

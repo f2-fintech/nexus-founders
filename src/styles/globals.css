@@ -696,7 +696,7 @@ img {
 }
 
 .founder-cyber-card:hover .founder-photo-container img {
-  transform: scale(1.03);
+  /* No hover zoom or distortion */
 }
 
 

@@ -22,6 +22,58 @@ import {
 import { TeamMemberSkeleton } from "@/components/common/Skeleton";
 import TeamModal, { TeamMemberData } from "./TeamModal";
 
+function getInitials(name: string) {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  return name.slice(0, 2).toUpperCase();
+}
+
+const AVATAR_GRADIENTS = [
+  "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)",
+  "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)",
+  "linear-gradient(135deg, #ec4899 0%, #be185d 100%)",
+  "linear-gradient(135deg, #10b981 0%, #047857 100%)",
+];
+
+function TeamMemberAvatar({ photo, name, index }: { photo?: string; name: string; index: number }) {
+  const [error, setError] = useState(false);
+  const initials = getInitials(name);
+  const gradient = AVATAR_GRADIENTS[index % AVATAR_GRADIENTS.length];
+
+  if (!photo || error) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          background: gradient,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#ffffff",
+          fontWeight: 800,
+          fontSize: "2.3rem",
+          letterSpacing: "1px",
+          userSelect: "none",
+          boxShadow: "inset 0 2px 8px rgba(255,255,255,0.25)",
+        }}
+      >
+        {initials}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={photo}
+      alt={name}
+      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+      loading="lazy"
+      onError={() => setError(true)}
+    />
+  );
+}
+
 export default function CoordinationTeam() {
   const { isEditMode } = useAdmin();
   const [members, setMembers] = useState<TeamMemberData[]>([]);
@@ -257,16 +309,7 @@ export default function CoordinationTeam() {
                     background: "#f8fafc",
                   }}
                 >
-                  <img
-                    src={member.photo || "/images/avatar-placeholder.webp"}
-                    alt={member.name}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    loading="lazy"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "https://nexusfounders.com/wp-content/uploads/2026/08/amit.jpg_cropped-300x300.jpeg";
-                    }}
-                  />
+                  <TeamMemberAvatar photo={member.photo} name={member.name} index={i} />
                 </div>
 
                 {/* Name */}

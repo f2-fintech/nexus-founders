@@ -4,13 +4,12 @@ import { useAdmin } from "@/context/AdminContext";
 import { motion } from "framer-motion";
 
 const galleryImages = [
-  { src: "https://nexusfounders.com/wp-content/uploads/2024/11/Nexus-Founders-images-1-1024x767.jpg", alt: "Nexus Founders Gathering" },
-  { src: "https://nexusfounders.com/wp-content/uploads/2024/11/Nexus-Founders-1-1024x766.jpg", alt: "Nexus Founders Session" },
-  { src: "https://nexusfounders.com/wp-content/uploads/2024/11/IMG_5401-1-1024x683.jpg", alt: "Nexus Founders Network" },
-  { src: "https://nexusfounders.com/wp-content/uploads/2024/12/Nexus-Founders-F2-Fintech--1024x682.jpg", alt: "Nexus Founders F2 Fintech" },
-  { src: "https://nexusfounders.com/wp-content/uploads/2024/12/Nexus-F2-FINETCH-1024x682.jpg", alt: "Nexus F2 Fintech Community" },
-  { src: "https://nexusfounders.com/wp-content/uploads/2024/12/Nexus-Founders-F2-FIntech01-1024x576.jpg", alt: "Nexus Founders Dialogue" },
-  { src: "https://nexusfounders.com/wp-content/uploads/2024/12/DSC_0869-1024x683.jpg", alt: "Nexus Founders Event" },
+  { src: "/images/eco1.webp", alt: "Nexus Founders Gathering" },
+  { src: "/images/eco2.webp", alt: "Nexus Founders Session" },
+  { src: "/images/eco3.webp", alt: "Nexus Founders Network" },
+  { src: "/images/eco1.webp", alt: "Nexus Founders F2 Fintech" },
+  { src: "/images/eco2.webp", alt: "Nexus F2 Fintech Community" },
+  { src: "/images/eco3.webp", alt: "Nexus Founders Dialogue" },
 ];
 
 export default function SustainableEcosystem() {

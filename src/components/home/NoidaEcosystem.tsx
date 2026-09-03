@@ -6,19 +6,19 @@ import { Cpu, Users, TrendingUp } from "lucide-react";
 
 const cards = [
   {
-    img: "https://nexusfounders.com/wp-content/uploads/2024/12/DSC_0725-1-scaled.jpg",
+    img: "/images/eco1.webp",
     title: "Emerging Tech Hub",
     desc: "Noida is rapidly becoming a hub for technology companies, attracting entrepreneurs and investors from across the country.",
     icon: <Cpu size={22} className="text-cyan-400" />,
   },
   {
-    img: "https://nexusfounders.com/wp-content/uploads/2024/11/Nexus-Founders.jpg",
+    img: "/images/eco2.webp",
     title: "Vibrant Community",
     desc: "The sector is home to a diverse range of businesses, from startups to established enterprises, fostering a dynamic and supportive environment.",
     icon: <Users size={22} className="text-indigo-400" />,
   },
   {
-    img: "https://nexusfounders.com/wp-content/uploads/2024/12/Nexus-Founders-F2-Fintech-.jpg",
+    img: "/images/eco3.webp",
     title: "Growth Potential",
     desc: "With its strategic location and growing infrastructure, Noida offers ample opportunities for businesses to flourish and expand.",
     icon: <TrendingUp size={22} className="text-purple-400" />,
