@@ -1,10 +1,14 @@
-﻿/** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'nexusfounders.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.amazonaws.com',
       },
     ],
   },

@@ -102,6 +102,7 @@ export default function TeamModal({ member, onSave, onClose, saveError }: TeamMo
       const webpFile = await convertToWebP(file, 0.9);
       const formData = new FormData();
       formData.append("file", webpFile);
+      formData.append("folder", "nexus-founders/team");
 
       const res = await fetch("/api/upload", {
         method: "POST",

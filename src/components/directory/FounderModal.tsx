@@ -45,6 +45,7 @@ function PhotoUploader({
       const webpFile = await convertToWebP(file, 0.9);
       const fd = new FormData();
       fd.append("file", webpFile);
+      fd.append("folder", "nexus-founders/founders");
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const json = await res.json();
       if (!json.success) throw new Error(json.error || "Upload failed");
