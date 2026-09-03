@@ -1,0 +1,39 @@
+import { NextRequest, NextResponse } from "next/server";
+import { connectDB } from "@/lib/mongodb";
+import Founder from "@/models/Founder";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
+
+function isAdmin(session: any) {
+  return session && session.user?.role === "admin";
+}
+
+// PUT update founder
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!isAdmin(session)) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  try {
+    await connectDB();
+    const body = await req.json();
+    const founder = await Founder.findByIdAndUpdate(params.id, body, { new: true, runValidators: true });
+    if (!founder) return NextResponse.json({ success: false, error: "Founder not found" }, { status: 404 });
+    return NextResponse.json({ success: true, data: founder });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error?.message || "Failed to update founder" }, { status: 500 });
+  }
+}
+
+// DELETE founder (soft delete)
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
+  if (!isAdmin(session)) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  try {
+    await connectDB();
+    await Founder.findByIdAndUpdate(params.id, { active: false });
+    return NextResponse.json({ success: true, message: "Founder removed" });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error?.message || "Failed to delete founder" }, { status: 500 });
+  }
+}
