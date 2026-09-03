@@ -1,17 +1,29 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
-const region = process.env.AWS_REGION || "eu-north-1";
-const accessKeyId = process.env.AWS_ACCESS_KEY_ID || "AKIA6ODU4552YNVUD37N";
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY || "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";
-const bucketName = process.env.AWS_BUCKET_NAME || "f2fintechcustomerdocs";
+function getS3Client() {
+  const region = process.env.AWS_REGION || "eu-north-1";
+  const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+  const bucketName = process.env.AWS_BUCKET_NAME;
 
-export const s3Client = new S3Client({
-  region,
-  credentials: {
-    accessKeyId,
-    secretAccessKey,
-  },
-});
+  if (!accessKeyId || !secretAccessKey || !bucketName) {
+    throw new Error(
+      "AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_BUCKET_NAME) are not configured in environment variables."
+    );
+  }
+
+  return {
+    client: new S3Client({
+      region,
+      credentials: {
+        accessKeyId,
+        secretAccessKey,
+      },
+    }),
+    region,
+    bucketName,
+  };
+}
 
 export async function uploadBufferToS3(
   buffer: Buffer,
@@ -19,6 +31,7 @@ export async function uploadBufferToS3(
   fileName: string,
   contentType: string = "image/webp"
 ): Promise<string> {
+  const { client, region, bucketName } = getS3Client();
   const cleanFolder = folder.replace(/^\/+|\/+$/g, "");
   const key = `${cleanFolder}/${Date.now()}_${fileName}`;
 
@@ -29,6 +42,6 @@ export async function uploadBufferToS3(
     ContentType: contentType,
   };
 
-  await s3Client.send(new PutObjectCommand(params));
+  await client.send(new PutObjectCommand(params));
   return `https://${bucketName}.s3.${region}.amazonaws.com/${key}`;
 }
