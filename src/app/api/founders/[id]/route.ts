@@ -25,14 +25,15 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-// DELETE founder (soft delete)
+// DELETE founder (permanently remove from database)
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
   if (!isAdmin(session)) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   try {
     await connectDB();
-    await Founder.findByIdAndUpdate(params.id, { active: false });
-    return NextResponse.json({ success: true, message: "Founder removed" });
+    const deleted = await Founder.findByIdAndDelete(params.id);
+    if (!deleted) return NextResponse.json({ success: false, error: "Founder not found" }, { status: 404 });
+    return NextResponse.json({ success: true, message: "Founder deleted from database", data: { _id: params.id } });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error?.message || "Failed to delete founder" }, { status: 500 });
   }
