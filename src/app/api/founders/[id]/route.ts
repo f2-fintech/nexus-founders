@@ -4,6 +4,7 @@ import Founder from "@/models/Founder";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { invalidateFoundersCache } from "@/lib/foundersCache";
+import { invalidatePhotoCache } from "@/lib/photoCache";
 
 export const dynamic = "force-dynamic";
 
@@ -18,9 +19,16 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   try {
     await connectDB();
     const body = await req.json();
+
+    // If photo is the endpoint URL, don't overwrite the existing database photo
+    if (body.photo && typeof body.photo === "string" && body.photo.startsWith("/api/founders/")) {
+      delete body.photo;
+    }
+
     const founder = await Founder.findByIdAndUpdate(params.id, body, { new: true, runValidators: true });
     if (!founder) return NextResponse.json({ success: false, error: "Founder not found" }, { status: 404 });
     invalidateFoundersCache();
+    invalidatePhotoCache(params.id);
     return NextResponse.json({ success: true, data: founder });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error?.message || "Failed to update founder" }, { status: 500 });
@@ -36,6 +44,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     const deleted = await Founder.findByIdAndDelete(params.id);
     if (!deleted) return NextResponse.json({ success: false, error: "Founder not found" }, { status: 404 });
     invalidateFoundersCache();
+    invalidatePhotoCache(params.id);
     return NextResponse.json({ success: true, message: "Founder deleted from database", data: { _id: params.id } });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error?.message || "Failed to delete founder" }, { status: 500 });
