@@ -393,21 +393,37 @@ export default function DirectoryPage() {
         </section>
 
         {/* ── Directory Content & Search Bar ───────────────────────────────── */}
-        <div className="section-wrapper" style={{ paddingTop: "3rem" }}>
+        <div className="section-wrapper" style={{ paddingTop: "1.5rem", maxWidth: "100%", width: "100%", boxSizing: "border-box" }}>
           {/* Toolbar */}
-          <div className="directory-toolbar" style={{
-            position: "relative",
-            background: "rgba(255, 255, 255, 0.94)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            borderRadius: "18px",
-            marginBottom: "2.5rem",
-            padding: "1rem 1.4rem",
-            boxShadow: "0 8px 30px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.05)",
-            border: "1px solid rgba(0, 0, 0, 0.06)",
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: isEditMode ? "space-between" : "flex-end",
+            gap: "1rem",
+            flexWrap: "wrap",
+            marginBottom: "1rem",
+            width: "100%",
+            boxSizing: "border-box",
           }}>
-            <div className="search-input-wrapper">
-              <Search className="search-icon" size={18} />
+            {isEditMode && (
+              <button
+                onClick={openAdd}
+                className="btn-neon-primary"
+                style={{ padding: "0.65rem 1.4rem", fontSize: "0.9rem", whiteSpace: "nowrap" }}
+              >
+                <UserPlus size={16} />
+                <span>Add Founder</span>
+              </button>
+            )}
+
+            <div className="search-input-wrapper" style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: "360px",
+              marginLeft: isEditMode ? "0" : "auto",
+              boxSizing: "border-box",
+            }}>
+              <Search className="search-icon" size={17} />
               <input
                 type="text"
                 placeholder="Search leaders by name, role, or company..."
@@ -415,21 +431,30 @@ export default function DirectoryPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="search-input"
               />
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-              <span style={{ color: "var(--text-muted)", fontSize: "0.95rem", fontWeight: 600, whiteSpace: "nowrap" }}>
-                Showing <strong style={{ color: "#0f172a" }}>{founders.length}</strong> of <strong style={{ color: "#0f172a" }}>{totalFounders}</strong> leaders
-              </span>
-
-              {isEditMode && (
+              {searchQuery && (
                 <button
-                  onClick={openAdd}
-                  className="btn-neon-primary"
-                  style={{ padding: "0.65rem 1.4rem", fontSize: "0.9rem", whiteSpace: "nowrap" }}
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  style={{
+                    position: "absolute",
+                    right: "0.85rem",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "rgba(0, 0, 0, 0.06)",
+                    border: "none",
+                    borderRadius: "50%",
+                    width: "20px",
+                    height: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    color: "#64748b",
+                    fontSize: "0.75rem",
+                  }}
+                  title="Clear search"
                 >
-                  <UserPlus size={16} />
-                  <span>Add Founder</span>
+                  ✕
                 </button>
               )}
             </div>
