@@ -15,7 +15,7 @@ export async function GET(
     // Check memory cache first (instant sub-millisecond return)
     const cached = getCachedPhoto(id);
     if (cached) {
-      return new NextResponse(cached.buffer, {
+      return new NextResponse(new Uint8Array(cached.buffer), {
         status: 200,
         headers: {
           "Content-Type": cached.contentType,
@@ -48,7 +48,7 @@ export async function GET(
         // Cache in memory
         setCachedPhoto(id, { buffer, contentType });
 
-        return new NextResponse(buffer, {
+        return new NextResponse(new Uint8Array(buffer), {
           status: 200,
           headers: {
             "Content-Type": contentType,
