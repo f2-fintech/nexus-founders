@@ -48,7 +48,7 @@ export default function NoidaEcosystem() {
         </h2>
       </motion.div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: "2rem" }}>
         {cards.map((c, i) => (
           <motion.div
             key={i}

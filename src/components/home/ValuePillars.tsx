@@ -37,7 +37,7 @@ export default function ValuePillars() {
         <h2 className="section-heading">Our Foundational <span className="gradient-text-cyan">Pillars</span></h2>
       </motion.div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: "2rem" }}>
         {items.map((item, i) => (
           <motion.div
             key={i}

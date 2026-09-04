@@ -18,7 +18,7 @@ export default function HomePage() {
   return (
     <>
       <Navbar />
-      <main style={{ position: "relative", zIndex: 2 }}>
+      <main style={{ position: "relative", zIndex: 2, overflowX: "hidden", maxWidth: "100%", width: "100%" }}>
         <HeroSection />
         <NoidaEcosystem />
         <FosteringGrowth />
