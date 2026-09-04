@@ -1248,9 +1248,27 @@ img {
   .section-wrapper { padding: 4rem 1rem; }
   .split-story-grid, .split-story-grid.reverse { grid-template-columns: 1fr; gap: 2.5rem; direction: ltr; }
   .founder-cyber-grid { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+  .founder-photo-container {
+    height: 330px;
+  }
   .directory-stats-capsule { grid-template-columns: 1fr; gap: 1.5rem; }
   .stat-divider-vertical { display: none; }
   .event-cyber-card { grid-template-columns: 1fr; text-align: center; }
+}
+
+@media (max-width: 580px) {
+  .founder-cyber-grid {
+    grid-template-columns: 1fr;
+    max-width: 440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .founder-photo-container {
+    height: clamp(360px, 98vw, 420px);
+  }
+  .founder-photo-container img {
+    object-position: center 10%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1273,6 +1291,12 @@ img {
     font-size: 0.8rem;
   }
   .founder-cyber-grid { grid-template-columns: 1fr; }
+  .founder-photo-container {
+    height: clamp(370px, 102vw, 430px);
+  }
+  .founder-photo-container img {
+    object-position: center 10%;
+  }
 }
 
 /* ── SKELETON SHIMMER ── */
