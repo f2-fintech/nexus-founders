@@ -31,7 +31,7 @@ export default function Footer() {
           <LinkedinIcon size={20} />
         </a>
         <a
-          href="https://www.instagram.com/nexus.founders"
+          href="https://www.instagram.com/nexusfounders?igsi=b2MxM2Vvc2pnMnV0"
           target="_blank"
           rel="noopener noreferrer"
           className="footer-social-btn"

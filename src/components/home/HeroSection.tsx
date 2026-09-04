@@ -30,7 +30,7 @@ export default function HeroSection() {
               contentEditable={isEditMode}
               suppressContentEditableWarning
             >
-              Nexus Founders 16th Edition–7th Aug 2026 at IIM Lucknow Noida Campus, Sector 62
+              Nexus Founders 18th Edition - 26th September 2026 at Moonlit Infra
             </span>
           </div>
 
