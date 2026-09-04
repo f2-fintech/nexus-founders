@@ -12,8 +12,11 @@ import {
   LogOut,
   Edit3,
   ChevronDown,
-  CheckCircle,
-  XCircle,
+  Menu,
+  X,
+  Home,
+  Users,
+  LogIn,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -23,17 +26,41 @@ export default function Navbar() {
   const role = (session?.user as any)?.role || "User";
   const userEmail = session?.user?.email || "admin@nexusfounders.com";
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+  const navbarContainerRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on click outside
+  // Close dropdowns on route change
+  useEffect(() => {
+    setProfileOpen(false);
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Close dropdowns on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (profileRef.current && !profileRef.current.contains(target)) {
         setProfileOpen(false);
+      }
+      if (navbarContainerRef.current && !navbarContainerRef.current.contains(target)) {
+        setMobileMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Close on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setProfileOpen(false);
+        setMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   // When admin logs out or session is absent, turn edit mode OFF and clear storage
@@ -44,13 +71,13 @@ export default function Navbar() {
   }, [session, setEditModeOff]);
 
   const baseLinks = [
-    { href: "/", label: "Home Page" },
-    { href: "/directory", label: "Directory" },
-    { href: "/join", label: "Join Us" },
+    { href: "/", label: "Home Page", icon: Home },
+    { href: "/directory", label: "Directory", icon: Users },
+    { href: "/join", label: "Join Us", icon: Sparkles },
   ];
 
   return (
-    <header className="navbar-wrapper">
+    <header className="navbar-wrapper" ref={navbarContainerRef}>
       <motion.nav
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -58,12 +85,12 @@ export default function Navbar() {
         className="navbar-capsule"
       >
         {/* Brand Logo */}
-        <Link href="/" className="navbar-logo">
+        <Link href="/" className="navbar-logo" onClick={() => setMobileMenuOpen(false)}>
           <img src="/images/logo.webp" alt="Nexus Founders" />
         </Link>
 
-        {/* 4 Tabs on left/center when logged in as admin */}
-        <div className="navbar-links" style={{ position: "relative" }}>
+        {/* ── Desktop Navigation Links ── */}
+        <div className="navbar-links desktop-only" style={{ position: "relative" }}>
           {baseLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -85,7 +112,7 @@ export default function Navbar() {
             );
           })}
 
-          {/* 4th Tab: Profile (for logged in admin/user) */}
+          {/* Profile Tab (for logged in admin/user) */}
           {session ? (
             <div ref={profileRef} style={{ position: "relative", display: "inline-block" }}>
               <button
@@ -270,9 +297,9 @@ export default function Navbar() {
           ) : null}
         </div>
 
-        {/* Right side: Login button when logged out */}
+        {/* Right side: Login button when logged out (Desktop only) */}
         {!session && (
-          <div className="navbar-actions">
+          <div className="navbar-actions desktop-only">
             <Link
               href="/login"
               className="btn-neon-primary"
@@ -283,7 +310,142 @@ export default function Navbar() {
             </Link>
           </div>
         )}
+
+        {/* ── Mobile & Tablet Controls (<= 860px) ── */}
+        <div className="navbar-mobile-controls">
+          {session && (
+            <div
+              className="navbar-mobile-user-badge"
+              title={`${session.user?.name || userEmail} (${role})`}
+            >
+              {userEmail[0].toUpperCase()}
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="navbar-mobile-toggle"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </motion.nav>
+
+      {/* ── Mobile Backdrop Overlay ── */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setMobileMenuOpen(false)}
+            className="navbar-mobile-backdrop"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* ── Mobile / Tablet Dropdown Drawer (<= 860px) ── */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="navbar-mobile-menu"
+          >
+            {/* Navigation Links with Icons */}
+            <div className="mobile-nav-links">
+              {baseLinks.map((link) => {
+                const isActive = pathname === link.href;
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`mobile-nav-link ${isActive ? "active" : ""}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <span className="mobile-nav-icon">
+                      <Icon size={18} />
+                    </span>
+                    <span className="mobile-nav-label">{link.label}</span>
+                    {isActive && <span className="mobile-nav-active-dot" />}
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="mobile-nav-divider" />
+
+            {/* Profile or Login section */}
+            {session ? (
+              <div className="mobile-profile-section">
+                <div className="mobile-user-card">
+                  <div className="mobile-user-avatar">
+                    {userEmail[0].toUpperCase()}
+                  </div>
+                  <div className="mobile-user-details">
+                    <div className="mobile-user-name">{session.user?.name || "Administrator"}</div>
+                    <div className="mobile-user-email">{userEmail}</div>
+                    <div className="mobile-user-badge">
+                      {role === "admin" ? <Shield size={12} /> : <User size={12} />}
+                      <span>{role}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {role === "admin" && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      toggleEditMode();
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`mobile-edit-mode-btn ${isEditMode ? "active" : ""}`}
+                  >
+                    <div className="mobile-edit-mode-left">
+                      <Edit3 size={16} />
+                      <span>Edit Mode</span>
+                    </div>
+                    <span className="mobile-edit-mode-pill">
+                      {isEditMode ? "ON" : "OFF"}
+                    </span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditModeOff();
+                    setMobileMenuOpen(false);
+                    signOut({ callbackUrl: "/login" });
+                  }}
+                  className="mobile-logout-btn"
+                >
+                  <LogOut size={16} />
+                  <span>Logout</span>
+                </button>
+              </div>
+            ) : (
+              <div className="mobile-auth-section">
+                <Link
+                  href="/login"
+                  className="mobile-login-btn"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <LogIn size={17} />
+                  <span>Login</span>
+                </Link>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
