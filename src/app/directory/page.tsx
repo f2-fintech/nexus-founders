@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FounderCard from "@/components/directory/FounderCard";
@@ -9,17 +9,109 @@ import { Founder, useAdmin } from "@/context/AdminContext";
 import { motion } from "framer-motion";
 import { Search, UserPlus, Sparkles, Users, MapPin, Calendar, Loader2 } from "lucide-react";
 
-const INITIAL_DISPLAY_COUNT = 28;
-const CHUNK_SIZE = 24;
+const PAGE_SIZE = 16;
+
+// In-memory module cache for instant client-side route transitions
+let cachedDirectoryFounders: Founder[] = [];
+let cachedDirectoryTotal = 0;
+let cachedDirectoryHasMore = true;
 
 export default function DirectoryPage() {
-  const { isEditMode, founders, loadingFounders, addFounder, updateFounder } = useAdmin();
+  const { isEditMode, addFounder, updateFounder } = useAdmin();
   const [modalOpen, setModalOpen] = useState(false);
   const [editFounder, setEditFounder] = useState<Founder | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
   const [saveError, setSaveError] = useState("");
-  const [displayCount, setDisplayCount] = useState(INITIAL_DISPLAY_COUNT);
+
+  const [founders, setFounders] = useState<Founder[]>(() => cachedDirectoryFounders);
+  const [totalFounders, setTotalFounders] = useState<number>(() => cachedDirectoryTotal);
+  const [page, setPage] = useState<number>(1);
+  const [hasMore, setHasMore] = useState<boolean>(() => cachedDirectoryHasMore);
+  const [loadingInitial, setLoadingInitial] = useState<boolean>(() => cachedDirectoryFounders.length === 0);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Debounce search input by 350ms so user typing doesn't spam backend
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Fetch page from backend (16 items per page)
+  const fetchPage = useCallback(async (pageNum: number, search: string, isInitial: boolean) => {
+    // Only show skeleton on initial load if no cached data exists
+    if (isInitial && cachedDirectoryFounders.length === 0) {
+      setLoadingInitial(true);
+    } else if (!isInitial) {
+      setLoadingMore(true);
+    }
+
+    try {
+      const params = new URLSearchParams({
+        page: pageNum.toString(),
+        limit: PAGE_SIZE.toString(),
+      });
+      if (search) params.set("search", search);
+
+      const res = await fetch(`/api/founders?${params.toString()}`);
+      const json = await res.json();
+
+      if (json.success && Array.isArray(json.data)) {
+        if (isInitial || pageNum === 1) {
+          setFounders(json.data);
+          if (!search) {
+            cachedDirectoryFounders = json.data;
+            cachedDirectoryTotal = json.pagination?.total ?? 0;
+            cachedDirectoryHasMore = Boolean(json.pagination?.hasMore);
+          }
+        } else {
+          // Avoid duplicate keys if items shifted
+          setFounders((prev) => {
+            const existingIds = new Set(prev.map((f) => f._id));
+            const newItems = json.data.filter((f: Founder) => !existingIds.has(f._id));
+            return [...prev, ...newItems];
+          });
+        }
+        setPage(pageNum);
+        setHasMore(Boolean(json.pagination?.hasMore));
+        setTotalFounders(json.pagination?.total ?? 0);
+      }
+    } catch (err) {
+      console.error("Failed to load founders", err);
+    } finally {
+      setLoadingInitial(false);
+      setLoadingMore(false);
+    }
+  }, []);
+
+  // Fetch first page on mount or whenever search query changes
+  useEffect(() => {
+    setPage(1);
+    setHasMore(true);
+    fetchPage(1, debouncedSearch, true);
+  }, [debouncedSearch, fetchPage]);
+
+  // Infinite scroll IntersectionObserver: loads next 10 founders when sentinel is visible
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingInitial && !loadingMore) {
+          fetchPage(page + 1, debouncedSearch, false);
+        }
+      },
+      { rootMargin: "300px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, loadingInitial, loadingMore, page, debouncedSearch, fetchPage]);
 
   const openAdd = () => { setEditFounder(null); setModalOpen(true); };
   const openEdit = (f: Founder) => { setEditFounder(f); setModalOpen(true); };
@@ -28,9 +120,12 @@ export default function DirectoryPage() {
     setSaveError("");
     try {
       if ("_id" in f && f._id) {
-        await updateFounder(f as Founder);
+        const updated = await updateFounder(f as Founder);
+        setFounders((prev) => prev.map((item) => (item._id === updated._id ? updated : item)));
       } else {
-        await addFounder(f as Omit<Founder, "_id">);
+        const created = await addFounder(f as Omit<Founder, "_id">);
+        setFounders((prev) => [created, ...prev]);
+        setTotalFounders((prev) => prev + 1);
       }
       setModalOpen(false);
     } catch (err: any) {
@@ -38,47 +133,16 @@ export default function DirectoryPage() {
     }
   };
 
-  const filteredFounders = useMemo(() => {
-    if (!searchQuery.trim()) return founders;
-    const q = searchQuery.toLowerCase();
-    return founders.filter(
-      (f) =>
-        f.name.toLowerCase().includes(q) ||
-        f.company.toLowerCase().includes(q) ||
-        f.role.toLowerCase().includes(q)
-    );
-  }, [founders, searchQuery]);
-
-  // Reset display count on new search
-  useEffect(() => {
-    setDisplayCount(INITIAL_DISPLAY_COUNT);
-  }, [searchQuery]);
-
-  // Progressive infinite scroll
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setDisplayCount((prev) => Math.min(prev + CHUNK_SIZE, filteredFounders.length));
-        }
-      },
-      { rootMargin: "300px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [filteredFounders.length, displayCount]);
-
-  const visibleFounders = useMemo(() => {
-    return filteredFounders.slice(0, displayCount);
-  }, [filteredFounders, displayCount]);
+  const handleDeleteFounder = (id: string) => {
+    setFounders((prev) => prev.filter((f) => f._id !== id));
+    setTotalFounders((prev) => Math.max(0, prev - 1));
+  };
 
   return (
     <>
       <Navbar />
       <main style={{ minHeight: "80vh", position: "relative", zIndex: 2, paddingBottom: "5rem" }}>
-        {/* ── Directoy Hero Section ────────────────────────────────────────── */}
+        {/* ── Directory Hero Section ────────────────────────────────────────── */}
         <section style={{
           padding: "5rem 1.5rem 2.5rem",
           textAlign: "center",
@@ -229,7 +293,7 @@ export default function DirectoryPage() {
                   WebkitTextFillColor: "transparent",
                   fontFamily: "var(--font-outfit), sans-serif",
                 }}>
-                  {founders.length > 0 ? `${founders.length}+` : "180+"}
+                  {totalFounders > 0 ? `${totalFounders}+` : "180+"}
                 </div>
                 <div style={{ fontSize: "0.85rem", color: "#94a3b8", marginTop: "0.3rem" }}>
                   Verified CEOs &amp; Leaders
@@ -352,7 +416,7 @@ export default function DirectoryPage() {
 
             <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
               <span style={{ color: "var(--text-muted)", fontSize: "0.95rem", fontWeight: 600, whiteSpace: "nowrap" }}>
-                Showing <strong style={{ color: "#0f172a" }}>{filteredFounders.length}</strong> leaders
+                Showing <strong style={{ color: "#0f172a" }}>{founders.length}</strong> of <strong style={{ color: "#0f172a" }}>{totalFounders}</strong> leaders
               </span>
 
               {isEditMode && (
@@ -368,13 +432,14 @@ export default function DirectoryPage() {
             </div>
           </div>
 
-          {loadingFounders ? (
+          {/* Initial loading skeletons */}
+          {loadingInitial ? (
             <div className="founder-cyber-grid">
-              {Array.from({ length: 12 }).map((_, idx) => (
+              {Array.from({ length: PAGE_SIZE }).map((_, idx) => (
                 <FounderCardSkeleton key={`skeleton-${idx}`} />
               ))}
             </div>
-          ) : filteredFounders.length === 0 ? (
+          ) : founders.length === 0 ? (
             <div style={{ textAlign: "center", padding: "6rem 2rem", color: "var(--text-secondary)" }}>
               <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🔍</div>
               <p style={{ fontSize: "1.2rem", fontWeight: 600 }}>No founders found for &quot;{searchQuery}&quot;</p>
@@ -382,31 +447,66 @@ export default function DirectoryPage() {
           ) : (
             <>
               <div className="founder-cyber-grid">
-                {visibleFounders.map((f, i) => (
-                  <FounderCard key={f._id} founder={f} onEdit={openEdit} index={i} />
+                {founders.map((f, i) => (
+                  <FounderCard
+                    key={f._id}
+                    founder={f}
+                    onEdit={openEdit}
+                    onDelete={handleDeleteFounder}
+                    index={i}
+                  />
                 ))}
               </div>
 
-              {/* Progressive loading sentinel */}
-              {displayCount < filteredFounders.length && (
-                <div
-                  ref={sentinelRef}
-                  style={{
-                    textAlign: "center",
-                    padding: "3.5rem 1rem",
-                    display: "flex",
-                    justifyContent: "center",
+              {/* Infinite scroll sentinel & bottom loader */}
+              <div
+                ref={sentinelRef}
+                style={{
+                  textAlign: "center",
+                  padding: "3.5rem 1rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.8rem",
+                  color: "#64748b",
+                  fontSize: "0.95rem",
+                  fontWeight: 600,
+                  minHeight: "90px",
+                }}
+              >
+                {loadingMore && (
+                  <div style={{
+                    display: "inline-flex",
                     alignItems: "center",
-                    gap: "0.6rem",
-                    color: "#64748b",
-                    fontSize: "0.95rem",
-                    fontWeight: 600,
-                  }}
-                >
-                  <Loader2 size={20} className="animate-spin text-cyan-600" />
-                  <span>Loading more leaders ({visibleFounders.length} / {filteredFounders.length})...</span>
-                </div>
-              )}
+                    gap: "0.7rem",
+                    padding: "0.6rem 1.4rem",
+                    background: "rgba(2, 132, 199, 0.08)",
+                    border: "1px solid rgba(2, 132, 199, 0.2)",
+                    borderRadius: "30px",
+                    color: "#0284c7",
+                  }}>
+                    <Loader2 size={18} className="animate-spin text-cyan-600" />
+                    <span>Loading more leaders ({founders.length} / {totalFounders})...</span>
+                  </div>
+                )}
+                {!hasMore && founders.length > 0 && (
+                  <div style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    padding: "0.5rem 1.4rem",
+                    background: "rgba(2, 132, 199, 0.05)",
+                    border: "1px solid rgba(2, 132, 199, 0.15)",
+                    borderRadius: "30px",
+                    color: "#0369a1",
+                    fontSize: "0.85rem",
+                  }}>
+                    <Sparkles size={14} className="text-cyan-600" />
+                    <span>All {totalFounders} leaders loaded</span>
+                  </div>
+                )}
+              </div>
             </>
           )}
         </div>

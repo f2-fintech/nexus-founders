@@ -39,6 +39,9 @@ const TeamMemberSchema = new Schema<ITeamMember>(
   { timestamps: true }
 );
 
+// Index on order for fast sorted fetches
+TeamMemberSchema.index({ order: 1 });
+
 const TeamMember: Model<ITeamMember> =
   mongoose.models.TeamMember || mongoose.model<ITeamMember>("TeamMember", TeamMemberSchema);
 

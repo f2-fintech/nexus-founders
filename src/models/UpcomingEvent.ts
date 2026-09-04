@@ -31,6 +31,9 @@ const UpcomingEventSchema = new Schema<IUpcomingEvent>(
   { timestamps: true }
 );
 
+// Compound index matches the primary query: isActive filter + eventDate sort
+UpcomingEventSchema.index({ isActive: 1, eventDate: 1 });
+
 const UpcomingEvent: Model<IUpcomingEvent> =
   mongoose.models.UpcomingEvent ||
   mongoose.model<IUpcomingEvent>("UpcomingEvent", UpcomingEventSchema);

@@ -57,14 +57,20 @@ const defaultTeam = [
 export async function GET() {
   try {
     await connectDB();
-    let members = await TeamMember.find().sort({ order: 1, createdAt: 1 }).lean();
+    let members = await TeamMember.find()
+      .select("name designation description photo socialLinks order")
+      .sort({ order: 1, createdAt: 1 })
+      .lean();
 
     if (members.length === 0) {
-      await TeamMember.insertMany(defaultTeam);
-      members = await TeamMember.find().sort({ order: 1, createdAt: 1 }).lean();
+      // insertMany returns the created docs — reuse them, no second query needed
+      const inserted = await TeamMember.insertMany(defaultTeam);
+      members = inserted.map((doc: any) => doc.toObject ? doc.toObject() : doc);
     }
 
-    return NextResponse.json({ success: true, data: members });
+    const response = NextResponse.json({ success: true, data: members });
+    response.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=120");
+    return response;
   } catch (error: any) {
     console.error("GET /api/team error:", error);
     return NextResponse.json({ success: false, error: error?.message || "Failed to fetch team members" }, { status: 500 });
