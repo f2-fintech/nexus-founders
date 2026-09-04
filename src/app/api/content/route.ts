@@ -10,10 +10,13 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     await connectDB();
-    const content = await SiteContent.find({}).lean();
+    // Only fetch key+value — client never needs type/section/label/updatedBy
+    const content = await SiteContent.find({}).select("key value").lean();
     const map: Record<string, string> = {};
     content.forEach((c: any) => { map[c.key] = c.value; });
-    return NextResponse.json({ success: true, data: map });
+    const response = NextResponse.json({ success: true, data: map });
+    response.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=120");
+    return response;
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error?.message || "Failed to fetch content" }, { status: 500 });
   }

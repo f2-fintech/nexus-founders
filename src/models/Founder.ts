@@ -35,8 +35,10 @@ const FounderSchema = new Schema<IFounder>(
   { timestamps: true }
 );
 
-FounderSchema.index({ order: 1 });
-FounderSchema.index({ active: 1 });
+// Compound index matches the primary query: active filter + order+createdAt sort
+FounderSchema.index({ active: 1, order: 1, createdAt: 1 });
+// Text index enables fast server-side search (faster than regex $or scans)
+FounderSchema.index({ name: "text", company: "text", role: "text" });
 
 const Founder: Model<IFounder> = mongoose.models.Founder || mongoose.model<IFounder>("Founder", FounderSchema);
 export default Founder;

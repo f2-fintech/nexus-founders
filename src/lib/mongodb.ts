@@ -30,6 +30,9 @@ export async function connectDB() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      maxPoolSize: 10,              // Allow up to 10 concurrent connections
+      serverSelectionTimeoutMS: 5000, // Fail fast if Atlas is unreachable
+      socketTimeoutMS: 45000,       // Disconnect idle sockets after 45s
     };
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {
       cached.conn = m;

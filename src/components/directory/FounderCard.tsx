@@ -48,10 +48,11 @@ function YoutubeIcon({ size = 15 }: { size?: number }) {
 interface Props {
   founder: Founder;
   onEdit: (f: Founder) => void;
+  onDelete?: (id: string) => void;
   index: number;
 }
 
-export default function FounderCard({ founder, onEdit, index }: Props) {
+export default function FounderCard({ founder, onEdit, onDelete, index }: Props) {
   const { isEditMode, deleteFounder } = useAdmin();
   const [imgError, setImgError] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -61,6 +62,7 @@ export default function FounderCard({ founder, onEdit, index }: Props) {
     if (!confirm(`Remove ${founder.name} from directory?`)) return;
     try {
       await deleteFounder(founder._id);
+      onDelete?.(founder._id);
     } catch (err: any) {
       alert(err?.message || "Failed to delete founder. Please try again.");
     }

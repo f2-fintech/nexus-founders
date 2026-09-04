@@ -31,7 +31,7 @@ export default function UpcomingEvents() {
   const fetchEvents = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/upcoming-events", { cache: "no-store" });
+      const res = await fetch("/api/upcoming-events");
       const data = await res.json();
       if (data.success) setEvents(data.data);
     } catch {
