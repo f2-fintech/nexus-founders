@@ -2,6 +2,10 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
+interface AnimatedMesh extends THREE.Mesh {
+  _speed: THREE.Vector3;
+}
+
 export default function ThreeDirectoryBackground() {
   const mountRef = useRef<HTMLDivElement>(null);
 
@@ -22,7 +26,7 @@ export default function ThreeDirectoryBackground() {
 
     // Floating icosahedrons
     const geoIco = new THREE.IcosahedronGeometry(1, 0);
-    const icoMeshes: THREE.Mesh[] = [];
+    const icoMeshes: AnimatedMesh[] = [];
     const count = 18;
 
     for (let i = 0; i < count; i++) {
@@ -32,7 +36,14 @@ export default function ThreeDirectoryBackground() {
         transparent: true,
         opacity: 0.18 + Math.random() * 0.14,
       });
-      const mesh = new THREE.Mesh(geoIco, mat);
+      const baseMesh = new THREE.Mesh(geoIco, mat);
+      const mesh: AnimatedMesh = Object.assign(baseMesh, {
+        _speed: new THREE.Vector3(
+          (Math.random() - 0.5) * 0.003,
+          (Math.random() - 0.5) * 0.003,
+          (Math.random() - 0.5) * 0.002
+        ),
+      });
       const scale = 0.8 + Math.random() * 2.4;
       mesh.scale.setScalar(scale);
       mesh.position.set(
@@ -41,12 +52,6 @@ export default function ThreeDirectoryBackground() {
         (Math.random() - 0.5) * 30
       );
       mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (mesh as any)._speed = new THREE.Vector3(
-        (Math.random() - 0.5) * 0.003,
-        (Math.random() - 0.5) * 0.003,
-        (Math.random() - 0.5) * 0.002
-      );
       scene.add(mesh);
       icoMeshes.push(mesh);
     }
@@ -95,11 +100,9 @@ export default function ThreeDirectoryBackground() {
 
       // Rotate icosahedrons
       icoMeshes.forEach((mesh) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const m = mesh as any;
-        mesh.rotation.x += m._speed.x;
-        mesh.rotation.y += m._speed.y;
-        mesh.rotation.z += m._speed.z;
+        mesh.rotation.x += mesh._speed.x;
+        mesh.rotation.y += mesh._speed.y;
+        mesh.rotation.z += mesh._speed.z;
       });
 
       // Parallax on camera
