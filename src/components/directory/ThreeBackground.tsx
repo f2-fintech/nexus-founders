@@ -36,7 +36,14 @@ export default function ThreeDirectoryBackground() {
         transparent: true,
         opacity: 0.18 + Math.random() * 0.14,
       });
-      const mesh = new THREE.Mesh(geoIco, mat) as AnimatedMesh;
+      const baseMesh = new THREE.Mesh(geoIco, mat);
+      const mesh: AnimatedMesh = Object.assign(baseMesh, {
+        _speed: new THREE.Vector3(
+          (Math.random() - 0.5) * 0.003,
+          (Math.random() - 0.5) * 0.003,
+          (Math.random() - 0.5) * 0.002
+        ),
+      });
       const scale = 0.8 + Math.random() * 2.4;
       mesh.scale.setScalar(scale);
       mesh.position.set(
@@ -45,11 +52,6 @@ export default function ThreeDirectoryBackground() {
         (Math.random() - 0.5) * 30
       );
       mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-      mesh._speed = new THREE.Vector3(
-        (Math.random() - 0.5) * 0.003,
-        (Math.random() - 0.5) * 0.003,
-        (Math.random() - 0.5) * 0.002
-      );
       scene.add(mesh);
       icoMeshes.push(mesh);
     }
