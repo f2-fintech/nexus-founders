@@ -1,5 +1,6 @@
 import Founder from "@/models/Founder";
 import { connectDB } from "@/lib/mongodb";
+import { invalidatePhotoCache } from "@/lib/photoCache";
 
 export interface FounderData {
   _id: string;
@@ -26,6 +27,7 @@ export function invalidateFoundersCache() {
   cachedActiveFounders = null;
   lastCacheTime = 0;
   fetchPromise = null;
+  invalidatePhotoCache();
 }
 
 export async function getActiveFounders(): Promise<FounderData[]> {
@@ -42,12 +44,51 @@ export async function getActiveFounders(): Promise<FounderData[]> {
   fetchPromise = (async () => {
     try {
       await connectDB();
-      const founders = await Founder.find({ active: true })
-        .select("name role company photo linkedin instagram googleplus twitter facebook youtube order createdAt")
-        .sort({ order: 1, createdAt: 1 })
-        .lean();
+      // Aggregate active founders without transferring heavy base64 strings
+      const founders = await Founder.aggregate([
+        { $match: { active: true } },
+        {
+          $project: {
+            name: 1,
+            role: 1,
+            company: 1,
+            order: 1,
+            createdAt: 1,
+            linkedin: 1,
+            instagram: 1,
+            googleplus: 1,
+            twitter: 1,
+            facebook: 1,
+            youtube: 1,
+            hasPhoto: { $gt: [{ $strLenCP: { $ifNull: ["$photo", ""] } }, 0] },
+            photoUrl: {
+              $cond: [
+                { $regexMatch: { input: { $ifNull: ["$photo", ""] }, regex: "^https?://" } },
+                "$photo",
+                ""
+              ]
+            }
+          }
+        },
+        { $sort: { order: 1, createdAt: 1 } }
+      ]);
 
-      cachedActiveFounders = founders as unknown as FounderData[];
+      cachedActiveFounders = founders.map((f: any) => ({
+        _id: f._id.toString(),
+        name: f.name || "",
+        role: f.role || "",
+        company: f.company || "",
+        linkedin: f.linkedin || "",
+        instagram: f.instagram || "",
+        googleplus: f.googleplus || "",
+        twitter: f.twitter || "",
+        facebook: f.facebook || "",
+        youtube: f.youtube || "",
+        order: f.order ?? 0,
+        createdAt: f.createdAt,
+        photo: f.photoUrl ? f.photoUrl : (f.hasPhoto ? `/api/founders/${f._id.toString()}/photo` : ""),
+      }));
+
       lastCacheTime = Date.now();
       return cachedActiveFounders;
     } finally {
