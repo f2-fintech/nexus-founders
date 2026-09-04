@@ -230,8 +230,6 @@ export default function DirectoryPage() {
                 <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10b981", animation: "pulse 2s infinite" }} />
                 Live Network
               </span>
-              <span>•</span>
-              <span>Page Last Updated on 30th June 2026</span>
             </div>
           </motion.div>
         </section>
@@ -265,8 +263,8 @@ export default function DirectoryPage() {
                 borderRadius: "16px",
                 transition: "transform 0.2s ease, background 0.2s ease",
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
               >
                 <div style={{
                   display: "inline-flex",
@@ -309,8 +307,8 @@ export default function DirectoryPage() {
                 borderLeft: "1px solid rgba(0, 0, 0, 0.06)",
                 borderRight: "1px solid rgba(0, 0, 0, 0.06)",
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
               >
                 <div style={{
                   display: "inline-flex",
@@ -351,8 +349,8 @@ export default function DirectoryPage() {
                 borderRadius: "16px",
                 transition: "transform 0.2s ease",
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
               >
                 <div style={{
                   display: "inline-flex",
