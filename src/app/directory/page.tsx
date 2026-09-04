@@ -9,7 +9,7 @@ import { Founder, useAdmin } from "@/context/AdminContext";
 import { motion } from "framer-motion";
 import { Search, UserPlus, Sparkles, Users, MapPin, Calendar, Loader2 } from "lucide-react";
 
-const PAGE_SIZE = 16;
+const PAGE_SIZE = 12;
 
 // In-memory module cache for instant client-side route transitions
 let cachedDirectoryFounders: Founder[] = [];

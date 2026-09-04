@@ -8,12 +8,12 @@ import { getActiveFounders, invalidateFoundersCache } from "@/lib/foundersCache"
 // Opt into per-request dynamic rendering only — allows Cache-Control to be respected by CDN & browser
 export const dynamic = "force-dynamic";
 
-// GET founders with backend pagination (16 per page by default) and search
+// GET founders with backend pagination (12 per page by default) and search
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-    const limit = Math.max(1, parseInt(searchParams.get("limit") || "16", 10));
+    const limit = Math.max(1, parseInt(searchParams.get("limit") || "12", 10));
     const search = searchParams.get("search")?.trim() || "";
     const all = searchParams.get("all") === "true";
 
