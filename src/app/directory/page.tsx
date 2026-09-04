@@ -141,12 +141,14 @@ export default function DirectoryPage() {
   return (
     <>
       <Navbar />
-      <main style={{ minHeight: "80vh", position: "relative", zIndex: 2, paddingBottom: "5rem" }}>
+      <main style={{ minHeight: "80vh", position: "relative", zIndex: 2, paddingBottom: "5rem", overflowX: "hidden", maxWidth: "100%" }}>
         {/* ── Directory Hero Section ────────────────────────────────────────── */}
         <section style={{
           padding: "5rem 1.5rem 2.5rem",
           textAlign: "center",
           position: "relative",
+          overflow: "hidden",
+          maxWidth: "100%",
         }}>
           {/* Subtle Ambient Glow */}
           <div style={{
@@ -154,7 +156,8 @@ export default function DirectoryPage() {
             top: "10%",
             left: "50%",
             transform: "translateX(-50%)",
-            width: "600px",
+            width: "min(600px, 92vw)",
+            maxWidth: "100%",
             height: "220px",
             background: "radial-gradient(ellipse at center, rgba(14, 165, 233, 0.15), rgba(99, 102, 241, 0.08), transparent 70%)",
             filter: "blur(40px)",
@@ -235,7 +238,7 @@ export default function DirectoryPage() {
         </section>
 
         {/* ── Stats Highlights Card ────────────────────────────────────────── */}
-        <section style={{ maxWidth: "1080px", margin: "0 auto", padding: "0 1.5rem" }}>
+        <section style={{ maxWidth: "1080px", width: "100%", margin: "0 auto", padding: "0 1.5rem", boxSizing: "border-box" }}>
           <motion.div
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -248,11 +251,13 @@ export default function DirectoryPage() {
               borderRadius: "24px",
               padding: "2rem 1.5rem",
               boxShadow: "0 20px 50px rgba(15, 23, 42, 0.06), 0 0 30px rgba(2, 132, 199, 0.05)",
+              boxSizing: "border-box",
+              width: "100%",
             }}
           >
             <div style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))",
               alignItems: "center",
               gap: "1.5rem",
             }}>
@@ -291,7 +296,7 @@ export default function DirectoryPage() {
                   WebkitTextFillColor: "transparent",
                   fontFamily: "var(--font-outfit), sans-serif",
                 }}>
-                  {totalFounders > 0 ? `${totalFounders}+` : "180+"}
+                  {totalFounders > 0 ? `${totalFounders}+` : ""}
                 </div>
                 <div style={{ fontSize: "0.85rem", color: "#94a3b8", marginTop: "0.3rem" }}>
                   Verified CEOs &amp; Leaders
@@ -377,10 +382,10 @@ export default function DirectoryPage() {
                   WebkitTextFillColor: "transparent",
                   fontFamily: "var(--font-outfit), sans-serif",
                 }}>
-                  1st Aug 2026
+                  26th September 2026
                 </div>
                 <div style={{ fontSize: "0.85rem", color: "#94a3b8", marginTop: "0.3rem" }}>
-                  IIM Lucknow Noida Campus
+                  Moonlight Infra
                 </div>
               </div>
             </div>

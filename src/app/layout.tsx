@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -7,9 +7,21 @@ import Providers from "@/components/Providers";
 import SpotlightGlow from "@/components/ui/SpotlightGlow";
 import { GlowingOrbs } from "@/components/ui/NeonElements";
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export const metadata: Metadata = {
   title: "Nexus Founders — Elite Entrepreneur Community",
   description: "Nexus Founders 16th Edition – Building Business Legacies with Founders. A vibrant ecosystem where innovators and visionary leaders thrive.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Nexus",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "32x32" },
