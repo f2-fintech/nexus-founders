@@ -1,185 +1,297 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAdmin } from "@/context/AdminContext";
 import { motion } from "framer-motion";
-import { Calendar, ArrowRight } from "lucide-react";
+import { Calendar, MapPin, ArrowRight, Sparkles } from "lucide-react";
+import UpcomingEventsManager from "@/components/admin/UpcomingEventsManager";
 
-const eventsData = [
-  {
-    day: "6th",
-    month: "January 2025",
-    title: "Founder Stories",
-    desc: "Join fellow community members for a day of insights and networking!",
-    btn: "See More",
-  },
-  {
-    day: "6th",
-    month: "January 2025",
-    title: "Community Meetup and Networking Session",
-    desc: "Hear inspiring stories from successful founders in our community.",
-    btn: "Find Out More",
-  },
+interface EventDoc {
+  _id: string;
+  title: string;
+  day: string;
+  month: string;
+  desc: string;
+  address: string;
+  btnText: string;
+  registrationLink: string;
+}
+
+const ACCENT_COLORS = [
+  { gradient: "linear-gradient(135deg, #0ea5e9, #6366f1)", light: "rgba(14,165,233,0.08)", border: "rgba(14,165,233,0.25)", dot: "#0ea5e9" },
+  { gradient: "linear-gradient(135deg, #8b5cf6, #ec4899)", light: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.25)", dot: "#8b5cf6" },
+  { gradient: "linear-gradient(135deg, #06b6d4, #10b981)", light: "rgba(6,182,212,0.08)", border: "rgba(6,182,212,0.25)", dot: "#06b6d4" },
 ];
 
 export default function UpcomingEvents() {
   const { isEditMode } = useAdmin();
+  const [events, setEvents] = useState<EventDoc[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchEvents = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/upcoming-events", { cache: "no-store" });
+      const data = await res.json();
+      if (data.success) setEvents(data.data);
+    } catch {
+      // silent fail
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchEvents(); }, [fetchEvents]);
 
   return (
-    <section className="section-wrapper" id="events" style={{ padding: "4rem 1.5rem" }}>
+    <section className="section-wrapper" id="events" style={{ padding: "5rem 1.5rem" }}>
+
+      {/* Section Header */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        style={{ marginBottom: "3rem" }}
+        style={{ marginBottom: "3.5rem" }}
       >
-        <span className="section-tag"><Calendar size={16} /> Connecting Innovators Together</span>
-        <h2
-          className="section-heading"
-          contentEditable={isEditMode}
-          suppressContentEditableWarning
-          style={{ marginTop: "0.5rem" }}
-        >
+        <span className="section-tag"><Calendar size={15} /> Connecting Innovators Together</span>
+        <h2 className="section-heading" style={{ marginTop: "0.6rem" }}>
           Upcoming <span className="gradient-text-cyan">Events</span>
         </h2>
-        <p
-          className="section-subtext"
-          contentEditable={isEditMode}
-          suppressContentEditableWarning
-          style={{ lineHeight: 1.7 }}
-        >
-          Join us in exploring innovative ideas and opportunities. Our community thrives on collaboration and creativity. Get ready for engaging discussions, exciting projects, and fruitful partnerships. We are here to foster a supportive environment for growth and development.
+        <p className="section-subtext" style={{ lineHeight: 1.8, maxWidth: "600px" }}>
+          Join us in exploring innovative ideas and opportunities. Our community thrives on
+          collaboration, creativity, and fruitful partnerships.
         </p>
       </motion.div>
 
+      {/* Admin Manager */}
+      {isEditMode && <UpcomingEventsManager onSaved={fetchEvents} />}
+
+      {/* Events List */}
       <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-        {eventsData.map((ev, i) => (
+        {loading ? (
+          [0, 1].map((i) => (
+            <div key={i} style={{
+              background: "linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)",
+              backgroundSize: "200% 100%",
+              borderRadius: "20px",
+              height: "140px",
+              animation: "shimmer 1.6s infinite",
+            }} />
+          ))
+        ) : events.length === 0 ? (
           <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: i * 0.15 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             style={{
-              background: "#ffffff",
-              border: "1px solid rgba(0, 0, 0, 0.08)",
-              borderRadius: "16px",
-              padding: "1.75rem 2rem",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "2rem",
-              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              flexWrap: "wrap",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-3px)";
-              e.currentTarget.style.boxShadow = "0 10px 30px rgba(2, 132, 199, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 4px 20px rgba(0, 0, 0, 0.04)";
+              textAlign: "center",
+              padding: "4rem 2rem",
+              border: "2px dashed rgba(14,165,233,0.2)",
+              borderRadius: "20px",
+              background: "linear-gradient(135deg, rgba(14,165,233,0.03), rgba(99,102,241,0.03))",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "2rem", flexWrap: "wrap" }}>
-              {/* Date Box */}
-              <div style={{
-                background: "linear-gradient(135deg, rgba(2, 132, 199, 0.08), rgba(99, 102, 241, 0.08))",
-                border: "1px solid rgba(2, 132, 199, 0.2)",
-                borderRadius: "12px",
-                padding: "0.8rem 1.4rem",
-                textAlign: "center",
-                minWidth: "120px",
-              }}>
-                <div
-                  style={{
-                    fontSize: "1.8rem",
-                    fontWeight: 900,
-                    color: "#0284c7",
-                    lineHeight: 1.1,
-                  }}
-                  contentEditable={isEditMode}
-                  suppressContentEditableWarning
-                >
-                  {ev.day}
-                </div>
-                <div
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    color: "#64748b",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.06em",
-                    marginTop: "0.2rem",
-                  }}
-                  contentEditable={isEditMode}
-                  suppressContentEditableWarning
-                >
-                  {ev.month}
-                </div>
-              </div>
-
-              {/* Event Info */}
-              <div>
-                <h3
-                  style={{
-                    fontSize: "1.35rem",
-                    fontWeight: 700,
-                    marginBottom: "0.4rem",
-                    color: "#0f172a",
-                  }}
-                  contentEditable={isEditMode}
-                  suppressContentEditableWarning
-                >
-                  {ev.title}
-                </h3>
-                <p
-                  style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}
-                  contentEditable={isEditMode}
-                  suppressContentEditableWarning
-                >
-                  {ev.desc}
-                </p>
-              </div>
-            </div>
-
-            {/* Action Button */}
-            <Link
-              href="/events/register"
-              style={{
-                background: "#ffffff",
-                border: "1.5px solid #1e293b",
-                color: "#1e293b",
-                borderRadius: "8px",
-                padding: "0.65rem 1.6rem",
-                fontSize: "0.92rem",
-                fontWeight: 700,
-                textDecoration: "none",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.45rem",
-                transition: "all 0.2s ease",
-                whiteSpace: "nowrap",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#0284c7";
-                e.currentTarget.style.borderColor = "#0284c7";
-                e.currentTarget.style.color = "#ffffff";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "#ffffff";
-                e.currentTarget.style.borderColor = "#1e293b";
-                e.currentTarget.style.color = "#1e293b";
-              }}
-            >
-              <span>{ev.btn}</span>
-              <ArrowRight size={14} />
-            </Link>
+            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🗓️</div>
+            <p style={{ color: "#64748b", fontSize: "1rem", fontWeight: 500 }}>
+              No upcoming events at the moment. Check back soon!
+            </p>
           </motion.div>
-        ))}
+        ) : (
+          events.map((ev, i) => {
+            const accent = ACCENT_COLORS[i % ACCENT_COLORS.length];
+            return (
+              <motion.div
+                key={ev._id}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.55, delay: i * 0.12 }}
+                style={{
+                  position: "relative",
+                  background: "#ffffff",
+                  borderRadius: "20px",
+                  overflow: "hidden",
+                  boxShadow: "0 2px 20px rgba(0,0,0,0.06)",
+                  border: "1px solid rgba(0,0,0,0.07)",
+                  transition: "transform 0.25s ease, box-shadow 0.25s ease",
+                  cursor: "default",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.boxShadow = `0 16px 40px ${accent.light.replace("0.08", "0.18")}`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 2px 20px rgba(0,0,0,0.06)";
+                }}
+              >
+                {/* Gradient left accent bar */}
+                <div style={{
+                  position: "absolute",
+                  left: 0, top: 0, bottom: 0,
+                  width: "5px",
+                  background: accent.gradient,
+                  borderRadius: "20px 0 0 20px",
+                }} />
+
+                {/* Top gradient stripe */}
+                <div style={{
+                  position: "absolute",
+                  top: 0, left: 0, right: 0,
+                  height: "2px",
+                  background: accent.gradient,
+                  opacity: 0.5,
+                }} />
+
+                <div style={{
+                  padding: "1.75rem 2rem 1.75rem 2.5rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "2rem",
+                  flexWrap: "wrap",
+                }}>
+                  {/* Left: Date + Info */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "1.75rem", flexWrap: "wrap", flex: 1 }}>
+
+                    {/* Date Badge */}
+                    <div style={{
+                      background: accent.light,
+                      border: `1.5px solid ${accent.border}`,
+                      borderRadius: "16px",
+                      padding: "1rem 1.4rem",
+                      textAlign: "center",
+                      minWidth: "110px",
+                      flexShrink: 0,
+                    }}>
+                      <div style={{
+                        fontSize: "2.2rem",
+                        fontWeight: 900,
+                        background: accent.gradient,
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        lineHeight: 1,
+                      }}>
+                        {ev.day}
+                      </div>
+                      <div style={{
+                        fontSize: "0.68rem",
+                        fontWeight: 700,
+                        color: "#64748b",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.08em",
+                        marginTop: "0.3rem",
+                      }}>
+                        {ev.month}
+                      </div>
+                    </div>
+
+                    {/* Event Details */}
+                    <div style={{ flex: 1 }}>
+                      {/* Live badge */}
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                        <span style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.3rem",
+                          background: accent.light,
+                          color: accent.dot,
+                          border: `1px solid ${accent.border}`,
+                          borderRadius: "999px",
+                          padding: "0.2rem 0.65rem",
+                          fontSize: "0.7rem",
+                          fontWeight: 700,
+                          letterSpacing: "0.05em",
+                          textTransform: "uppercase",
+                        }}>
+                          <Sparkles size={10} />
+                          Upcoming
+                        </span>
+                      </div>
+
+                      <h3 style={{
+                        fontSize: "1.2rem",
+                        fontWeight: 800,
+                        color: "#0f172a",
+                        marginBottom: "0.45rem",
+                        lineHeight: 1.3,
+                      }}>
+                        {ev.title}
+                      </h3>
+
+                      <p style={{
+                        color: "#64748b",
+                        fontSize: "0.9rem",
+                        lineHeight: 1.6,
+                        margin: "0 0 0.6rem",
+                      }}>
+                        {ev.desc}
+                      </p>
+
+                      {/* Venue pill */}
+                      <span style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.35rem",
+                        background: "#f8fafc",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "999px",
+                        padding: "0.25rem 0.75rem",
+                        fontSize: "0.8rem",
+                        fontWeight: 600,
+                        color: "#475569",
+                      }}>
+                        <MapPin size={11} style={{ color: accent.dot }} />
+                        {ev.address}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* CTA Button */}
+                  <Link
+                    href="/events/register"
+                    style={{
+                      background: accent.gradient,
+                      color: "#ffffff",
+                      border: "none",
+                      borderRadius: "12px",
+                      padding: "0.75rem 1.8rem",
+                      fontSize: "0.9rem",
+                      fontWeight: 700,
+                      textDecoration: "none",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      transition: "opacity 0.2s ease, transform 0.2s ease",
+                      whiteSpace: "nowrap",
+                      flexShrink: 0,
+                      boxShadow: `0 4px 15px ${accent.light.replace("0.08", "0.4")}`,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.opacity = "0.88";
+                      e.currentTarget.style.transform = "scale(1.03)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.opacity = "1";
+                      e.currentTarget.style.transform = "scale(1)";
+                    }}
+                  >
+                    <span>{ev.btnText || "Register Now"}</span>
+                    <ArrowRight size={15} />
+                  </Link>
+                </div>
+              </motion.div>
+            );
+          })
+        )}
       </div>
+
+      <style>{`
+        @keyframes shimmer {
+          0%   { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      `}</style>
     </section>
   );
 }
