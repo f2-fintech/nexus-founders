@@ -256,35 +256,42 @@ img {
 
 /* ── NAVBAR MOBILE & TABLET RESPONSIVE ── */
 .navbar-mobile-controls {
-  display: none;
+  display: flex;
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
 }
 
 .navbar-mobile-toggle {
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background: #f1f5f9;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  color: #0f172a;
+  background: #f8fafc;
+  border: 1px solid rgba(2, 132, 199, 0.25);
+  color: #0284c7;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.08);
+  outline: none;
 }
 
 .navbar-mobile-toggle:hover {
-  background: #e2e8f0;
-  color: #0284c7;
+  background: #e0f2fe;
+  color: #0369a1;
+  border-color: rgba(2, 132, 199, 0.4);
   transform: scale(1.05);
 }
 
 .navbar-mobile-toggle:active {
   transform: scale(0.95);
+}
+
+.navbar-mobile-toggle svg {
+  stroke-width: 2.25;
+  display: block;
 }
 
 .navbar-mobile-user-badge {
@@ -537,6 +544,91 @@ img {
 
 .mobile-login-btn:hover {
   box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+}
+
+/* ── HERO ACTION BUTTONS ── */
+.hero-action-buttons {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.hero-btn-primary {
+  background: #3b82f6;
+  color: #ffffff;
+  padding: 0.85rem 2.2rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.hero-btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
+}
+
+.hero-btn-secondary {
+  background: #ffffff;
+  color: #1e293b;
+  border: 1.5px solid #1e293b;
+  padding: 0.85rem 2.2rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.hero-btn-secondary:hover {
+  background: #f8fafc;
+  border-color: #0284c7;
+  color: #0284c7;
+  transform: translateY(-2px);
+}
+
+/* Mobile: smaller and side by side */
+@media (max-width: 640px) {
+  .hero-action-buttons {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 0.65rem !important;
+    width: 100% !important;
+  }
+
+  .hero-btn-primary,
+  .hero-btn-secondary {
+    flex: 1 1 0 !important;
+    padding: 0.65rem 0.6rem !important;
+    font-size: 0.88rem !important;
+    text-align: center !important;
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 370px) {
+  .hero-action-buttons {
+    gap: 0.45rem !important;
+  }
+
+  .hero-btn-primary,
+  .hero-btn-secondary {
+    padding: 0.55rem 0.4rem !important;
+    font-size: 0.8rem !important;
+  }
 }
 
 /* ── BUTTONS ── */
@@ -1129,6 +1221,9 @@ img {
   .navbar-actions.desktop-only {
     display: none !important;
   }
+  .navbar-mobile-controls {
+    display: flex !important;
+  }
   .navbar-mobile-toggle,
   .navbar-mobile-user-badge {
     display: flex !important;
@@ -1139,9 +1234,11 @@ img {
 }
 
 @media (min-width: 861px) {
+  .navbar-mobile-controls,
   .navbar-mobile-toggle,
   .navbar-mobile-user-badge,
-  .navbar-mobile-menu {
+  .navbar-mobile-menu,
+  .navbar-mobile-backdrop {
     display: none !important;
   }
 }

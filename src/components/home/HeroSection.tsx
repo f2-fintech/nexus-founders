@@ -64,35 +64,12 @@ export default function HeroSection() {
             Welcome to Founder Nexus, a vibrant community where innovators thrive! Connect with dynamic entrepreneurs and visionary leaders. Join us for engaging discussions, insightful events, and collaboration opportunities that empower you to reach new heights in your entrepreneurial journey.
           </p>
 
-          {/* Two Action Buttons (exact styling from screenshot) */}
-          <div style={{ display: "flex", gap: "1.25rem", flexWrap: "wrap", alignItems: "center" }}>
+          {/* Two Action Buttons */}
+          <div className="hero-action-buttons">
             {/* 1. Join Us Now button */}
             <Link
               href="/join"
-              style={{
-                background: "#3b82f6",
-                color: "#ffffff",
-                padding: "0.85rem 2.2rem",
-                fontSize: "1.05rem",
-                fontWeight: 700,
-                borderRadius: "4px",
-                textDecoration: "none",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 4px 14px rgba(59, 130, 246, 0.35)",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#2563eb";
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow = "0 6px 20px rgba(59, 130, 246, 0.45)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "#3b82f6";
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 4px 14px rgba(59, 130, 246, 0.35)";
-              }}
+              className="hero-btn-primary"
             >
               Join Us Now
             </Link>
@@ -100,32 +77,7 @@ export default function HeroSection() {
             {/* 2. Explore Events button */}
             <a
               href="#events"
-              style={{
-                background: "#ffffff",
-                color: "#1e293b",
-                border: "1.5px solid #1e293b",
-                padding: "0.85rem 2.2rem",
-                fontSize: "1.05rem",
-                fontWeight: 700,
-                borderRadius: "4px",
-                textDecoration: "none",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#f8fafc";
-                e.currentTarget.style.borderColor = "#0284c7";
-                e.currentTarget.style.color = "#0284c7";
-                e.currentTarget.style.transform = "translateY(-2px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "#ffffff";
-                e.currentTarget.style.borderColor = "#1e293b";
-                e.currentTarget.style.color = "#1e293b";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
+              className="hero-btn-secondary"
             >
               Explore Events
             </a>
