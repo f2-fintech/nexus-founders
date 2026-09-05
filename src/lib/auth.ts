@@ -39,5 +39,5 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: { signIn: "/login" },
-  secret: process.env.NEXTAUTH_SECRET || "nexus-founders-secret-key-2024",
+  secret: process.env.NEXTAUTH_SECRET,
 };
