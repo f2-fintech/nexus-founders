@@ -6,7 +6,6 @@ try {
 } catch (e) {}
 
 const localUri = "mongodb://127.0.0.1:27017/nexus-founders";
-const liveUri = "mongodb+srv://f2fintech-hrms:fintechhrmslts@f2fintech-hrms.1exq3rs.mongodb.net/nexus-founders?retryWrites=true&w=majority";
 
 const eventSchema = new mongoose.Schema(
   {
