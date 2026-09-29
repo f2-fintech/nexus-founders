@@ -356,12 +356,15 @@ export default function PreviousEvents() {
               position: "fixed",
               inset: 0,
               zIndex: 99999,
-              background: "rgba(15, 23, 42, 0.85)",
+              background: "rgba(15, 23, 42, 0.88)",
               backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "1.25rem",
+              padding: "clamp(0.75rem, 2vh, 1.5rem)",
+              overflowY: "auto",
+              boxSizing: "border-box",
             }}
             onClick={() => setSelectedVideo(null)}
           >
@@ -373,43 +376,52 @@ export default function PreviousEvents() {
               onClick={(e) => e.stopPropagation()}
               style={{
                 width: "100%",
-                maxWidth: "920px",
+                maxWidth: "min(900px, 94vw, calc((90vh - 65px) * (16 / 9)))",
+                maxHeight: "min(92vh, 92dvh)",
                 background: "#0f172a",
-                borderRadius: "20px",
+                borderRadius: "16px",
                 overflow: "hidden",
-                boxShadow: "0 25px 60px rgba(0,0,0,0.5)",
+                boxShadow: "0 25px 60px rgba(0,0,0,0.6)",
                 border: "1px solid rgba(255, 255, 255, 0.15)",
                 position: "relative",
+                display: "flex",
+                flexDirection: "column",
+                margin: "auto",
               }}
             >
               {/* Modal Top Header */}
               <div
                 style={{
-                  padding: "1rem 1.25rem",
+                  padding: "0.75rem 1.25rem",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
                   background: "linear-gradient(180deg, #1e293b 0%, #0f172a 100%)",
                   borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                  flexShrink: 0,
+                  gap: "0.75rem",
                 }}
               >
-                <div>
+                <div style={{ minWidth: 0, flex: 1 }}>
                   <h3
                     style={{
                       color: "#ffffff",
-                      fontSize: "1.05rem",
+                      fontSize: "1rem",
                       fontWeight: 700,
                       margin: 0,
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
                     }}
                   >
                     {selectedVideo.tagline || "Nexus Founders Meetup"}
                   </h3>
-                  <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>
+                  <span style={{ fontSize: "0.78rem", color: "#94a3b8" }}>
                     Nexus Founders Community
                   </span>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", flexShrink: 0 }}>
                   <a
                     href={selectedVideo.url}
                     target="_blank"
@@ -419,7 +431,7 @@ export default function PreviousEvents() {
                       color: "#ffffff",
                       border: "1px solid rgba(255, 255, 255, 0.2)",
                       borderRadius: "8px",
-                      padding: "0.4rem 0.75rem",
+                      padding: "0.35rem 0.7rem",
                       fontSize: "0.78rem",
                       fontWeight: 600,
                       textDecoration: "none",
@@ -440,15 +452,15 @@ export default function PreviousEvents() {
                       border: "none",
                       color: "#ffffff",
                       borderRadius: "50%",
-                      width: "32px",
-                      height: "32px",
+                      width: "30px",
+                      height: "30px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       cursor: "pointer",
                     }}
                   >
-                    <X size={18} />
+                    <X size={17} />
                   </button>
                 </div>
               </div>
@@ -460,6 +472,8 @@ export default function PreviousEvents() {
                   width: "100%",
                   aspectRatio: "16 / 9",
                   background: "#000000",
+                  flex: "1 1 auto",
+                  minHeight: 0,
                 }}
               >
                 <iframe

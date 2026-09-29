@@ -8,7 +8,7 @@ export default function HeroSection() {
   const { isEditMode } = useAdmin();
 
   return (
-    <section className="hero-wrapper" style={{ padding: "4rem 1.5rem 3rem" }}>
+    <section className="hero-wrapper">
       <div className="hero-grid" style={{ maxWidth: "1280px", margin: "0 auto", alignItems: "center" }}>
         {/* Left Column: Text & CTA Buttons */}
         <motion.div
@@ -17,12 +17,12 @@ export default function HeroSection() {
           transition={{ duration: 0.7, ease: "easeOut" }}
         >
           {/* Edition Tag */}
-          <div style={{ marginBottom: "1rem" }}>
+          <div style={{ marginBottom: "0.6rem" }}>
             <span
               style={{
                 display: "inline-block",
                 color: "var(--neon-cyan)",
-                fontSize: "0.95rem",
+                fontSize: "0.9rem",
                 fontWeight: 700,
                 letterSpacing: "0.02em",
                 textTransform: "none",
@@ -37,11 +37,11 @@ export default function HeroSection() {
           {/* Main Title */}
           <h1
             style={{
-              fontSize: "clamp(2.4rem, 4.5vw, 3.8rem)",
+              fontSize: "clamp(2rem, 3.5vw, 3.2rem)",
               fontWeight: 800,
-              lineHeight: 1.15,
+              lineHeight: 1.16,
               color: "#0f172a",
-              marginBottom: "1.25rem",
+              marginBottom: "0.85rem",
             }}
             contentEditable={isEditMode}
             suppressContentEditableWarning
@@ -52,11 +52,11 @@ export default function HeroSection() {
           {/* Description */}
           <p
             style={{
-              fontSize: "1.05rem",
-              lineHeight: 1.7,
+              fontSize: "0.98rem",
+              lineHeight: 1.62,
               color: "var(--text-secondary)",
-              marginBottom: "2.25rem",
-              maxWidth: "580px",
+              marginBottom: "1.6rem",
+              maxWidth: "560px",
             }}
             contentEditable={isEditMode}
             suppressContentEditableWarning
