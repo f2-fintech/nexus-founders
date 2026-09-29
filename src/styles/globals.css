@@ -181,7 +181,7 @@ img {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1.25rem 1.5rem 0.5rem;
+  padding: 0.75rem 1.5rem 0.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -564,7 +564,7 @@ img {
 /* ── HERO ACTION BUTTONS ── */
 .hero-action-buttons {
   display: flex;
-  gap: 1.25rem;
+  gap: 1rem;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -572,10 +572,10 @@ img {
 .hero-btn-primary {
   background: #3b82f6;
   color: #ffffff;
-  padding: 0.85rem 2.2rem;
-  font-size: 1.05rem;
+  padding: 0.72rem 1.85rem;
+  font-size: 0.98rem;
   font-weight: 700;
-  border-radius: 4px;
+  border-radius: 6px;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -595,10 +595,10 @@ img {
   background: #ffffff;
   color: #1e293b;
   border: 1.5px solid #1e293b;
-  padding: 0.85rem 2.2rem;
-  font-size: 1.05rem;
+  padding: 0.72rem 1.85rem;
+  font-size: 0.98rem;
   font-weight: 700;
-  border-radius: 4px;
+  border-radius: 6px;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -698,16 +698,23 @@ img {
 /* ── HERO SECTION ── */
 .hero-wrapper {
   position: relative;
-  padding: 6rem 2rem 5rem;
+  min-height: calc(100vh - 76px);
+  min-height: calc(100dvh - 76px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1.5rem 2rem;
   max-width: 1280px;
   margin: 0 auto;
   z-index: 2;
+  box-sizing: border-box;
 }
 
 .hero-grid {
+  width: 100%;
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
-  gap: 4rem;
+  gap: clamp(1.75rem, 3.5vw, 3.5rem);
   align-items: center;
 }
 
@@ -1423,7 +1430,7 @@ img {
 }
 
 @media (max-width: 768px) {
-  .hero-wrapper { padding: 4rem 1rem 3rem; }
+  .hero-wrapper { min-height: auto; padding: 3rem 1rem 2.5rem; }
   .section-wrapper { padding: 4rem 1rem; }
   .split-story-grid, .split-story-grid.reverse { grid-template-columns: 1fr; gap: 2.5rem; direction: ltr; }
   .founder-cyber-grid { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }

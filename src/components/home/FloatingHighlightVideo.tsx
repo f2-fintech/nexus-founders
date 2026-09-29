@@ -314,13 +314,15 @@ export default function FloatingHighlightVideo() {
               position: "fixed",
               inset: 0,
               zIndex: 99999,
-              background: "rgba(0, 0, 0, 0.85)",
+              background: "rgba(0, 0, 0, 0.88)",
               backdropFilter: "blur(8px)",
               WebkitBackdropFilter: "blur(8px)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "20px",
+              padding: "clamp(12px, 2vh, 24px)",
+              overflowY: "auto",
+              boxSizing: "border-box",
             }}
           >
             {/* Modal Card */}
@@ -334,11 +336,15 @@ export default function FloatingHighlightVideo() {
               style={{
                 position: "relative",
                 width: "100%",
-                maxWidth: "920px",
+                maxWidth: "min(920px, 94vw, calc((90vh - 40px) * (16 / 9)))",
+                maxHeight: "min(92vh, 92dvh)",
                 borderRadius: "20px",
                 overflow: "hidden",
                 background: "#000000",
                 boxShadow: "0 25px 70px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.15)",
+                margin: "auto",
+                display: "flex",
+                flexDirection: "column",
               }}
             >
               {/* Top Close Button (✕) */}
@@ -429,9 +435,10 @@ export default function FloatingHighlightVideo() {
                 style={{
                   width: "100%",
                   aspectRatio: "16 / 9",
-                  maxHeight: "80vh",
                   background: "#000",
                   position: "relative",
+                  flex: "1 1 auto",
+                  minHeight: 0,
                 }}
               >
                 <iframe
