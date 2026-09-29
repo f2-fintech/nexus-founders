@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAdmin } from "@/context/AdminContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "@/context/ThemeContext";
 import {
   Sparkles,
   Shield,
@@ -18,9 +19,12 @@ import {
   Users,
   LogIn,
   LayoutDashboard,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 export default function Navbar() {
+  const { isDark, toggleTheme } = useTheme();
   const { data: session } = useSession();
   const pathname = usePathname();
   const { isEditMode, toggleEditMode, setEditModeOff } = useAdmin();
@@ -164,9 +168,12 @@ export default function Navbar() {
                     transition={{ duration: 0.2 }}
                     style={{
                       position: "absolute", top: "calc(100% + 12px)", right: 0,
-                      minWidth: "260px", background: "#ffffff", borderRadius: "16px",
-                      boxShadow: "0 15px 40px rgba(15, 23, 42, 0.12), 0 0 1px rgba(0,0,0,0.1)",
-                      border: "1px solid rgba(0, 0, 0, 0.08)", padding: "1.25rem", zIndex: 1000,
+                      minWidth: "260px",
+                      background: isDark ? "#111827" : "#ffffff",
+                      borderRadius: "16px",
+                      boxShadow: isDark ? "0 15px 40px rgba(0, 0, 0, 0.6)" : "0 15px 40px rgba(15, 23, 42, 0.12), 0 0 1px rgba(0,0,0,0.1)",
+                      border: `1px solid ${isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)"}`,
+                      padding: "1.25rem", zIndex: 1000,
                     }}
                   >
                     <div style={{ marginBottom: "1rem" }}>
@@ -180,10 +187,10 @@ export default function Navbar() {
                           {userEmail[0].toUpperCase()}
                         </div>
                         <div>
-                          <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a", lineHeight: 1.2 }}>
+                          <div style={{ fontSize: "0.9rem", fontWeight: 700, color: isDark ? "#f8fafc" : "#0f172a", lineHeight: 1.2 }}>
                             {session.user?.name || "Administrator"}
                           </div>
-                          <div style={{ fontSize: "0.78rem", color: "#64748b", wordBreak: "break-all" }}>
+                          <div style={{ fontSize: "0.78rem", color: isDark ? "#94a3b8" : "#64748b", wordBreak: "break-all" }}>
                             {userEmail}
                           </div>
                         </div>
@@ -201,7 +208,39 @@ export default function Navbar() {
                       </div>
                     </div>
 
-                    <div style={{ height: "1px", background: "#f1f5f9", margin: "0.75rem 0" }} />
+                    <div style={{ height: "1px", background: isDark ? "rgba(255, 255, 255, 0.1)" : "#f1f5f9", margin: "0.75rem 0" }} />
+
+                    {/* Theme Switcher Button under Profile */}
+                    <div style={{ marginBottom: "0.75rem" }}>
+                      <button
+                        type="button"
+                        onClick={toggleTheme}
+                        style={{
+                          width: "100%", display: "flex", alignItems: "center",
+                          justifyContent: "space-between", padding: "0.65rem 0.9rem",
+                          borderRadius: "10px", border: "1px solid",
+                          borderColor: isDark ? "rgba(56, 189, 248, 0.35)" : "#e2e8f0",
+                          background: isDark ? "rgba(56, 189, 248, 0.1)" : "#f8fafc",
+                          cursor: "pointer", transition: "all 0.2s ease",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                          {isDark ? <Moon size={15} color="#38bdf8" /> : <Sun size={15} color="#d97706" />}
+                          <span style={{ fontSize: "0.85rem", fontWeight: 600, color: isDark ? "#f8fafc" : "#334155" }}>
+                            Theme
+                          </span>
+                        </div>
+                        <span style={{
+                          fontSize: "0.78rem", fontWeight: 700,
+                          color: isDark ? "#38bdf8" : "#64748b",
+                          background: isDark ? "rgba(56, 189, 248, 0.2)" : "#e2e8f0",
+                          padding: "0.2rem 0.6rem", borderRadius: "12px",
+                          display: "inline-flex", alignItems: "center", gap: "4px",
+                        }}>
+                          {isDark ? "Dark 🌙" : "Light ☀️"}
+                        </span>
+                      </button>
+                    </div>
 
                     {role === "admin" && (
                       <div style={{ marginBottom: "0.75rem" }}>
@@ -212,21 +251,21 @@ export default function Navbar() {
                             width: "100%", display: "flex", alignItems: "center",
                             justifyContent: "space-between", padding: "0.65rem 0.9rem",
                             borderRadius: "10px", border: "1px solid",
-                            borderColor: isEditMode ? "rgba(217, 119, 6, 0.4)" : "#e2e8f0",
-                            background: isEditMode ? "rgba(217, 119, 6, 0.08)" : "#f8fafc",
+                            borderColor: isEditMode ? "rgba(217, 119, 6, 0.4)" : (isDark ? "rgba(255, 255, 255, 0.12)" : "#e2e8f0"),
+                            background: isEditMode ? (isDark ? "rgba(217, 119, 6, 0.15)" : "rgba(217, 119, 6, 0.08)") : (isDark ? "#1e293b" : "#f8fafc"),
                             cursor: "pointer", transition: "all 0.2s ease",
                           }}
                         >
                           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                            <Edit3 size={15} color={isEditMode ? "#d97706" : "#64748b"} />
-                            <span style={{ fontSize: "0.85rem", fontWeight: 600, color: isEditMode ? "#d97706" : "#334155" }}>
+                            <Edit3 size={15} color={isEditMode ? "#d97706" : (isDark ? "#94a3b8" : "#64748b")} />
+                            <span style={{ fontSize: "0.85rem", fontWeight: 600, color: isEditMode ? "#d97706" : (isDark ? "#cbd5e1" : "#334155") }}>
                               Edit Mode
                             </span>
                           </div>
                           <span style={{
                             fontSize: "0.78rem", fontWeight: 700,
-                            color: isEditMode ? "#d97706" : "#94a3b8",
-                            background: isEditMode ? "#fef3c7" : "#e2e8f0",
+                            color: isEditMode ? "#d97706" : (isDark ? "#94a3b8" : "#94a3b8"),
+                            background: isEditMode ? "#fef3c7" : (isDark ? "#334155" : "#e2e8f0"),
                             padding: "0.2rem 0.55rem", borderRadius: "12px",
                           }}>
                             {isEditMode ? "ON" : "OFF"}
@@ -241,12 +280,11 @@ export default function Navbar() {
                       style={{
                         width: "100%", display: "flex", alignItems: "center", gap: "0.5rem",
                         padding: "0.65rem 0.9rem", borderRadius: "10px",
-                        border: "1px solid #fee2e2", background: "#fff5f5",
-                        color: "#dc2626", fontSize: "0.85rem", fontWeight: 600,
+                        border: isDark ? "1px solid rgba(239, 68, 68, 0.25)" : "1px solid #fee2e2",
+                        background: isDark ? "rgba(239, 68, 68, 0.1)" : "#fff5f5",
+                        color: "#ef4444", fontSize: "0.85rem", fontWeight: 600,
                         cursor: "pointer", transition: "all 0.2s ease",
                       }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = "#fee2e2"; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = "#fff5f5"; }}
                     >
                       <LogOut size={15} />
                       <span>Logout</span>
@@ -260,7 +298,7 @@ export default function Navbar() {
 
         {/* Right side: nav links on right when NOT logged in */}
         {!session && (
-          <div className="navbar-links desktop-only" style={{ position: "relative" }}>
+          <div className="navbar-links desktop-only" style={{ position: "relative", display: "flex", alignItems: "center", gap: "0.5rem" }}>
             {baseLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
@@ -280,11 +318,34 @@ export default function Navbar() {
                 </Link>
               );
             })}
+
+            {/* Dark / Light Mode Button on the right side of Join Us */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="navbar-theme-toggle-btn"
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              aria-label="Toggle dark/light mode"
+            >
+              {isDark ? <Sun size={17} /> : <Moon size={17} />}
+            </button>
           </div>
         )}
 
         {/* ── Mobile & Tablet Controls (<= 860px) ── */}
         <div className="navbar-mobile-controls">
+          {/* Mobile Theme Toggle Button */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="navbar-theme-toggle-btn"
+            style={{ width: "38px", height: "38px" }}
+            title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            aria-label="Toggle theme"
+          >
+            {isDark ? <Sun size={17} /> : <Moon size={17} />}
+          </button>
+
           {session && (
             <div
               className="navbar-mobile-user-badge"

@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { AdminProvider } from "@/context/AdminContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import Providers from "@/components/Providers";
 import SpotlightGlow from "@/components/ui/SpotlightGlow";
 import { GlowingOrbs } from "@/components/ui/NeonElements";
@@ -41,15 +42,24 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const session = await getServerSession(authOptions);
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('nexus_theme');if(t==='dark'){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body>
-        <SpotlightGlow />
-        <GlowingOrbs />
-        <Providers session={session}>
-          <AdminProvider>
-            {children}
-          </AdminProvider>
-        </Providers>
+        <ThemeProvider>
+          <SpotlightGlow />
+          <GlowingOrbs />
+          <Providers session={session}>
+            <AdminProvider>
+              {children}
+            </AdminProvider>
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
   );

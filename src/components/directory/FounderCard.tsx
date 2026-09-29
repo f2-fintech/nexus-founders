@@ -93,7 +93,7 @@ export default function FounderCard({ founder, onEdit, onDelete, index }: Props)
     if (!card) return;
     card.style.transition = "transform 0.55s cubic-bezier(0.16,1,0.3,1), box-shadow 0.55s ease";
     card.style.transform = "perspective(900px) rotateY(0deg) rotateX(0deg) scale3d(1,1,1)";
-    card.style.boxShadow = "0 4px 20px rgba(0,0,0,0.06)";
+    card.style.boxShadow = "";
     setTimeout(() => {
       if (card) card.style.transition = "";
     }, 560);

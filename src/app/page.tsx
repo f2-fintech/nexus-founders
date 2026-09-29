@@ -9,10 +9,11 @@ import {
   InvestmentSection,
   CommunitySection,
 } from "@/components/home/SplitSections";
-import SustainableEcosystem from "@/components/home/SustainableEcosystem";
 import ValuePillars from "@/components/home/ValuePillars";
 import UpcomingEvents from "@/components/home/UpcomingEvents";
+import PreviousEvents from "@/components/home/PreviousEvents";
 import CoordinationTeam from "@/components/home/CoordinationTeam";
+import FloatingHighlightVideo from "@/components/home/FloatingHighlightVideo";
 
 export default function HomePage() {
   return (
@@ -26,12 +27,13 @@ export default function HomePage() {
         <KnowledgeSection />
         <InvestmentSection />
         <CommunitySection />
-        <SustainableEcosystem />
         <ValuePillars />
         <UpcomingEvents />
+        <PreviousEvents />
         <CoordinationTeam />
       </main>
       <Footer />
+      <FloatingHighlightVideo />
     </>
   );
 }

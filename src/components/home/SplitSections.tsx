@@ -98,7 +98,7 @@ export function MentorshipSection() {
           }}
         >
           <img
-            src="/images/eco3.webp"
+            src="/images/eco2.webp"
             alt="Mentorship and Networking"
             loading="lazy"
             decoding="async"
@@ -173,7 +173,7 @@ export function KnowledgeSection() {
           }}
         >
           <img
-            src="/images/eco1.webp"
+            src="/images/founders-16th.webp"
             alt="Knowledge Sharing Workshop"
             loading="lazy"
             decoding="async"
@@ -248,7 +248,7 @@ export function InvestmentSection() {
           }}
         >
           <img
-            src="/images/eco2.webp"
+            src="/images/founders-17th.webp"
             alt="Investment Opportunities"
             loading="lazy"
             decoding="async"
@@ -324,7 +324,7 @@ export function CommunitySection() {
         >
           <img
             src="/images/eco3.webp"
-            alt="Community Engagement"
+            alt="Community Engagement - Nexus Founders"
             loading="lazy"
             decoding="async"
             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", background: "#f1f5f9" }}

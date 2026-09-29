@@ -4,12 +4,9 @@ import { useAdmin } from "@/context/AdminContext";
 import { motion } from "framer-motion";
 
 const galleryImages = [
-  { src: "/images/eco1.webp", alt: "Nexus Founders Gathering" },
-  { src: "/images/eco2.webp", alt: "Nexus Founders Session" },
   { src: "/images/eco3.webp", alt: "Nexus Founders Network" },
-  { src: "/images/eco1.webp", alt: "Nexus Founders F2 Fintech" },
-  { src: "/images/eco2.webp", alt: "Nexus F2 Fintech Community" },
-  { src: "/images/eco3.webp", alt: "Nexus Founders Dialogue" },
+  { src: "/images/founders-16th.webp", alt: "Nexus Founders 16th Edition Group Photo" },
+  { src: "/images/founders-17th.webp", alt: "Nexus Founders 17th Edition Group Picture" },
 ];
 
 export default function SustainableEcosystem() {

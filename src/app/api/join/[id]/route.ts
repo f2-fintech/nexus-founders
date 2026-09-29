@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import JoinSubmission from "@/models/JoinSubmission";
+import JoinSubmission, { buildQuestionsAndAnswers } from "@/models/JoinSubmission";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -35,10 +35,18 @@ export async function PUT(
     await connectDB();
     const body = await req.json();
 
-    const updated = await JoinSubmission.findByIdAndUpdate(params.id, body, {
-      new: true,
-      runValidators: true,
-    });
+    const questionsAndAnswers = buildQuestionsAndAnswers(body);
+    const updated = await JoinSubmission.findByIdAndUpdate(
+      params.id,
+      {
+        ...body,
+        questionsAndAnswers,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     if (!updated) {
       return NextResponse.json({ success: false, error: "Submission not found" }, { status: 404 });
