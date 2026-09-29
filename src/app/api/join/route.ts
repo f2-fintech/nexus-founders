@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import JoinSubmission from "@/models/JoinSubmission";
+import JoinSubmission, { buildQuestionsAndAnswers } from "@/models/JoinSubmission";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -37,7 +37,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const submission = await JoinSubmission.create(body);
+    const questionsAndAnswers = buildQuestionsAndAnswers(body);
+    const submission = await JoinSubmission.create({
+      ...body,
+      questionsAndAnswers,
+    });
     return NextResponse.json({ success: true, data: submission }, { status: 201 });
   } catch (error: any) {
     console.error("Error creating join submission:", error);

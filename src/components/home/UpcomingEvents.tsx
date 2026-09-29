@@ -11,6 +11,7 @@ interface EventDoc {
   title: string;
   day: string;
   month: string;
+  eventDate?: string | Date;
   desc: string;
   address: string;
   btnText: string;
@@ -22,6 +23,21 @@ const ACCENT_COLORS = [
   { gradient: "linear-gradient(135deg, #8b5cf6, #ec4899)", light: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.25)", dot: "#8b5cf6" },
   { gradient: "linear-gradient(135deg, #06b6d4, #10b981)", light: "rgba(6,182,212,0.08)", border: "rgba(6,182,212,0.25)", dot: "#06b6d4" },
 ];
+
+function isEventUpcoming(ev: EventDoc): boolean {
+  let d: Date | null = null;
+  if (ev.eventDate) {
+    d = new Date(ev.eventDate);
+  } else if (ev.day && ev.month) {
+    const clean = `${ev.day} ${ev.month}`.replace(/(\d+)(st|nd|rd|th)/i, "$1").trim();
+    d = new Date(clean);
+  }
+  if (!d || isNaN(d.getTime())) return true;
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const eventDay = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  return eventDay >= today;
+}
 
 export default function UpcomingEvents() {
   const { isEditMode } = useAdmin();
@@ -43,6 +59,8 @@ export default function UpcomingEvents() {
 
   useEffect(() => { fetchEvents(); }, [fetchEvents]);
 
+  const hasUpcoming = events.length > 0 && events.some(isEventUpcoming);
+
   return (
     <section className="section-wrapper" id="events" style={{ padding: "5rem 1.5rem" }}>
 
@@ -56,7 +74,8 @@ export default function UpcomingEvents() {
       >
         <span className="section-tag"><Calendar size={15} /> Connecting Innovators Together</span>
         <h2 className="section-heading" style={{ marginTop: "0.6rem" }}>
-          Upcoming <span className="gradient-text-cyan">Events</span>
+          {hasUpcoming ? "Upcoming" : "Latest"}{" "}
+          <span className="gradient-text-cyan">{hasUpcoming ? "Events" : "Edition"}</span>
         </h2>
         <p className="section-subtext" style={{ lineHeight: 1.8, maxWidth: "600px" }}>
           Join us in exploring innovative ideas and opportunities. Our community thrives on
@@ -99,6 +118,7 @@ export default function UpcomingEvents() {
         ) : (
           events.map((ev, i) => {
             const accent = ACCENT_COLORS[i % ACCENT_COLORS.length];
+            const isUpcoming = isEventUpcoming(ev);
             return (
               <motion.div
                 key={ev._id}
@@ -194,9 +214,9 @@ export default function UpcomingEvents() {
                           display: "inline-flex",
                           alignItems: "center",
                           gap: "0.3rem",
-                          background: accent.light,
-                          color: accent.dot,
-                          border: `1px solid ${accent.border}`,
+                          background: isUpcoming ? accent.light : "rgba(245, 158, 11, 0.12)",
+                          color: isUpcoming ? accent.dot : "#d97706",
+                          border: `1px solid ${isUpcoming ? accent.border : "rgba(245, 158, 11, 0.3)"}`,
                           borderRadius: "999px",
                           padding: "0.2rem 0.65rem",
                           fontSize: "0.7rem",
@@ -205,7 +225,7 @@ export default function UpcomingEvents() {
                           textTransform: "uppercase",
                         }}>
                           <Sparkles size={10} />
-                          Upcoming
+                          {isUpcoming ? "Upcoming" : "Latest"}
                         </span>
                       </div>
 
@@ -249,7 +269,7 @@ export default function UpcomingEvents() {
 
                   {/* CTA Button */}
                   <Link
-                    href="/events/register"
+                    href="/join"
                     style={{
                       background: accent.gradient,
                       color: "#ffffff",

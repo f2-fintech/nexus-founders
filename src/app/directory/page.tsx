@@ -7,7 +7,7 @@ import FounderModal from "@/components/directory/FounderModal";
 import { FounderCardSkeleton } from "@/components/common/Skeleton";
 import { Founder, useAdmin } from "@/context/AdminContext";
 import { motion } from "framer-motion";
-import { Search, UserPlus, Sparkles, Users, MapPin, Calendar, Loader2 } from "lucide-react";
+import { Search, UserPlus, Sparkles, Users, MapPin, Calendar, Loader2, Edit3 } from "lucide-react";
 
 const PAGE_SIZE = 12;
 
@@ -15,6 +15,62 @@ const PAGE_SIZE = 12;
 let cachedDirectoryFounders: Founder[] = [];
 let cachedDirectoryTotal = 0;
 let cachedDirectoryHasMore = true;
+
+function formatOrdinal(n: number): string {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+function formatEventDisplayDate(dayStr?: string, monthStr?: string, eventDate?: string | Date): string {
+  if (eventDate) {
+    const d = new Date(eventDate);
+    if (!isNaN(d.getTime())) {
+      const day = d.getDate();
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+      return `${formatOrdinal(day)} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+    }
+  }
+  if (dayStr && monthStr) {
+    const dNum = parseInt(dayStr, 10);
+    const day = isNaN(dNum) ? dayStr : formatOrdinal(dNum);
+    const month = monthStr
+      .split(" ")
+      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(" ");
+    return `${day} ${month}`;
+  }
+  return "26th September 2026";
+}
+
+// Helper to evaluate whether an event date string has passed or is upcoming
+function evaluateEventStatus(dateString: string): { isUpcoming: boolean; label: string } {
+  if (!dateString) {
+    return { isUpcoming: false, label: "Latest Edition Date" };
+  }
+
+  // Remove ordinal suffixes like "26th" -> "26"
+  const clean = dateString.replace(/(\d+)(st|nd|rd|th)/i, "$1").trim();
+  const parsed = new Date(clean);
+
+  if (isNaN(parsed.getTime())) {
+    return { isUpcoming: false, label: "Latest Edition Date" };
+  }
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const eventMidnight = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate()).getTime();
+
+  // If event is today or in the future: Next Edition Date. If in the past: Latest Edition Date.
+  const isUpcoming = eventMidnight >= today;
+  return {
+    isUpcoming,
+    label: isUpcoming ? "Next Edition Date" : "Latest Edition Date",
+  };
+}
 
 export default function DirectoryPage() {
   const { isEditMode, addFounder, updateFounder } = useAdmin();
@@ -28,6 +84,100 @@ export default function DirectoryPage() {
   const [hasMore, setHasMore] = useState<boolean>(() => cachedDirectoryHasMore);
   const [loadingInitial, setLoadingInitial] = useState<boolean>(() => cachedDirectoryFounders.length === 0);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
+
+  // Dynamic Edition Date State
+  const [eventDateStr, setEventDateStr] = useState<string>("26th September 2026");
+  const [eventVenue, setEventVenue] = useState<string>("Moonlight Infra");
+  const [isEditingEvent, setIsEditingEvent] = useState(false);
+  const [editDateInput, setEditDateInput] = useState("26th September 2026");
+  const [editVenueInput, setEditVenueInput] = useState("Moonlight Infra");
+
+  // Automatically fetch and synchronize with the latest event from Upcoming Events
+  const loadUpcomingEvent = useCallback(async () => {
+    try {
+      const res = await fetch("/api/upcoming-events");
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+        const eventsWithDates = json.data.map((ev: any) => {
+          let d: Date | null = null;
+          if (ev.eventDate) {
+            d = new Date(ev.eventDate);
+          } else if (ev.day && ev.month) {
+            const clean = `${ev.day} ${ev.month}`.replace(/(\d+)(st|nd|rd|th)/i, "$1").trim();
+            d = new Date(clean);
+          }
+          return {
+            ...ev,
+            timestamp: d && !isNaN(d.getTime()) ? new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() : 0,
+            parsedDate: d,
+          };
+        });
+
+        // 1. Look for upcoming events (eventDate >= today)
+        const upcoming = eventsWithDates
+          .filter((e: any) => e.timestamp >= today)
+          .sort((a: any, b: any) => a.timestamp - b.timestamp);
+
+        if (upcoming.length > 0) {
+          const ev = upcoming[0];
+          const dateFormatted = formatEventDisplayDate(ev.day, ev.month, ev.eventDate);
+          setEventDateStr(dateFormatted);
+          setEditDateInput(dateFormatted);
+          if (ev.address) {
+            setEventVenue(ev.address);
+            setEditVenueInput(ev.address);
+          }
+          return;
+        }
+
+        // 2. If all events have passed, pick the most recent past event
+        const past = eventsWithDates
+          .filter((e: any) => e.timestamp > 0 && e.timestamp < today)
+          .sort((a: any, b: any) => b.timestamp - a.timestamp);
+
+        if (past.length > 0) {
+          const ev = past[0];
+          const dateFormatted = formatEventDisplayDate(ev.day, ev.month, ev.eventDate);
+          setEventDateStr(dateFormatted);
+          setEditDateInput(dateFormatted);
+          if (ev.address) {
+            setEventVenue(ev.address);
+            setEditVenueInput(ev.address);
+          }
+          return;
+        }
+
+        // 3. Fallback to latest item in array
+        const latest = json.data[json.data.length - 1];
+        const dateFormatted = formatEventDisplayDate(latest.day, latest.month, latest.eventDate);
+        setEventDateStr(dateFormatted);
+        setEditDateInput(dateFormatted);
+        if (latest.address) {
+          setEventVenue(latest.address);
+          setEditVenueInput(latest.address);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load upcoming event for directory", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUpcomingEvent();
+    window.addEventListener("focus", loadUpcomingEvent);
+    return () => window.removeEventListener("focus", loadUpcomingEvent);
+  }, [loadUpcomingEvent]);
+
+  const handleSaveEvent = async () => {
+    setEventDateStr(editDateInput);
+    setEventVenue(editVenueInput);
+    setIsEditingEvent(false);
+  };
+
+  const editionStatus = evaluateEventStatus(eventDateStr);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -173,20 +323,16 @@ export default function DirectoryPage() {
           >
             {/* Top Pill Badge */}
             <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", marginBottom: "1.2rem" }}>
-              <span style={{
+              <span className="directory-hero-badge" style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "0.4rem",
                 padding: "0.35rem 1rem",
-                background: "linear-gradient(135deg, rgba(2, 132, 199, 0.08), rgba(99, 102, 241, 0.08))",
-                border: "1px solid rgba(2, 132, 199, 0.25)",
                 borderRadius: "50px",
                 fontSize: "0.82rem",
                 fontWeight: 700,
-                color: "#0284c7",
                 letterSpacing: "0.06em",
                 textTransform: "uppercase",
-                boxShadow: "0 2px 10px rgba(2, 132, 199, 0.08)",
               }}>
                 <Sparkles size={14} className="text-cyan-500" />
                 Exclusive Directory
@@ -194,14 +340,7 @@ export default function DirectoryPage() {
             </div>
 
             {/* Main Hero Title */}
-            <h1 style={{
-              fontSize: "clamp(2.5rem, 5.5vw, 4.2rem)",
-              fontWeight: 900,
-              letterSpacing: "-0.03em",
-              color: "#0f172a",
-              lineHeight: 1.15,
-              marginBottom: "1rem",
-            }}>
+            <h1 className="directory-hero-title">
               Nexus Founders <span style={{
                 background: "linear-gradient(135deg, #0284c7 0%, #4f46e5 50%, #9333ea 100%)",
                 WebkitBackgroundClip: "text",
@@ -215,18 +354,15 @@ export default function DirectoryPage() {
               alignItems: "center",
               justifyContent: "center",
               gap: "0.75rem",
-              color: "#64748b",
               fontSize: "1rem",
               fontWeight: 500,
             }}>
-              <span style={{
+              <span className="directory-live-badge" style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "0.35rem",
-                color: "#10b981",
                 fontSize: "0.85rem",
                 fontWeight: 700,
-                background: "rgba(16, 185, 129, 0.1)",
                 padding: "0.2rem 0.65rem",
                 borderRadius: "20px",
               }}>
@@ -243,17 +379,7 @@ export default function DirectoryPage() {
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.15 }}
-            style={{
-              background: "rgba(255, 255, 255, 0.92)",
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
-              border: "1px solid rgba(2, 132, 199, 0.15)",
-              borderRadius: "24px",
-              padding: "2rem 1.5rem",
-              boxShadow: "0 20px 50px rgba(15, 23, 42, 0.06), 0 0 30px rgba(2, 132, 199, 0.05)",
-              boxSizing: "border-box",
-              width: "100%",
-            }}
+            className="directory-stats-highlights"
           >
             <div style={{
               display: "grid",
@@ -262,131 +388,171 @@ export default function DirectoryPage() {
               gap: "1.5rem",
             }}>
               {/* Stat 1: Total Founders */}
-              <div style={{
-                textAlign: "center",
-                padding: "1rem",
-                borderRadius: "16px",
-                transition: "transform 0.2s ease, background 0.2s ease",
-              }}
+              <div
+                className="directory-stat-item"
                 onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                <div style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "42px",
-                  height: "42px",
-                  borderRadius: "12px",
-                  background: "rgba(2, 132, 199, 0.1)",
-                  color: "#0284c7",
-                  marginBottom: "0.75rem",
-                }}>
+                <div className="directory-stat-icon-wrap cyan">
                   <Users size={22} />
                 </div>
-                <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.25rem" }}>
+                <div className="directory-stat-label">
                   Total Founders
                 </div>
-                <div style={{
-                  fontSize: "clamp(2.4rem, 3.5vw, 3rem)",
-                  fontWeight: 900,
-                  lineHeight: 1.1,
-                  background: "linear-gradient(135deg, #0284c7, #0369a1)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  fontFamily: "var(--font-outfit), sans-serif",
-                }}>
+                <div className="directory-stat-val val-cyan" style={{ fontFamily: "var(--font-outfit), sans-serif" }}>
                   {totalFounders > 0 ? `${totalFounders}+` : ""}
                 </div>
-                <div style={{ fontSize: "0.85rem", color: "#94a3b8", marginTop: "0.3rem" }}>
+                <div className="directory-stat-sub">
                   Verified CEOs &amp; Leaders
                 </div>
               </div>
 
               {/* Stat 2: Active Locations */}
-              <div style={{
-                textAlign: "center",
-                padding: "1rem",
-                borderRadius: "16px",
-                transition: "transform 0.2s ease",
-                borderLeft: "1px solid rgba(0, 0, 0, 0.06)",
-                borderRight: "1px solid rgba(0, 0, 0, 0.06)",
-              }}
+              <div
+                className="directory-stat-item stat-border-x"
                 onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                <div style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "42px",
-                  height: "42px",
-                  borderRadius: "12px",
-                  background: "rgba(147, 51, 234, 0.1)",
-                  color: "#9333ea",
-                  marginBottom: "0.75rem",
-                }}>
+                <div className="directory-stat-icon-wrap purple">
                   <MapPin size={22} />
                 </div>
-                <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.25rem" }}>
+                <div className="directory-stat-label">
                   Active Locations
                 </div>
-                <div style={{
-                  fontSize: "clamp(2.4rem, 3.5vw, 3rem)",
-                  fontWeight: 900,
-                  lineHeight: 1.1,
-                  background: "linear-gradient(135deg, #9333ea, #6366f1)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  fontFamily: "var(--font-outfit), sans-serif",
-                }}>
+                <div className="directory-stat-val val-purple" style={{ fontFamily: "var(--font-outfit), sans-serif" }}>
                   7+
                 </div>
-                <div style={{ fontSize: "0.85rem", color: "#94a3b8", marginTop: "0.3rem" }}>
+                <div className="directory-stat-sub">
                   NCR, Noida &amp; Regional
                 </div>
               </div>
 
-              {/* Stat 3: Next Edition */}
-              <div style={{
-                textAlign: "center",
-                padding: "1rem",
-                borderRadius: "16px",
-                transition: "transform 0.2s ease",
-              }}
+              {/* Stat 3: Next / Latest Edition */}
+              <div
+                className="directory-stat-item"
+                style={{ position: "relative" }}
                 onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                <div style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "42px",
-                  height: "42px",
-                  borderRadius: "12px",
-                  background: "rgba(217, 119, 6, 0.1)",
-                  color: "#d97706",
-                  marginBottom: "0.75rem",
-                }}>
-                  <Calendar size={22} />
-                </div>
-                <div style={{ fontSize: "0.8rem", fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.25rem" }}>
-                  Next Edition Date
-                </div>
-                <div style={{
-                  fontSize: "clamp(1.9rem, 2.8vw, 2.5rem)",
-                  fontWeight: 900,
-                  lineHeight: 1.2,
-                  background: "linear-gradient(135deg, #d97706, #ea580c)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  fontFamily: "var(--font-outfit), sans-serif",
-                }}>
-                  26th September 2026
-                </div>
-                <div style={{ fontSize: "0.85rem", color: "#94a3b8", marginTop: "0.3rem" }}>
-                  Moonlight Infra
-                </div>
+                {isEditMode && !isEditingEvent && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditDateInput(eventDateStr);
+                      setEditVenueInput(eventVenue);
+                      setIsEditingEvent(true);
+                    }}
+                    title="Edit Edition Date & Venue"
+                    style={{
+                      position: "absolute",
+                      top: "0.5rem",
+                      right: "0.5rem",
+                      background: "rgba(245, 158, 11, 0.15)",
+                      border: "1px solid rgba(245, 158, 11, 0.3)",
+                      color: "#f59e0b",
+                      borderRadius: "6px",
+                      padding: "0.25rem 0.5rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.25rem",
+                      fontSize: "0.75rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    <Edit3 size={12} />
+                    <span>Edit</span>
+                  </button>
+                )}
+
+                {isEditingEvent ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", width: "100%", padding: "0.25rem 0" }}>
+                    <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#f59e0b" }}>
+                      Edit Edition Details
+                    </div>
+                    <input
+                      type="text"
+                      value={editDateInput}
+                      onChange={(e) => setEditDateInput(e.target.value)}
+                      placeholder="e.g. 26th September 2026"
+                      style={{
+                        padding: "0.4rem 0.6rem",
+                        borderRadius: "6px",
+                        border: "1px solid #cbd5e1",
+                        fontSize: "0.85rem",
+                        width: "100%",
+                        boxSizing: "border-box",
+                        background: "var(--bg-input, #ffffff)",
+                        color: "var(--text-primary, #0f172a)",
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={editVenueInput}
+                      onChange={(e) => setEditVenueInput(e.target.value)}
+                      placeholder="e.g. Moonlight Infra"
+                      style={{
+                        padding: "0.4rem 0.6rem",
+                        borderRadius: "6px",
+                        border: "1px solid #cbd5e1",
+                        fontSize: "0.85rem",
+                        width: "100%",
+                        boxSizing: "border-box",
+                        background: "var(--bg-input, #ffffff)",
+                        color: "var(--text-primary, #0f172a)",
+                      }}
+                    />
+                    <div style={{ display: "flex", gap: "0.4rem", justifyContent: "flex-end" }}>
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingEvent(false)}
+                        style={{
+                          background: "#f1f5f9",
+                          border: "none",
+                          borderRadius: "6px",
+                          padding: "0.3rem 0.6rem",
+                          fontSize: "0.78rem",
+                          cursor: "pointer",
+                          color: "#64748b",
+                        }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveEvent}
+                        style={{
+                          background: "#f59e0b",
+                          border: "none",
+                          borderRadius: "6px",
+                          padding: "0.3rem 0.75rem",
+                          fontSize: "0.78rem",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          color: "#ffffff",
+                        }}
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="directory-stat-icon-wrap amber">
+                      <Calendar size={22} />
+                    </div>
+                    <div className="directory-stat-label">
+                      {editionStatus.label}
+                    </div>
+                    <div className="directory-stat-val val-amber" style={{ fontFamily: "var(--font-outfit), sans-serif" }}>
+                      {eventDateStr}
+                    </div>
+                    <div className="directory-stat-sub">
+                      {eventVenue}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
@@ -435,23 +601,7 @@ export default function DirectoryPage() {
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  style={{
-                    position: "absolute",
-                    right: "0.85rem",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    background: "rgba(0, 0, 0, 0.06)",
-                    border: "none",
-                    borderRadius: "50%",
-                    width: "20px",
-                    height: "20px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    color: "#64748b",
-                    fontSize: "0.75rem",
-                  }}
+                  className="search-clear-btn"
                   title="Clear search"
                 >
                   ✕
@@ -497,39 +647,20 @@ export default function DirectoryPage() {
                   alignItems: "center",
                   justifyContent: "center",
                   gap: "0.8rem",
-                  color: "#64748b",
+                  color: "var(--text-muted)",
                   fontSize: "0.95rem",
                   fontWeight: 600,
                   minHeight: "90px",
                 }}
               >
                 {loadingMore && (
-                  <div style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.7rem",
-                    padding: "0.6rem 1.4rem",
-                    background: "rgba(2, 132, 199, 0.08)",
-                    border: "1px solid rgba(2, 132, 199, 0.2)",
-                    borderRadius: "30px",
-                    color: "#0284c7",
-                  }}>
+                  <div className="directory-loading-badge">
                     <Loader2 size={18} className="animate-spin text-cyan-600" />
                     <span>Loading more leaders ({founders.length} / {totalFounders})...</span>
                   </div>
                 )}
                 {!hasMore && founders.length > 0 && (
-                  <div style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    padding: "0.5rem 1.4rem",
-                    background: "rgba(2, 132, 199, 0.05)",
-                    border: "1px solid rgba(2, 132, 199, 0.15)",
-                    borderRadius: "30px",
-                    color: "#0369a1",
-                    fontSize: "0.85rem",
-                  }}>
+                  <div className="directory-loaded-badge">
                     <Sparkles size={14} className="text-cyan-600" />
                     <span>All {totalFounders} leaders loaded</span>
                   </div>

@@ -362,6 +362,7 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.22 }}
+        className="founder-modal-dialog"
         style={{
           background: "#ffffff",
           border: "1px solid rgba(2, 132, 199, 0.2)",
@@ -383,6 +384,7 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
           </h2>
           <button
             onClick={onClose}
+            className="founder-modal-close-btn"
             style={{
               background: "#f1f5f9",
               border: "none",
@@ -396,8 +398,6 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
               justifyContent: "center",
               transition: "background 0.2s, color 0.2s",
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "#e2e8f0"; e.currentTarget.style.color = "#0f172a"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "#f1f5f9"; e.currentTarget.style.color = "#64748b"; }}
           >
             <X size={18} />
           </button>
@@ -571,6 +571,7 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
           <button
             onClick={onClose}
             disabled={saving}
+            className="founder-modal-cancel-btn"
             style={{
               flex: 1,
               padding: "0.75rem 1.5rem",
@@ -583,8 +584,6 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
               cursor: "pointer",
               transition: "background 0.2s",
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "#e2e8f0"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "#f1f5f9"}
           >
             Cancel
           </button>

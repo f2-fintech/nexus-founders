@@ -12,13 +12,13 @@ const cards = [
     icon: <Cpu size={22} className="text-cyan-400" />,
   },
   {
-    img: "/images/eco2.webp",
+    img: "/images/1739780682342.webp",
     title: "Vibrant Community",
     desc: "The sector is home to a diverse range of businesses, from startups to established enterprises, fostering a dynamic and supportive environment.",
     icon: <Users size={22} className="text-indigo-400" />,
   },
   {
-    img: "/images/eco3.webp",
+    img: "/images/abt2025-1000.webp",
     title: "Growth Potential",
     desc: "With its strategic location and growing infrastructure, Noida offers ample opportunities for businesses to flourish and expand.",
     icon: <TrendingUp size={22} className="text-purple-400" />,

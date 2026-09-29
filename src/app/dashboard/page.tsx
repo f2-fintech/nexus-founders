@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import {
   Users, CalendarCheck, RefreshCw, Trash2,
   CheckCircle, Clock, XCircle, Eye,
-  BarChart2, Search, X, ArrowLeft,
+  BarChart2, Search, X, ArrowLeft, Sun, Moon,
 } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
 import "./dashboard.css";
 
 // ─── Types ────────────────────────────────────────────────────
@@ -22,6 +23,7 @@ interface JoinSub {
   challenges: string; risks: string; businessStage: string;
   financialStatus: string; milestone: string; visionImpact: string;
   uniqueStrengths: string; supportNeeded: string; valueContribution: string;
+  questionsAndAnswers?: { section: string; question: string; answer: string; key?: string }[];
   status: "pending" | "reviewed" | "approved" | "rejected";
   createdAt: string;
 }
@@ -64,14 +66,11 @@ function StatusSelector({ id, currentStatus, options, onUpdate, loading }: {
   onUpdate: (id: string, status: string) => void; loading: boolean;
 }) {
   return (
-    <select value={currentStatus} disabled={loading}
+    <select
+      value={currentStatus}
+      disabled={loading}
       onChange={(e) => onUpdate(id, e.target.value)}
-      style={{
-        padding: "0.3rem 0.65rem", borderRadius: "8px",
-        border: "1.5px solid #e2e8f0", background: "#f8fafc",
-        fontSize: "0.8rem", fontWeight: 600, cursor: "pointer",
-        color: "#334155", outline: "none", minWidth: "110px", fontFamily: "inherit",
-      }}
+      className="db-status-select"
     >
       {options.map((opt) => (
         <option key={opt} value={opt}>{opt.charAt(0).toUpperCase() + opt.slice(1)}</option>
@@ -80,61 +79,229 @@ function StatusSelector({ id, currentStatus, options, onUpdate, loading }: {
   );
 }
 
+// ─── Join Question Sections ───────────────────────────────────────
+const JOIN_QUESTION_SECTIONS = [
+  {
+    title: "Section 1: Basic Information",
+    badge: "Profile",
+    color: "#2563eb",
+    bg: "rgba(37, 99, 235, 0.08)",
+    columns: 2,
+    items: [
+      { key: "fullName", question: "Full Name" },
+      { key: "companyName", question: "Company / Startup Name" },
+      { key: "designation", question: "Designation" },
+      { key: "email", question: "Official Email Address" },
+      { key: "linkedin", question: "LinkedIn Profile URL" },
+      { key: "instagram", question: "Instagram Handle / URL" },
+    ],
+  },
+  {
+    title: "Section 2: Business Insights & Strategy",
+    badge: "Insights",
+    color: "#7c3aed",
+    bg: "rgba(124, 58, 237, 0.08)",
+    columns: 1,
+    items: [
+      { key: "challenges", question: "What are the top 2 challenges currently holding back your business growth?" },
+      { key: "risks", question: "If unresolved, what risks do you foresee in the next 6–12 months?" },
+      { key: "businessStage", question: "At what stage is your business currently?" },
+      { key: "financialStatus", question: "Which of these best describes your current financial status?" },
+      { key: "milestone", question: "What is the most important milestone you aim to achieve in the next 12 months?" },
+      { key: "visionImpact", question: "In the Next 3–5 Years, what is the larger vision or impact you want your business to create?" },
+      { key: "uniqueStrengths", question: "What unique strengths set your business apart from competitors?" },
+    ],
+  },
+  {
+    title: "Section 3: Nexus Community Support Exchange",
+    badge: "Reciprocity",
+    color: "#059669",
+    bg: "rgba(5, 150, 105, 0.08)",
+    columns: 1,
+    items: [
+      { key: "supportNeeded", question: "What support do you seek from the Nexus Founders community?" },
+      { key: "valueContribution", question: "What value, knowledge, or resources can you contribute to fellow founders?" },
+    ],
+  },
+];
+
 // ─── Detail Modal ─────────────────────────────────────────────
 function DetailModal({ item, onClose, type }: {
   item: JoinSub | EventReg | null; onClose: () => void; type: "event" | "join";
 }) {
   if (!item) return null;
+  const isJoin = type === "join";
+  const joinItem = isJoin ? (item as JoinSub) : null;
+  const eventItem = !isJoin ? (item as EventReg) : null;
+
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 9999,
-      background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)",
-      display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem",
+      background: "rgba(0,0,0,0.6)", backdropFilter: "blur(5px)",
+      display: "flex", alignItems: "center", justifyContent: "center", padding: "1.25rem",
     }} onClick={onClose}>
-      <div style={{
-        background: "#fff", borderRadius: "20px", padding: "2rem",
-        maxWidth: "640px", width: "100%", maxHeight: "85vh",
-        overflowY: "auto", position: "relative",
-        boxShadow: "0 25px 60px rgba(0,0,0,0.2)",
-      }} onClick={(e) => e.stopPropagation()}>
-        <button onClick={onClose} style={{
-          position: "absolute", top: "1rem", right: "1rem",
+      <div
+        className="no-scrollbar db-modal-content"
+        style={{
+          background: "#ffffff", borderRadius: "22px", padding: "2.25rem 2rem",
+          maxWidth: isJoin ? "840px" : "640px", width: "100%", maxHeight: "88vh",
+          overflowY: "auto", position: "relative",
+          boxShadow: "0 25px 65px rgba(0,0,0,0.25)",
+          border: "1px solid rgba(226, 232, 240, 0.9)",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        } as React.CSSProperties}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button onClick={onClose} className="db-modal-close" style={{
+          position: "absolute", top: "1.25rem", right: "1.25rem",
           border: "none", background: "#f1f5f9", borderRadius: "50%",
-          width: "32px", height: "32px", cursor: "pointer",
+          width: "36px", height: "36px", cursor: "pointer",
           display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b",
+          transition: "background 0.15s ease",
         }}>
-          <X size={16} />
+          <X size={18} />
         </button>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "1.25rem" }}>
-          <div style={{
-            width: "40px", height: "40px", borderRadius: "10px",
-            background: "linear-gradient(135deg, #2563eb, #6366f1)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#fff", fontWeight: 800, fontSize: "1.1rem",
-          }}>
-            {type === "join" ? (item as JoinSub).fullName?.[0] : (item as EventReg).name?.[0]}
+
+        {/* Modal Header */}
+        <div className="db-modal-header" style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          gap: "1rem", marginBottom: "1.75rem", paddingBottom: "1.25rem",
+          borderBottom: "1px solid #f1f5f9", flexWrap: "wrap",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
+            <div style={{
+              width: "48px", height: "48px", borderRadius: "14px",
+              background: "linear-gradient(135deg, #2563eb, #6366f1)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#fff", fontWeight: 800, fontSize: "1.25rem",
+              boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)",
+            }}>
+              {isJoin ? joinItem?.fullName?.[0] : eventItem?.name?.[0]}
+            </div>
+            <div>
+              <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#0f172a", margin: 0, letterSpacing: "-0.01em" }}>
+                {isJoin ? joinItem?.fullName : eventItem?.name}
+              </h3>
+              <span style={{ fontSize: "0.86rem", color: "#64748b", fontWeight: 500 }}>
+                {isJoin ? `${joinItem?.designation || "Applicant"} at ${joinItem?.companyName || "Venture"}` : eventItem?.eventEdition}
+              </span>
+            </div>
           </div>
-          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#0f172a", margin: 0 }}>
-            {type === "join" ? (item as JoinSub).fullName : (item as EventReg).name}
-          </h3>
+
+          {isJoin && joinItem && (
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <StatusBadge status={joinItem.status} config={joinStatusConfig} />
+              <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>
+                {new Date(joinItem.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+              </span>
+            </div>
+          )}
         </div>
-        <div style={{ display: "grid", gap: "0.6rem" }}>
-          {Object.entries(item)
-            .filter(([k]) => !["_id", "__v"].includes(k))
-            .map(([key, val]) => (
-              <div key={key} style={{
-                display: "grid", gridTemplateColumns: "150px 1fr", gap: "0.5rem",
-                padding: "0.5rem 0", borderBottom: "1px solid #f1f5f9",
+
+        {/* Question & Answer Sections */}
+        {isJoin && joinItem ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
+            {JOIN_QUESTION_SECTIONS.map((sec) => (
+              <div key={sec.title} className="db-modal-section" style={{
+                background: "#f8fafc",
+                borderRadius: "16px",
+                padding: "1.35rem 1.5rem",
+                border: "1px solid #e2e8f0",
               }}>
-                <span style={{ fontSize: "0.77rem", fontWeight: 600, color: "#94a3b8", textTransform: "capitalize" }}>
-                  {key.replace(/([A-Z])/g, " $1").trim()}
-                </span>
-                <span style={{ fontSize: "0.84rem", color: "#334155", wordBreak: "break-word" }}>
-                  {String(val || "—")}
-                </span>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+                  <h4 style={{
+                    fontSize: "0.95rem",
+                    fontWeight: 700,
+                    color: sec.color,
+                    letterSpacing: "0.02em",
+                    margin: 0,
+                  }}>
+                    {sec.title}
+                  </h4>
+                  <span style={{
+                    fontSize: "0.72rem",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    padding: "0.2rem 0.6rem",
+                    borderRadius: "9999px",
+                    background: sec.bg,
+                    color: sec.color,
+                  }}>
+                    {sec.badge}
+                  </span>
+                </div>
+
+                <div style={{
+                  display: sec.columns === 2 ? "grid" : "flex",
+                  gridTemplateColumns: sec.columns === 2 ? "repeat(auto-fit, minmax(280px, 1fr))" : undefined,
+                  flexDirection: sec.columns === 2 ? undefined : "column",
+                  gap: "0.9rem",
+                }}>
+                  {sec.items.map((it) => {
+                    const rawVal = (joinItem as any)[it.key];
+                    const answer = rawVal && String(rawVal).trim() !== "" ? String(rawVal) : "—";
+                    const isLink = (it.key === "linkedin" || it.key === "instagram") && answer.startsWith("http");
+
+                    return (
+                      <div key={it.key} className="db-modal-answer" style={{
+                        background: "#ffffff",
+                        padding: "0.9rem 1.1rem",
+                        borderRadius: "12px",
+                        border: "1px solid #e2e8f0",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
+                      }}>
+                        <div style={{
+                          fontSize: "0.84rem",
+                          fontWeight: 700,
+                          color: "#1e293b",
+                          marginBottom: "0.4rem",
+                          lineHeight: 1.35,
+                        }}>
+                          {it.question}
+                        </div>
+                        <div className="answer-val" style={{
+                          fontSize: "0.9rem",
+                          color: answer === "—" ? "#94a3b8" : "#334155",
+                          lineHeight: 1.55,
+                          wordBreak: "break-word",
+                          whiteSpace: "pre-wrap",
+                        }}>
+                          {isLink ? (
+                            <a href={answer} target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", textDecoration: "underline", fontWeight: 500 }}>
+                              {answer}
+                            </a>
+                          ) : (
+                            answer
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             ))}
-        </div>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gap: "0.6rem" }}>
+            {Object.entries(item)
+              .filter(([k]) => !["_id", "__v", "questionsAndAnswers"].includes(k))
+              .map(([key, val]) => (
+                <div key={key} style={{
+                  display: "grid", gridTemplateColumns: "170px 1fr", gap: "0.5rem",
+                  padding: "0.5rem 0", borderBottom: "1px solid #f1f5f9",
+                }}>
+                  <span style={{ fontSize: "0.77rem", fontWeight: 600, color: "#94a3b8", textTransform: "capitalize" }}>
+                    {key.replace(/([A-Z])/g, " $1").trim()}
+                  </span>
+                  <span style={{ fontSize: "0.84rem", color: "#334155", wordBreak: "break-word" }}>
+                    {String(val || "—")}
+                  </span>
+                </div>
+              ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -144,8 +311,9 @@ function DetailModal({ item, onClose, type }: {
 export default function DashboardPage() {
   const { data: session, status: sessionStatus } = useSession();
   const router = useRouter();
+  const { isDark, toggleTheme } = useTheme();
 
-  const [activeTab, setActiveTab] = useState<"events" | "joins">("events");
+  const [activeTab, setActiveTab] = useState<"events" | "joins">("joins");
   const [eventRegs, setEventRegs] = useState<EventReg[]>([]);
   const [joinSubs, setJoinSubs] = useState<JoinSub[]>([]);
   const [loadingData, setLoadingData] = useState(false);
@@ -153,7 +321,7 @@ export default function DashboardPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [detailItem, setDetailItem] = useState<EventReg | JoinSub | null>(null);
-  const [detailType, setDetailType] = useState<"event" | "join">("event");
+  const [detailType, setDetailType] = useState<"event" | "join">("join");
 
   useEffect(() => {
     if (sessionStatus === "unauthenticated") router.push("/login");
@@ -260,10 +428,19 @@ export default function DashboardPage() {
                 Admin <span>Dashboard</span>
               </h1>
               <p className="db-hero-subtitle">
-                Manage event registrations &amp; join submissions in one place
+                Manage join submissions in one place
               </p>
             </div>
             <div className="db-hero-actions">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="db-theme-toggle"
+                title="Toggle Theme"
+              >
+                {isDark ? <Sun size={15} color="#fbbf24" /> : <Moon size={15} color="#e0e7ff" />}
+                <span>{isDark ? "Light Mode" : "Dark Mode"}</span>
+              </button>
               <a href="/" className="db-back">
                 <ArrowLeft size={14} />
                 Back to Website
@@ -281,41 +458,25 @@ export default function DashboardPage() {
       <div className="db-body">
         <div className="db-container">
 
-          {/* Stats */}
-          {activeTab === "events" ? (
-            <div className="db-stats">
-              {[
-                { label: "Total",     value: eventStats.total,     color: "#2563eb" },
-                { label: "Pending",   value: eventStats.pending,   color: "#f59e0b" },
-                { label: "Confirmed", value: eventStats.confirmed, color: "#3b82f6" },
-                { label: "Attended",  value: eventStats.attended,  color: "#10b981" },
-                { label: "Cancelled", value: eventStats.cancelled, color: "#ef4444" },
-              ].map((s) => (
-                <div className="db-stat" key={s.label}>
-                  <div className="db-stat-num" style={{ color: s.color }}>{s.value}</div>
-                  <div className="db-stat-lbl">{s.label}</div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="db-stats">
-              {[
-                { label: "Total",    value: joinStats.total,    color: "#2563eb" },
-                { label: "Pending",  value: joinStats.pending,  color: "#f59e0b" },
-                { label: "Reviewed", value: joinStats.reviewed, color: "#6366f1" },
-                { label: "Approved", value: joinStats.approved, color: "#10b981" },
-                { label: "Rejected", value: joinStats.rejected, color: "#ef4444" },
-              ].map((s) => (
-                <div className="db-stat" key={s.label}>
-                  <div className="db-stat-num" style={{ color: s.color }}>{s.value}</div>
-                  <div className="db-stat-lbl">{s.label}</div>
-                </div>
-              ))}
-            </div>
-          )}
+          {/* Stats: Join Submissions */}
+          <div className="db-stats">
+            {[
+              { label: "Total",    value: joinStats.total,    color: "#2563eb" },
+              { label: "Pending",  value: joinStats.pending,  color: "#f59e0b" },
+              { label: "Reviewed", value: joinStats.reviewed, color: "#6366f1" },
+              { label: "Approved", value: joinStats.approved, color: "#10b981" },
+              { label: "Rejected", value: joinStats.rejected, color: "#ef4444" },
+            ].map((s) => (
+              <div className="db-stat" key={s.label}>
+                <div className="db-stat-num" style={{ color: s.color }}>{s.value}</div>
+                <div className="db-stat-lbl">{s.label}</div>
+              </div>
+            ))}
+          </div>
 
           {/* Tabs */}
           <div className="db-tabs">
+            {/* Event Registrations Tab - Commented out for now
             <button
               className={"db-tab" + (activeTab === "events" ? " active" : "")}
               onClick={() => { setActiveTab("events"); setSearchQuery(""); }}
@@ -324,8 +485,9 @@ export default function DashboardPage() {
               Event Registrations
               <span className="db-tab-count">{eventRegs.length}</span>
             </button>
+            */}
             <button
-              className={"db-tab" + (activeTab === "joins" ? " active" : "")}
+              className="db-tab active"
               onClick={() => { setActiveTab("joins"); setSearchQuery(""); }}
             >
               <Users size={15} />
@@ -340,17 +502,17 @@ export default function DashboardPage() {
               <Search size={14} className="db-search-ico" />
               <input
                 className="db-search"
-                placeholder={activeTab === "events" ? "Search by name, email, company…" : "Search submissions…"}
+                placeholder="Search submissions by name, email, company…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <div className="db-count">
-              {activeTab === "events" ? filteredEvents.length : filteredJoins.length} records
+              {filteredJoins.length} records
             </div>
           </div>
 
-          {/* Event Registrations Table */}
+          {/* Event Registrations Table - Commented out for now
           {activeTab === "events" && (
             <div className="db-card">
               {loadingData ? (
@@ -409,6 +571,7 @@ export default function DashboardPage() {
               )}
             </div>
           )}
+          */}
 
           {/* Join Submissions Table */}
           {activeTab === "joins" && (

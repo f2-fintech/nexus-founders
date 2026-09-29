@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Mail, Lock, ArrowRight, AlertCircle, ArrowLeft } from "lucide-react";
+import { Mail, Lock, ArrowRight, AlertCircle, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,14 +208,14 @@ export default function LoginPage() {
                 }}
               />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 style={{
                   width: "100%",
-                  padding: "0.8rem 1rem 0.8rem 2.75rem",
+                  padding: "0.8rem 2.75rem 0.8rem 2.75rem",
                   background: "#ffffff",
                   border: "1.5px solid #e2e8f0",
                   borderRadius: "10px",
@@ -233,6 +234,29 @@ export default function LoginPage() {
                   e.currentTarget.style.boxShadow = "none";
                 }}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                style={{
+                  position: "absolute",
+                  right: "1rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  color: "#94a3b8",
+                  display: "flex",
+                  alignItems: "center",
+                  transition: "color 0.15s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#0284c7")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#94a3b8")}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
@@ -269,8 +293,38 @@ export default function LoginPage() {
               e.currentTarget.style.boxShadow = "0 4px 14px rgba(2, 132, 199, 0.25)";
             }}
           >
-            {loading ? "Authenticating..." : "Sign In to Portal"}
-            <ArrowRight size={17} />
+            {loading ? (
+              <>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  style={{ animation: "spin 0.8s linear infinite" }}
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="rgba(255,255,255,0.35)"
+                    strokeWidth="3"
+                  />
+                  <path
+                    d="M12 2a10 10 0 0 1 10 10"
+                    stroke="#ffffff"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                Authenticating...
+              </>
+            ) : (
+              <>
+                Sign In to Portal
+                <ArrowRight size={17} />
+              </>
+            )}
+            <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
           </button>
         </form>
       </motion.div>
