@@ -314,7 +314,7 @@ export default function CoordinationTeam() {
                 </div>
 
                 {/* Name */}
-                <h3 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#0f172a", marginBottom: "0.3rem" }}>
+                <h3 style={{ fontSize: "1.25rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "0.3rem" }}>
                   {member.name}
                 </h3>
 
