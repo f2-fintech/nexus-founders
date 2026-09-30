@@ -615,10 +615,7 @@ export default function FloatingHighlightVideo() {
                     return (
                       <button
                         key={item.editionNumber}
-                        onClick={() => {
-                          setProgress(0);
-                          setCurrentIndex(idx);
-                        }}
+                        onClick={() => setCurrentIndex(idx)}
                         title={item.name}
                         aria-label={item.name}
                         style={{
