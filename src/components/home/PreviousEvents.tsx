@@ -82,6 +82,13 @@ const allEditions: Edition[] = [
     videoId: "CxfYif02l3k",
     tagline: "The Future of Enterprise",
   },
+  {
+    name: "15th Edition",
+    editionNum: 15,
+    url: " https://youtu.be/pGvtcQPHvmQ?si=SJWXX9TSA9gVG1i0",
+    videoId: "pGvtcQPHvmQ",
+    tagline: "The Future of Enterprise",
+  },
 ];
 
 function getYouTubeThumbnail(videoId: string) {
