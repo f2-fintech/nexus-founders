@@ -137,13 +137,13 @@ export default function FloatingHighlightVideo() {
               onMouseLeave={() => setIsHovered(false)}
               title="Click to watch full reel"
               style={{
-                width: "clamp(120px, 11vw, 132px)",
+                width: "clamp(92px, 7.5vw, 104px)",
                 aspectRatio: "9 / 16",
-                borderRadius: "14px",
+                borderRadius: "11px",
                 overflow: "hidden",
                 background: "#080c18",
                 boxShadow:
-                  "0 12px 30px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.16)",
+                  "0 10px 25px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.16)",
                 position: "relative",
                 cursor: "pointer",
                 transform: "translateZ(0)",
@@ -155,8 +155,8 @@ export default function FloatingHighlightVideo() {
               <div
                 style={{
                   position: "absolute",
-                  top: "6px",
-                  right: "6px",
+                  top: "4px",
+                  right: "4px",
                   zIndex: 25,
                   pointerEvents: "auto",
                 }}
@@ -166,8 +166,8 @@ export default function FloatingHighlightVideo() {
                   title="Close"
                   aria-label="Close highlights widget"
                   style={{
-                    width: "20px",
-                    height: "20px",
+                    width: "18px",
+                    height: "18px",
                     borderRadius: "50%",
                     background: "rgba(10, 15, 30, 0.85)",
                     backdropFilter: "blur(8px)",
@@ -182,7 +182,7 @@ export default function FloatingHighlightVideo() {
                     padding: 0,
                   }}
                 >
-                  <X size={11} />
+                  <X size={10} />
                 </button>
               </div>
 
@@ -234,11 +234,11 @@ export default function FloatingHighlightVideo() {
                     position: "absolute",
                     inset: 0,
                     background:
-                      "linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.88) 100%)",
+                      "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.3) 65%, rgba(0,0,0,0.9) 100%)",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "flex-end",
-                    padding: "6px 6px 5px",
+                    padding: "4px 5px",
                     zIndex: 10,
                     pointerEvents: "none",
                   }}
@@ -254,18 +254,18 @@ export default function FloatingHighlightVideo() {
                   >
                     <span
                       style={{
-                        width: "5px",
-                        height: "5px",
+                        width: "4px",
+                        height: "4px",
                         borderRadius: "50%",
                         background: "#06b6d4",
                         display: "inline-block",
-                        boxShadow: "0 0 5px #06b6d4",
+                        boxShadow: "0 0 4px #06b6d4",
                       }}
                     />
                     <span
                       style={{
                         color: "#38bdf8",
-                        fontSize: "0.6rem",
+                        fontSize: "0.52rem",
                         fontWeight: 700,
                         letterSpacing: "0.02em",
                         textTransform: "uppercase",
@@ -280,13 +280,13 @@ export default function FloatingHighlightVideo() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      gap: "4px",
+                      gap: "2px",
                     }}
                   >
                     <span
                       style={{
                         color: "#ffffff",
-                        fontSize: "0.56rem",
+                        fontSize: "0.48rem",
                         fontWeight: 600,
                         textShadow: "0 1px 2px rgba(0,0,0,0.9)",
                         whiteSpace: "nowrap",
@@ -300,18 +300,17 @@ export default function FloatingHighlightVideo() {
                       style={{
                         background: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)",
                         color: "#ffffff",
-                        borderRadius: "4px",
-                        padding: "1px 4px",
+                        borderRadius: "3px",
+                        padding: "1px 3px",
                         display: "flex",
                         alignItems: "center",
                         gap: "2px",
-                        fontSize: "0.54rem",
+                        fontSize: "0.46rem",
                         fontWeight: 700,
-                        boxShadow: "0 2px 5px rgba(2, 132, 199, 0.4)",
+                        boxShadow: "0 2px 4px rgba(2, 132, 199, 0.4)",
                       }}
                     >
-                      <Maximize2 size={8} />
-                      <span>Enlarge</span>
+                      <Maximize2 size={7} />
                     </div>
                   </div>
                 </div>
