@@ -22,7 +22,9 @@ import BingoTileCard from "@/components/bingo/BingoTileCard";
 import BingoCameraModal from "@/components/bingo/BingoCameraModal";
 import BingoRegistrationModal from "@/components/bingo/BingoRegistrationModal";
 import BingoLeaderboardModal from "@/components/bingo/BingoLeaderboardModal";
+import BingoLevelUpModal from "@/components/bingo/BingoLevelUpModal";
 import { ClientBingoParticipant } from "@/models/BingoParticipant";
+import Navbar from "@/components/Navbar";
 import "./bingo.css";
 
 const TOTAL_TIME_SECONDS = 120 * 60; // 120 Minutes
@@ -56,6 +58,15 @@ export default function BingoPage() {
   const [activeScanningTile, setActiveScanningTile] = useState<number | null>(null);
   const [previewCardUrl, setPreviewCardUrl] = useState<string | null>(null);
   const [showWinnerCelebration, setShowWinnerCelebration] = useState(false);
+  const [showLevelUpModal, setShowLevelUpModal] = useState(false);
+  const [levelUpData, setLevelUpData] = useState<{
+    level: number;
+    tileNumber: number;
+    tileTitle: string;
+    contactName?: string;
+    contactCompany?: string;
+    cardPhotoUrl?: string;
+  } | null>(null);
 
   // Timer
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -204,11 +215,23 @@ export default function BingoPage() {
           throw new Error(resData.error || "Failed to update tile");
         }
 
+        const currentTileNum = activeScanningTile;
+        const currentChallenge = BINGO_CHALLENGES.find((c) => c.id === currentTileNum);
+
         setParticipant(resData.participant);
 
-        if (resData.justWon) {
-          setShowWinnerCelebration(true);
-        }
+        const newLevel = resData.completedCount || ((participant?.completedCount || 0) + 1);
+
+        // Always show the congratulatory Level Up celebration modal
+        setLevelUpData({
+          level: newLevel,
+          tileNumber: currentTileNum,
+          tileTitle: currentChallenge?.statement || `Challenge #${currentTileNum}`,
+          contactName: data.contactName,
+          contactCompany: data.contactCompany,
+          cardPhotoUrl: data.photoUrl,
+        });
+        setShowLevelUpModal(true);
       } catch (err: any) {
         alert(`Error updating tile: ${err.message}`);
       } finally {
@@ -233,8 +256,10 @@ export default function BingoPage() {
   const isGamePaused = gameConfig?.gameState === "paused";
 
   return (
-    <div className="bingo-container">
-      <div className="bingo-wrapper">
+    <div className="bingo-page-container">
+      <Navbar />
+      <div className="bingo-container">
+        <div className="bingo-wrapper">
 
 
         {/* Paused Banner if game is paused by admin */}
@@ -881,6 +906,29 @@ export default function BingoPage() {
         />
       )}
 
+      {/* ── Gamified Level Up Celebration Modal ── */}
+      {levelUpData && (
+        <BingoLevelUpModal
+          isOpen={showLevelUpModal}
+          onClose={() => {
+            setShowLevelUpModal(false);
+            if (levelUpData.level >= 20) {
+              setShowWinnerCelebration(true);
+            }
+          }}
+          level={levelUpData.level}
+          tileNumber={levelUpData.tileNumber}
+          tileTitle={levelUpData.tileTitle}
+          contactName={levelUpData.contactName}
+          contactCompany={levelUpData.contactCompany}
+          cardPhotoUrl={levelUpData.cardPhotoUrl}
+          onCompleteAll={() => {
+            setShowLevelUpModal(false);
+            setShowWinnerCelebration(true);
+          }}
+        />
+      )}
+
       {/* ── Live Leaderboard Modal ── */}
       <BingoLeaderboardModal
         isOpen={isLeaderboardOpen}
@@ -1166,6 +1214,7 @@ export default function BingoPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

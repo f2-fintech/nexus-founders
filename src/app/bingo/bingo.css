@@ -17,9 +17,9 @@
   --bingo-card-text: #f8fafc;
 }
 
-.bingo-container {
+.bingo-page-container {
   min-height: 100vh;
-  padding: 6.5rem 1.5rem 4rem;
+  min-height: 100dvh;
   background: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.15) 0%, transparent 60%),
               radial-gradient(circle at 10% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
               radial-gradient(circle at 90% 70%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
@@ -27,7 +27,20 @@
   color: #f8fafc;
   display: flex;
   flex-direction: column;
+  position: relative;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.bingo-container {
+  flex: 1;
+  padding: 1.25rem 1.5rem 4rem;
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .bingo-wrapper {
@@ -157,7 +170,7 @@
     height: 36px;
   }
   .bingo-container {
-    padding: 5rem 0.6rem 2.5rem;
+    padding: 1rem 0.6rem 2.5rem;
   }
   .bingo-header-card {
     padding: 1.25rem 1rem;
@@ -169,7 +182,7 @@
 
 @media (max-width: 580px) {
   .bingo-container {
-    padding: 4.5rem 0.35rem 2rem;
+    padding: 0.75rem 0.35rem 2rem;
   }
   .bingo-wrapper {
     gap: 0.85rem;
