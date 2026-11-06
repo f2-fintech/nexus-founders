@@ -41,8 +41,8 @@
 /* Header Banner */
 .bingo-header-card {
   background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 24px;
   padding: 2.25rem 2rem;
@@ -50,6 +50,8 @@
   text-align: center;
   position: relative;
   overflow: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .bingo-header-card::before {
@@ -270,7 +272,8 @@
 /* Progress bar capsule */
 .bingo-progress-capsule {
   background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   padding: 1.25rem 1.5rem;
@@ -278,6 +281,8 @@
   flex-direction: column;
   gap: 0.75rem;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 /* Timer pill */

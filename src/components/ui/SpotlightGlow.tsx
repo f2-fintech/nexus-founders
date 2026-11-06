@@ -6,11 +6,16 @@ export default function SpotlightGlow() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    // Disable on mobile/touch screens to save GPU memory on iOS WebKit
+    if (window.matchMedia && window.matchMedia("(hover: none)").matches) {
+      return;
+    }
+
     setIsClient(true);
     const handleMouseMove = (e: MouseEvent) => {
       setPos({ x: e.clientX, y: e.clientY });
     };
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
