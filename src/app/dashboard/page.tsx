@@ -6,8 +6,10 @@ import {
   Users, CalendarCheck, RefreshCw, Trash2,
   CheckCircle, Clock, XCircle, Eye,
   BarChart2, Search, X, ArrowLeft, Sun, Moon,
+  Trophy,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
+import BingoManager from "@/components/admin/BingoManager";
 import "./dashboard.css";
 
 // ─── Types ────────────────────────────────────────────────────
@@ -313,7 +315,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const { isDark, toggleTheme } = useTheme();
 
-  const [activeTab, setActiveTab] = useState<"events" | "joins">("joins");
+  const [activeTab, setActiveTab] = useState<"events" | "joins" | "bingo">("joins");
   const [eventRegs, setEventRegs] = useState<EventReg[]>([]);
   const [joinSubs, setJoinSubs] = useState<JoinSub[]>([]);
   const [loadingData, setLoadingData] = useState(false);
@@ -458,43 +460,44 @@ export default function DashboardPage() {
       <div className="db-body">
         <div className="db-container">
 
-          {/* Stats: Join Submissions */}
-          <div className="db-stats">
-            {[
-              { label: "Total",    value: joinStats.total,    color: "#2563eb" },
-              { label: "Pending",  value: joinStats.pending,  color: "#f59e0b" },
-              { label: "Reviewed", value: joinStats.reviewed, color: "#6366f1" },
-              { label: "Approved", value: joinStats.approved, color: "#10b981" },
-              { label: "Rejected", value: joinStats.rejected, color: "#ef4444" },
-            ].map((s) => (
-              <div className="db-stat" key={s.label}>
-                <div className="db-stat-num" style={{ color: s.color }}>{s.value}</div>
-                <div className="db-stat-lbl">{s.label}</div>
-              </div>
-            ))}
-          </div>
-
           {/* Tabs */}
-          <div className="db-tabs">
-            {/* Event Registrations Tab - Commented out for now
+          <div className="db-tabs" style={{ marginBottom: "1.5rem" }}>
             <button
-              className={"db-tab" + (activeTab === "events" ? " active" : "")}
-              onClick={() => { setActiveTab("events"); setSearchQuery(""); }}
-            >
-              <CalendarCheck size={15} />
-              Event Registrations
-              <span className="db-tab-count">{eventRegs.length}</span>
-            </button>
-            */}
-            <button
-              className="db-tab active"
+              className={"db-tab" + (activeTab === "joins" ? " active" : "")}
               onClick={() => { setActiveTab("joins"); setSearchQuery(""); }}
             >
               <Users size={15} />
               Join Submissions
               <span className="db-tab-count">{joinSubs.length}</span>
             </button>
+            <button
+              className={"db-tab" + (activeTab === "bingo" ? " active" : "")}
+              onClick={() => { setActiveTab("bingo"); setSearchQuery(""); }}
+            >
+              <Trophy size={15} />
+              Nexus Bingo (SFF)
+            </button>
           </div>
+
+          {activeTab === "bingo" && <BingoManager />}
+
+          {activeTab === "joins" && (
+            <>
+              {/* Stats: Join Submissions */}
+              <div className="db-stats">
+                {[
+                  { label: "Total",    value: joinStats.total,    color: "#2563eb" },
+                  { label: "Pending",  value: joinStats.pending,  color: "#f59e0b" },
+                  { label: "Reviewed", value: joinStats.reviewed, color: "#6366f1" },
+                  { label: "Approved", value: joinStats.approved, color: "#10b981" },
+                  { label: "Rejected", value: joinStats.rejected, color: "#ef4444" },
+                ].map((s) => (
+                  <div className="db-stat" key={s.label}>
+                    <div className="db-stat-num" style={{ color: s.color }}>{s.value}</div>
+                    <div className="db-stat-lbl">{s.label}</div>
+                  </div>
+                ))}
+              </div>
 
           {/* Toolbar */}
           <div className="db-toolbar">
@@ -630,6 +633,8 @@ export default function DashboardPage() {
               )}
             </div>
           )}
+        </>
+      )}
 
         </div>
       </div>

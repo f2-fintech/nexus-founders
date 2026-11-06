@@ -1,0 +1,355 @@
+/* Nexus Networking Bingo Page Styles */
+
+:root {
+  --bingo-bg: #090d1a;
+  --bingo-card-bg: #ffffff;
+  --bingo-card-border: #cbd5e1;
+  --bingo-card-text: #0f172a;
+  --bingo-accent: #0284c7;
+  --bingo-accent-hover: #0369a1;
+  --bingo-success: #10b981;
+}
+
+[data-theme="dark"] {
+  --bingo-bg: #050814;
+  --bingo-card-bg: #0f172a;
+  --bingo-card-border: rgba(255, 255, 255, 0.12);
+  --bingo-card-text: #f8fafc;
+}
+
+.bingo-container {
+  min-height: 100vh;
+  padding: 6.5rem 1.5rem 4rem;
+  background: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.15) 0%, transparent 60%),
+              radial-gradient(circle at 10% 30%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 90% 70%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+              var(--bingo-bg);
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bingo-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Header Banner */
+.bingo-header-card {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: 2.25rem 2rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.bingo-header-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #0284c7, #6366f1, #10b981, #f59e0b);
+}
+
+.bingo-title {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin: 0.5rem 0 0.25rem;
+  background: linear-gradient(135deg, #ffffff 30%, #38bdf8 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+}
+
+.bingo-subtitle {
+  font-size: 1rem;
+  color: #94a3b8;
+  max-width: 650px;
+  margin: 0.5rem auto 1.5rem;
+  line-height: 1.5;
+}
+
+/* Grid Layout: 4 Columns on ALL devices as requested by user */
+.bingo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+/* Default label visibility on desktop */
+.bingo-scan-lbl-short {
+  display: none;
+}
+.bingo-scan-lbl-full {
+  display: inline;
+}
+.bingo-rescan-lbl-full {
+  display: inline;
+}
+
+/* Challenge Tile Icon Box & Image (Enlarged on Desktop for visual prominence) */
+.bingo-tile-icon-box {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+  flex-shrink: 0;
+}
+
+.bingo-tile:hover .bingo-tile-icon-box {
+  transform: scale(1.06);
+}
+
+.bingo-tile-icon-img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@media (max-width: 1024px) {
+  .bingo-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.85rem;
+  }
+  .bingo-tile-icon-box {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+  }
+  .bingo-tile-icon-img {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 768px) {
+  .bingo-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+  .bingo-tile-icon-box {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+  }
+  .bingo-tile-icon-img {
+    width: 36px;
+    height: 36px;
+  }
+  .bingo-container {
+    padding: 5rem 0.6rem 2.5rem;
+  }
+  .bingo-header-card {
+    padding: 1.25rem 1rem;
+  }
+  .bingo-title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 580px) {
+  .bingo-container {
+    padding: 4.5rem 0.35rem 2rem;
+  }
+  .bingo-wrapper {
+    gap: 0.85rem;
+  }
+  .bingo-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.3rem;
+  }
+
+  /* Compact 4-column card format on mobile */
+  .bingo-tile, .bingo-skeleton-card {
+    padding: 0.4rem 0.25rem !important;
+    min-height: 155px !important;
+    border-radius: 10px !important;
+  }
+
+  .bingo-tile-number {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 0.65rem !important;
+  }
+
+  .bingo-tile-badge {
+    padding: 0.15rem 0.35rem !important;
+    font-size: 0.58rem !important;
+    border-radius: 8px !important;
+  }
+
+  .bingo-verified-lbl {
+    display: none !important;
+  }
+
+  .bingo-tile-icon-box {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 8px !important;
+  }
+
+  .bingo-tile-icon-img {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .bingo-tile-statement {
+    font-size: 0.62rem !important;
+    line-height: 1.2 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .bingo-tile-sign-hint {
+    display: none !important;
+  }
+
+  .bingo-tile-scan-btn {
+    padding: 0.32rem 0.2rem !important;
+    font-size: 0.62rem !important;
+    border-radius: 6px !important;
+  }
+
+  .bingo-scan-lbl-full {
+    display: none !important;
+  }
+
+  .bingo-scan-lbl-short {
+    display: inline !important;
+  }
+
+  .bingo-scan-ico {
+    width: 11px !important;
+    height: 11px !important;
+  }
+
+  .bingo-tile-thumb {
+    width: 22px !important;
+    height: 16px !important;
+  }
+
+  .bingo-tile-contact-name {
+    font-size: 0.6rem !important;
+    max-width: 42px !important;
+  }
+
+  .bingo-tile-contact-comp {
+    display: none !important;
+  }
+
+  .bingo-tile-rescan-btn {
+    padding: 0.22rem 0.35rem !important;
+    font-size: 0.58rem !important;
+  }
+
+  .bingo-rescan-lbl-full {
+    display: none !important;
+  }
+}
+
+/* Progress bar capsule */
+.bingo-progress-capsule {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Timer pill */
+.bingo-timer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  border-radius: 30px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  font-family: monospace;
+}
+
+/* Confetti animation */
+@keyframes popWinner {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.bingo-winner-modal {
+  animation: popWinner 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Skeleton Loading Shimmer ── */
+@keyframes shimmerWave {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.bingo-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmerWave 1.6s infinite ease-in-out;
+  border-radius: 8px;
+}
+
+.bingo-skeleton-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justifyContent: space-between;
+  min-height: 220px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.bingo-skeleton-card .skeleton-pulse {
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 25%,
+    #e2e8f0 50%,
+    #f1f5f9 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmerWave 1.4s infinite ease-in-out;
+  border-radius: 6px;
+}

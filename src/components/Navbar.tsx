@@ -21,6 +21,7 @@ import {
   LayoutDashboard,
   Sun,
   Moon,
+  Gamepad2,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -78,6 +79,7 @@ export default function Navbar() {
   const baseLinks = [
     { href: "/", label: "Home Page", icon: Home },
     { href: "/directory", label: "Directory", icon: Users },
+    { href: "/bingo", label: "Nexus Bingo", icon: Gamepad2 },
     { href: "/join", label: "Join Us", icon: Sparkles },
   ];
 

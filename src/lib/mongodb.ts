@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
-import dns from "node:dns";
+import dns from "dns";
 
-// Prevent Windows querySrv ETIMEOUT on MongoDB Atlas SRV connection strings
+// Prevent Windows querySrv ECONNREFUSED on MongoDB Atlas SRV connection strings
 try {
   dns.setServers(["8.8.8.8", "1.1.1.1", "8.8.4.4"]);
+  dns.setDefaultResultOrder?.("ipv4first");
 } catch (e) {
   // Ignore in environments where setting DNS servers is restricted
 }
@@ -26,6 +27,11 @@ if (!global._mongoose) {
 
 export async function connectDB() {
   if (cached.conn) return cached.conn;
+
+  try {
+    dns.setServers(["8.8.8.8", "1.1.1.1", "8.8.4.4"]);
+    dns.setDefaultResultOrder?.("ipv4first");
+  } catch (e) {}
 
   if (!cached.promise) {
     const opts = {
