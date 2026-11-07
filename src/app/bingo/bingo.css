@@ -371,3 +371,118 @@
   animation: shimmerWave 1.4s infinite ease-in-out;
   border-radius: 6px;
 }
+
+/* ── Card Scanner Laser Beam & Corner Brackets ── */
+@keyframes laserScan {
+  0% {
+    top: 6%;
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  100% {
+    top: 92%;
+    opacity: 0.3;
+  }
+}
+
+.scanner-laser-beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #38bdf8 20%, #10b981 50%, #38bdf8 80%, transparent 100%);
+  box-shadow: 0 0 14px #38bdf8, 0 0 5px #10b981;
+  animation: laserScan 2s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.scanner-laser-beam.detected {
+  background: linear-gradient(90deg, transparent 0%, #10b981 20%, #34d399 50%, #10b981 80%, transparent 100%);
+  box-shadow: 0 0 16px #10b981, 0 0 6px #34d399;
+}
+
+.corner-bracket {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: #38bdf8;
+  border-style: solid;
+  pointer-events: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.corner-bracket.detected {
+  border-color: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+
+.corner-top-left {
+  top: -2px;
+  left: -2px;
+  border-width: 3.5px 0 0 3.5px;
+  border-top-left-radius: 10px;
+}
+
+.corner-top-right {
+  top: -2px;
+  right: -2px;
+  border-width: 3.5px 3.5px 0 0;
+  border-top-right-radius: 10px;
+}
+
+.corner-bottom-left {
+  bottom: -2px;
+  left: -2px;
+  border-width: 0 0 3.5px 3.5px;
+  border-bottom-left-radius: 10px;
+}
+
+.corner-bottom-right {
+  bottom: -2px;
+  right: -2px;
+  border-width: 0 3.5px 3.5px 0;
+  border-bottom-right-radius: 10px;
+}
+
+/* Real Camera Shutter Flash & Countdown Pulse Animations */
+@keyframes shutterFlash {
+  0% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.shutter-flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  pointer-events: none;
+  z-index: 99;
+  animation: shutterFlash 0.25s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes countdownPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.22);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+}
+
+.countdown-pulse {
+  display: inline-block;
+  animation: countdownPulse 0.6s ease-in-out infinite;
+}
+
