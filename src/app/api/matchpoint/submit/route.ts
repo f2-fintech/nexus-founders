@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import MatchPointSubmission from "@/models/MatchPointSubmission";
+import { findBestMatchesForSubmission } from "@/lib/matchmaking";
+import { sendMatchIntroductionEmail } from "@/lib/mailer";
 import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
@@ -213,6 +215,93 @@ export async function POST(req: NextRequest) {
       matchedWith: [],
       source,
     });
+
+    // Robust automated matchmaking on registration
+    try {
+      const existingPool = await MatchPointSubmission.find({ _id: { $ne: newSubmission._id } }).sort({ createdAt: -1 });
+      const bestMatches = findBestMatchesForSubmission(newSubmission, existingPool, 1, 78);
+
+      if (bestMatches.length > 0) {
+        const { candidate: partner, evaluation } = bestMatches[0];
+
+        let emailSent = false;
+        let emailSentAt: Date | undefined;
+
+        if (newSubmission.email && partner.email) {
+          const mailRes = await sendMatchIntroductionEmail({
+            seeker: {
+              fullName: newSubmission.fullName,
+              email: newSubmission.email,
+              companyName: newSubmission.companyName,
+              designation: newSubmission.designation,
+              phone: newSubmission.phone,
+              city: newSubmission.city,
+              linkedinUrl: newSubmission.linkedinUrl,
+              websiteUrl: newSubmission.websiteUrl,
+              aboutCompany: newSubmission.aboutCompany,
+              lookingForDetails: newSubmission.lookingForDetails,
+            },
+            provider: {
+              fullName: partner.fullName,
+              email: partner.email,
+              companyName: partner.companyName,
+              designation: partner.designation,
+              phone: partner.phone,
+              city: partner.city,
+              linkedinUrl: partner.linkedinUrl,
+              aboutCompany: partner.aboutCompany,
+              usps: partner.usps,
+            },
+            matchedCategory: evaluation.matchedCategory,
+            matchPercentage: evaluation.percentage,
+            matchReason: evaluation.reason,
+          });
+
+          if (mailRes.success) {
+            emailSent = true;
+            emailSentAt = new Date();
+          }
+        }
+
+        // Link partner to newSubmission
+        newSubmission.matchedWith.push({
+          submissionId: partner._id,
+          companyName: partner.companyName,
+          contactName: partner.fullName,
+          email: partner.email,
+          phone: partner.phone || "",
+          matchedCategory: evaluation.matchedCategory,
+          matchScore: evaluation.score,
+          matchPercentage: evaluation.percentage,
+          matchReason: evaluation.reason,
+          emailSent,
+          emailSentAt,
+          matchedAt: new Date(),
+        });
+        newSubmission.status = emailSent ? "emailed" : "matched";
+        await newSubmission.save();
+
+        // Bilateral link on partner
+        partner.matchedWith.push({
+          submissionId: newSubmission._id,
+          companyName: newSubmission.companyName,
+          contactName: newSubmission.fullName,
+          email: newSubmission.email,
+          phone: newSubmission.phone || "",
+          matchedCategory: evaluation.matchedCategory,
+          matchScore: evaluation.score,
+          matchPercentage: evaluation.percentage,
+          matchReason: evaluation.reason,
+          emailSent,
+          emailSentAt,
+          matchedAt: new Date(),
+        });
+        partner.status = emailSent ? "emailed" : "matched";
+        await partner.save();
+      }
+    } catch (matchErr) {
+      console.error("Auto-match on registration notice:", matchErr);
+    }
 
     return NextResponse.json({
       success: true,

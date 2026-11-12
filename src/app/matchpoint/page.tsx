@@ -1154,27 +1154,93 @@ function MatchPointContent() {
                       <div key={idx} style={{ background: "#ffffff", padding: "0.85rem 1.1rem", borderRadius: "14px", border: "1px solid rgba(16, 185, 129, 0.3)", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.4rem" }}>
                           <strong style={{ fontSize: "1rem", color: "#0f172a" }}>{m.companyName}</strong>
-                          <span style={{ fontSize: "0.78rem", background: "rgba(16, 185, 129, 0.12)", color: "#059669", padding: "0.2rem 0.6rem", borderRadius: "8px", fontWeight: 700 }}>
-                            {m.matchedCategory}
-                          </span>
+                          <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                            {m.matchPercentage && (
+                              <span style={{ fontSize: "0.76rem", background: "#059669", color: "#ffffff", padding: "0.2rem 0.65rem", borderRadius: "8px", fontWeight: 800 }}>
+                                {m.matchPercentage}% Alignment
+                              </span>
+                            )}
+                            <span style={{ fontSize: "0.76rem", background: "rgba(16, 185, 129, 0.12)", color: "#059669", padding: "0.2rem 0.6rem", borderRadius: "8px", fontWeight: 700 }}>
+                              {m.matchedCategory}
+                            </span>
+                          </div>
                         </div>
                         {m.contactName && (
-                          <div style={{ fontSize: "0.82rem", color: "#64748b", marginTop: "0.25rem" }}>
-                            Contact: <strong>{m.contactName}</strong>
+                          <div style={{ fontSize: "0.82rem", color: "#64748b", marginTop: "0.3rem" }}>
+                            Contact: <strong>{m.contactName}</strong> {m.email ? `• ${m.email}` : ""}
+                          </div>
+                        )}
+                        {m.matchReason && (
+                          <div style={{ fontSize: "0.82rem", color: "#065f46", margin: "0.35rem 0 0", fontWeight: 600 }}>
+                            Focus: {m.matchReason}
                           </div>
                         )}
                         {m.notes && (
-                          <p style={{ fontSize: "0.82rem", color: "#334155", margin: "0.35rem 0 0", fontStyle: "italic" }}>
-                            "{m.notes}"
+                          <p style={{ fontSize: "0.8rem", color: "#475569", margin: "0.25rem 0 0", fontStyle: "italic" }}>
+                            &ldquo;{m.notes}&rdquo;
                           </p>
                         )}
                       </div>
                     ))}
                   </div>
 
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.85rem", fontSize: "0.8rem", color: "#047857" }}>
-                    <Mail size={14} />
-                    <span>Official introduction emails with direct contact coordinates will be shared on <strong>Nov 20th–21st</strong>.</span>
+                  {activePass.status === "emailed" || activePass.matchedWith?.some((m: any) => m.emailSent) ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.85rem", fontSize: "0.82rem", color: "#047857", background: "rgba(16, 185, 129, 0.12)", padding: "0.6rem 0.85rem", borderRadius: "10px" }}>
+                      <CheckCircle2 size={16} color="#059669" />
+                      <span>Official executive introduction email has been dispatched to both founders! Please check your official inbox (<strong>{activePass.email}</strong>).</span>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.85rem", fontSize: "0.8rem", color: "#047857" }}>
+                      <Mail size={14} />
+                      <span>Official introduction email connecting both leadership teams will be dispatched to <strong>{activePass.email}</strong>.</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Waiting for Match Banner (When no partner matched yet) */}
+              {!(activePass.status === "matched" || (activePass.matchedWith && activePass.matchedWith.length > 0)) && (
+                <div style={{
+                  background: "linear-gradient(135deg, rgba(2, 132, 199, 0.05) 0%, rgba(59, 130, 246, 0.02) 100%)",
+                  border: "1.5px dashed rgba(2, 132, 199, 0.35)",
+                  borderRadius: "18px",
+                  padding: "1.25rem 1.4rem",
+                  margin: "1.25rem 0",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "0.9rem",
+                  boxShadow: "0 4px 15px rgba(2, 132, 199, 0.04)"
+                }}>
+                  <div style={{
+                    width: "38px",
+                    height: "38px",
+                    borderRadius: "12px",
+                    background: "rgba(2, 132, 199, 0.12)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#0284c7",
+                    flexShrink: 0,
+                    marginTop: "2px",
+                  }}>
+                    <Clock size={18} className="spin" style={{ animationDuration: "10s" }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.35rem" }}>
+                      <strong style={{ fontSize: "1.02rem", color: "#0f172a" }}>
+                        Waiting for an Ideal Match...
+                      </strong>
+                      <span style={{ fontSize: "0.72rem", background: "#e0f2fe", color: "#0369a1", padding: "0.2rem 0.6rem", borderRadius: "9999px", fontWeight: 700 }}>
+                        Live Queue Active
+                      </span>
+                    </div>
+                    <p style={{ fontSize: "0.84rem", color: "#475569", margin: "0 0 0.5rem", lineHeight: 1.55 }}>
+                      Your requirements under <strong>{activePass.needCategories?.join(", ") || "General Partnership"}</strong> are actively screening across Singapore FinTech Festival attendees.
+                    </p>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.8rem", color: "#0284c7", fontWeight: 600 }}>
+                      <Mail size={14} />
+                      As soon as a matching founder or company is identified, both parties will automatically receive an official executive introduction email!
+                    </div>
                   </div>
                 </div>
               )}

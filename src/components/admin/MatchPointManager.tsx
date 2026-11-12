@@ -26,8 +26,10 @@ import {
   Sparkles,
   ArrowRight,
   Send,
+  Zap,
 } from "lucide-react";
 import { ClientMatchPointSubmission, IMatchedPartner } from "@/models/MatchPointSubmission";
+import { evaluateMatch, MatchEvaluation } from "@/lib/matchmaking";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   pending: { label: "Pending Review", color: "#f59e0b", bg: "rgba(245, 158, 11, 0.12)" },
@@ -58,13 +60,20 @@ export default function MatchPointManager() {
 
   // Matchmaking modal
   const [matchModalTarget, setMatchModalTarget] = useState<ClientMatchPointSubmission | null>(null);
+  const [matchPartnerSubmissionId, setMatchPartnerSubmissionId] = useState<string | null>(null);
   const [matchPartnerCompany, setMatchPartnerCompany] = useState("");
   const [matchPartnerContact, setMatchPartnerContact] = useState("");
   const [matchPartnerEmail, setMatchPartnerEmail] = useState("");
   const [matchPartnerPhone, setMatchPartnerPhone] = useState("");
   const [matchPartnerCategory, setMatchPartnerCategory] = useState("");
+  const [matchPartnerPercentage, setMatchPartnerPercentage] = useState<number>(88);
+  const [matchPartnerScore, setMatchPartnerScore] = useState<number>(60);
+  const [matchPartnerReason, setMatchPartnerReason] = useState("");
   const [matchPartnerNotes, setMatchPartnerNotes] = useState("");
+  const [sendEmailNow, setSendEmailNow] = useState(true);
   const [savingMatch, setSavingMatch] = useState(false);
+  const [runningAutoMatch, setRunningAutoMatch] = useState(false);
+  const [resendingEmailId, setResendingEmailId] = useState<string | null>(null);
 
   // Quick notes editor
   const [editingNotesId, setEditingNotesId] = useState<string | null>(null);
@@ -142,12 +151,17 @@ export default function MatchPointManager() {
       const payload = {
         id: matchModalTarget._id,
         addMatch: {
+          submissionId: matchPartnerSubmissionId || undefined,
           companyName: matchPartnerCompany.trim(),
           contactName: matchPartnerContact.trim(),
           email: matchPartnerEmail.trim(),
           phone: matchPartnerPhone.trim(),
           matchedCategory: matchPartnerCategory.trim() || matchModalTarget.needCategories?.[0] || "General Match",
+          matchPercentage: matchPartnerPercentage || 88,
+          matchScore: matchPartnerScore || 60,
+          matchReason: matchPartnerReason || "",
           notes: matchPartnerNotes.trim(),
+          sendEmailNow,
         },
       };
 
@@ -160,13 +174,23 @@ export default function MatchPointManager() {
       const data = await res.json();
       if (data.success) {
         setMatchModalTarget(null);
+        setMatchPartnerSubmissionId(null);
         setMatchPartnerCompany("");
         setMatchPartnerContact("");
         setMatchPartnerEmail("");
         setMatchPartnerPhone("");
         setMatchPartnerCategory("");
+        setMatchPartnerPercentage(88);
+        setMatchPartnerReason("");
         setMatchPartnerNotes("");
+        setSendEmailNow(true);
         fetchData();
+
+        if (data.emailDispatched) {
+          alert("Match successfully linked and introduction email dispatched to both parties!");
+        } else if (data.emailError) {
+          alert(`Match linked. Note regarding email: ${data.emailError}`);
+        }
       }
     } catch (e) {
       console.error("Failed to link match:", e);
@@ -175,14 +199,71 @@ export default function MatchPointManager() {
     }
   };
 
-  // Quick link from candidate
-  const handleSelectCandidate = (candidate: ClientMatchPointSubmission) => {
+  // Run Bulk Auto-Match
+  const handleRunAutoMatch = async () => {
+    if (!confirm("Run Auto-Match across pending submissions and dispatch introduction emails to compatible companies?")) return;
+    setRunningAutoMatch(true);
+    try {
+      const res = await fetch("/api/matchpoint/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "run_automatch", minPercentage: 75, sendEmails: true }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(data.message || `Connected ${data.matchedCount} pairs!`);
+        fetchData();
+      } else {
+        alert(data.error || "Failed to execute auto-match.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("An unexpected error occurred while executing auto-match.");
+    } finally {
+      setRunningAutoMatch(false);
+    }
+  };
+
+  // Re-dispatch introduction email for an existing match
+  const handleResendEmail = async (submissionId: string, matchIndex: number) => {
+    setResendingEmailId(`${submissionId}-${matchIndex}`);
+    try {
+      const res = await fetch("/api/matchpoint/admin", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: submissionId, resendEmailIndex: matchIndex }),
+      });
+      const data = await res.json();
+      if (data.success && data.emailDispatched) {
+        alert("Introduction email dispatched successfully to both parties!");
+        fetchData();
+      } else {
+        alert(data.emailError || "Failed to dispatch email.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error sending email.");
+    } finally {
+      setResendingEmailId(null);
+    }
+  };
+
+  // Quick link from candidate with evaluation
+  const handleSelectCandidate = (candidate: ClientMatchPointSubmission, evaluation?: MatchEvaluation) => {
+    setMatchPartnerSubmissionId(candidate._id);
     setMatchPartnerCompany(candidate.companyName);
     setMatchPartnerContact(candidate.fullName);
     setMatchPartnerEmail(candidate.email);
     setMatchPartnerPhone(candidate.phone || "");
-    setMatchPartnerCategory(candidate.category || "Service Partner");
-    setMatchPartnerNotes(`Paired based on ${candidate.companyName}'s offerings and ${matchModalTarget?.companyName}'s needs.`);
+    setMatchPartnerCategory(evaluation?.matchedCategory || candidate.needCategories?.[0] || "Strategic Partner");
+    setMatchPartnerPercentage(evaluation?.percentage || 88);
+    setMatchPartnerScore(evaluation?.score || 60);
+    setMatchPartnerReason(evaluation?.reason || "");
+    setMatchPartnerNotes(
+      evaluation?.reason
+        ? `Synergy: ${evaluation.reason}`
+        : `Paired based on ${candidate.companyName}'s offerings and ${matchModalTarget?.companyName}'s requirements.`
+    );
   };
 
   // Remove linked match
@@ -307,29 +388,16 @@ export default function MatchPointManager() {
   // Potential Match Suggestions for Matchmaking Modal
   const candidateMatches = useMemo(() => {
     if (!matchModalTarget) return [];
-    const targetNeeds = matchModalTarget.needCategories || [];
-    const targetKeywords = matchModalTarget.keywords || [];
 
     return submissions
       .filter((s) => s._id !== matchModalTarget._id)
       .map((s) => {
-        // Calculate basic keyword overlap score
-        let score = 0;
-        const offerText = `${s.aboutCompany} ${s.offeringsDescription || ""} ${s.usps?.join(" ") || ""}`.toLowerCase();
-
-        targetKeywords.forEach((kw) => {
-          if (kw && offerText.includes(kw.toLowerCase())) score += 2;
-        });
-
-        targetNeeds.forEach((need) => {
-          if (need && offerText.includes(need.toLowerCase())) score += 3;
-        });
-
-        return { candidate: s, score };
+        const evaluation = evaluateMatch(matchModalTarget as any, s as any);
+        return { candidate: s, evaluation };
       })
-      .filter((item) => item.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5);
+      .filter((item) => item.evaluation.percentage >= 60)
+      .sort((a, b) => b.evaluation.percentage - a.evaluation.percentage)
+      .slice(0, 6);
   }, [matchModalTarget, submissions]);
 
   return (
@@ -453,7 +521,28 @@ export default function MatchPointManager() {
         </div>
 
         {/* Action Buttons */}
-        <div style={{ display: "flex", gap: "0.6rem" }}>
+        <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={handleRunAutoMatch}
+            disabled={runningAutoMatch || loading}
+            className="mp-btn-primary"
+            style={{
+              height: "42px",
+              padding: "0 1.15rem",
+              fontSize: "0.86rem",
+              background: "linear-gradient(135deg, #0369a1, #0284c7)",
+              boxShadow: "0 4px 14px rgba(2, 132, 199, 0.25)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.45rem",
+            }}
+            title="Automatically pair compatible attendees and dispatch executive introduction emails"
+          >
+            <Zap size={14} className={runningAutoMatch ? "spin" : ""} />
+            {runningAutoMatch ? "Matching & Emailing..." : "⚡ Run Auto-Match & Send Emails"}
+          </button>
+
           <button
             type="button"
             onClick={fetchData}
@@ -667,17 +756,76 @@ export default function MatchPointManager() {
                           style={{
                             display: "inline-flex",
                             alignItems: "center",
-                            gap: "0.35rem",
-                            background: "rgba(16, 185, 129, 0.1)",
-                            border: "1px solid rgba(16, 185, 129, 0.25)",
-                            color: "#059669",
+                            gap: "0.45rem",
+                            background: "rgba(16, 185, 129, 0.08)",
+                            border: "1px solid rgba(16, 185, 129, 0.28)",
+                            color: "#065f46",
                             fontSize: "0.78rem",
                             fontWeight: 700,
-                            padding: "0.2rem 0.6rem",
-                            borderRadius: "14px",
+                            padding: "0.25rem 0.65rem",
+                            borderRadius: "12px",
                           }}
                         >
-                          <strong>{m.companyName}</strong> ({m.matchedCategory})
+                          {m.matchPercentage && (
+                            <span
+                              style={{
+                                background: "#059669",
+                                color: "#ffffff",
+                                fontSize: "0.68rem",
+                                fontWeight: 800,
+                                padding: "1px 5px",
+                                borderRadius: "4px",
+                                letterSpacing: "0.02em",
+                              }}
+                            >
+                              {m.matchPercentage}%
+                            </span>
+                          )}
+                          <strong>{m.companyName}</strong>
+                          <span style={{ color: "#475569", fontWeight: 600 }}>({m.matchedCategory})</span>
+
+                          {m.emailSent ? (
+                            <span
+                              style={{
+                                color: "#0284c7",
+                                fontSize: "0.7rem",
+                                fontWeight: 700,
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "3px",
+                                background: "rgba(2, 132, 199, 0.08)",
+                                padding: "1px 5px",
+                                borderRadius: "4px",
+                              }}
+                              title={`Official introduction email dispatched${m.emailSentAt ? ` on ${new Date(m.emailSentAt).toLocaleString()}` : ""}`}
+                            >
+                              <Mail size={10} /> Intro Sent
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleResendEmail(sub._id, idx)}
+                              disabled={resendingEmailId === `${sub._id}-${idx}`}
+                              style={{
+                                background: "#ffffff",
+                                border: "1px solid #0284c7",
+                                color: "#0284c7",
+                                fontSize: "0.7rem",
+                                fontWeight: 700,
+                                padding: "1px 6px",
+                                borderRadius: "6px",
+                                cursor: "pointer",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "3px",
+                              }}
+                              title="Send introduction email to both parties now"
+                            >
+                              <Send size={10} />
+                              {resendingEmailId === `${sub._id}-${idx}` ? "Sending..." : "Send Mail"}
+                            </button>
+                          )}
+
                           <button
                             type="button"
                             onClick={() => handleRemoveMatch(sub._id, idx)}
@@ -838,46 +986,61 @@ export default function MatchPointManager() {
 
             {/* Smart Suggested Candidates */}
             {candidateMatches.length > 0 && (
-              <div style={{ background: "rgba(2, 132, 199, 0.05)", borderRadius: "14px", padding: "1rem", border: "1px solid rgba(2, 132, 199, 0.2)", marginBottom: "1.25rem" }}>
-                <span style={{ fontSize: "0.78rem", fontWeight: 800, textTransform: "uppercase", color: "#0284c7", display: "flex", alignItems: "center", gap: "0.35rem", marginBottom: "0.5rem" }}>
-                  <Sparkles size={14} /> AI & Keyword Suggested Matches from SFF Venue
+              <div style={{ background: "rgba(2, 132, 199, 0.04)", borderRadius: "14px", padding: "1.1rem", border: "1px solid rgba(2, 132, 199, 0.2)", marginBottom: "1.25rem" }}>
+                <span style={{ fontSize: "0.78rem", fontWeight: 800, textTransform: "uppercase", color: "#0284c7", display: "flex", alignItems: "center", gap: "0.35rem", marginBottom: "0.65rem", letterSpacing: "0.04em" }}>
+                  <Zap size={14} /> Executive Compatibility Matches (Verified Attendees)
                 </span>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                  {candidateMatches.map(({ candidate }) => (
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
+                  {candidateMatches.map(({ candidate, evaluation }) => (
                     <div
                       key={candidate._id}
                       style={{
                         background: "#ffffff",
-                        padding: "0.6rem 0.85rem",
-                        borderRadius: "10px",
+                        padding: "0.75rem 1rem",
+                        borderRadius: "12px",
                         border: "1px solid #e2e8f0",
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        gap: "0.5rem",
+                        gap: "0.75rem",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
                       }}
                     >
-                      <div>
-                        <strong style={{ fontSize: "0.88rem", color: "#0f172a" }}>{candidate.companyName}</strong>
-                        <span style={{ fontSize: "0.78rem", color: "#64748b", marginLeft: "0.5rem" }}>
-                          ({candidate.fullName} • {candidate.category})
-                        </span>
-                        <p style={{ fontSize: "0.78rem", color: "#475569", margin: "0.2rem 0 0", lineClamp: 1, overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {candidate.aboutCompany.slice(0, 85)}...
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                          <strong style={{ fontSize: "0.92rem", color: "#0f172a" }}>{candidate.companyName}</strong>
+                          <span
+                            style={{
+                              background: "#059669",
+                              color: "#ffffff",
+                              fontSize: "0.72rem",
+                              fontWeight: 800,
+                              padding: "2px 7px",
+                              borderRadius: "6px",
+                            }}
+                          >
+                            {evaluation.percentage}% Synergy
+                          </span>
+                          <span style={{ fontSize: "0.76rem", color: "#64748b" }}>
+                            ({candidate.fullName} &bull; {candidate.designation})
+                          </span>
+                        </div>
+                        <p style={{ fontSize: "0.78rem", color: "#475569", margin: "0.25rem 0 0", lineHeight: 1.4 }}>
+                          {evaluation.reason}
                         </p>
                       </div>
 
                       <button
                         type="button"
-                        onClick={() => handleSelectCandidate(candidate)}
+                        onClick={() => handleSelectCandidate(candidate, evaluation)}
                         style={{
                           background: "#0284c7",
                           color: "#ffffff",
                           border: "none",
-                          fontSize: "0.75rem",
+                          fontSize: "0.76rem",
                           fontWeight: 700,
-                          padding: "0.35rem 0.75rem",
+                          padding: "0.4rem 0.85rem",
                           borderRadius: "8px",
                           cursor: "pointer",
                           whiteSpace: "nowrap",
@@ -941,7 +1104,7 @@ export default function MatchPointManager() {
                   />
                 </div>
 
-                <div style={{ gridColumn: "1 / -1" }}>
+                <div>
                   <label className="mp-label" style={{ fontSize: "0.8rem" }}>Matched Service Category</label>
                   <input
                     type="text"
@@ -952,6 +1115,29 @@ export default function MatchPointManager() {
                   />
                 </div>
 
+                <div>
+                  <label className="mp-label" style={{ fontSize: "0.8rem" }}>Match Compatibility (%)</label>
+                  <input
+                    type="number"
+                    min="50"
+                    max="99"
+                    className="mp-input"
+                    value={matchPartnerPercentage}
+                    onChange={(e) => setMatchPartnerPercentage(parseInt(e.target.value) || 85)}
+                  />
+                </div>
+
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label className="mp-label" style={{ fontSize: "0.8rem" }}>Executive Alignment Summary</label>
+                  <input
+                    type="text"
+                    className="mp-input"
+                    placeholder="e.g. High synergy in HR & Recruitment with focus on sales talent hiring"
+                    value={matchPartnerReason}
+                    onChange={(e) => setMatchPartnerReason(e.target.value)}
+                  />
+                </div>
+
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label className="mp-label" style={{ fontSize: "0.8rem" }}>Introduction / Match Notes</label>
                   <textarea
@@ -959,8 +1145,33 @@ export default function MatchPointManager() {
                     placeholder="Notes for email introduction (e.g. Connecting F2 Fintech with Acme HR for their sales hiring requirement)..."
                     value={matchPartnerNotes}
                     onChange={(e) => setMatchPartnerNotes(e.target.value)}
-                    style={{ minHeight: "70px" }}
+                    style={{ minHeight: "65px" }}
                   />
+                </div>
+
+                {/* Instant Email Trigger Checkbox */}
+                <div
+                  style={{
+                    gridColumn: "1 / -1",
+                    background: "rgba(2, 132, 199, 0.05)",
+                    border: "1px solid rgba(2, 132, 199, 0.2)",
+                    borderRadius: "10px",
+                    padding: "0.8rem 1rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    id="sendEmailCheckbox"
+                    checked={sendEmailNow}
+                    onChange={(e) => setSendEmailNow(e.target.checked)}
+                    style={{ width: "17px", height: "17px", cursor: "pointer", accentColor: "#0284c7" }}
+                  />
+                  <label htmlFor="sendEmailCheckbox" style={{ fontSize: "0.82rem", fontWeight: 700, color: "#0f172a", cursor: "pointer" }}>
+                    Dispatch Official Executive Introduction Email to both founders immediately (via partners@f2fintech.com)
+                  </label>
                 </div>
               </div>
 
@@ -976,9 +1187,10 @@ export default function MatchPointManager() {
                   type="submit"
                   className="mp-btn-primary"
                   disabled={savingMatch}
+                  style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
                 >
-                  {savingMatch ? <RefreshCw size={15} className="spin" /> : <LinkIcon size={15} />}
-                  Confirm Match & Link
+                  {savingMatch ? <RefreshCw size={15} className="spin" /> : sendEmailNow ? <Send size={15} /> : <LinkIcon size={15} />}
+                  {sendEmailNow ? "Confirm Match & Send Intro Email" : "Confirm Match & Link"}
                 </button>
               </div>
             </form>

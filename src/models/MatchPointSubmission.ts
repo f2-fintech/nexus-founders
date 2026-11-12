@@ -7,7 +7,12 @@ export interface IMatchedPartner {
   email?: string;
   phone?: string;
   matchedCategory: string;
+  matchScore?: number;
+  matchPercentage?: number;
+  matchReason?: string;
   notes?: string;
+  emailSent?: boolean;
+  emailSentAt?: Date;
   matchedAt: Date;
 }
 
@@ -80,7 +85,12 @@ const MatchedPartnerSchema = new Schema<IMatchedPartner>(
     email: { type: String, default: "" },
     phone: { type: String, default: "" },
     matchedCategory: { type: String, required: true },
+    matchScore: { type: Number, default: 0 },
+    matchPercentage: { type: Number, default: 85 },
+    matchReason: { type: String, default: "" },
     notes: { type: String, default: "" },
+    emailSent: { type: Boolean, default: false },
+    emailSentAt: { type: Date },
     matchedAt: { type: Date, default: Date.now },
   },
   { _id: false }
