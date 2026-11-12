@@ -149,6 +149,7 @@ export function parseVisitingCardText(text: string): ParsedVisitingCard {
     (email && phone)
   );
 
+  const meaningfulLines = lines.filter((l) => l.length >= 3 && !/^[^\w]+$/.test(l));
   const hasNameAndDetails = Boolean(
     contactName && (contactCompany || meaningfulLines.length >= 3)
   );
