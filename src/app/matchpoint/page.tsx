@@ -11,6 +11,7 @@ import {
   Users,
   Search,
   ArrowRight,
+  ArrowLeft,
   Copy,
   Check,
   Share2,
@@ -333,6 +334,30 @@ function MatchPointContent() {
   );
 
   const [refreshingPass, setRefreshingPass] = useState(false);
+  const [mobileStep, setMobileStep] = useState<1 | 2>(1);
+
+  // Mobile navigation helper
+  const handleNextToStep2 = () => {
+    setErrorMsg(null);
+    if (!isProfileComplete) {
+      requireProfileFirst(undefined, "Please enter your profile details first before proceeding to step 2:");
+      return;
+    }
+    if (selectedIndustries.length === 0) {
+      setErrorMsg("Please select or add at least one industry/domain under 'What You Do & Offer'.");
+      window.scrollTo({ top: 320, behavior: "smooth" });
+      return;
+    }
+    if (!aboutCompany.trim() || aboutCompany.length < 10) {
+      setErrorMsg("Please tell us briefly what your company does in the 'What You Do & Offer' section.");
+      window.scrollTo({ top: 320, behavior: "smooth" });
+      return;
+    }
+    setMobileStep(2);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 280, behavior: "smooth" });
+    }
+  };
 
   // Dynamically compute suggested USPs based on selectedIndustries
   const dynamicUspSuggestions = useMemo(() => {
@@ -528,6 +553,7 @@ function MatchPointContent() {
 
     setErrorMsg(null);
     setModalErrorMsg(null);
+    setMobileStep(1);
     window.scrollTo({ top: 320, behavior: "smooth" });
   };
 
@@ -639,18 +665,21 @@ function MatchPointContent() {
 
     if (selectedIndustries.length === 0) {
       setErrorMsg("Please select or add at least one industry/domain under 'What You Do & Offer'.");
+      setMobileStep(1);
       window.scrollTo({ top: 380, behavior: "smooth" });
       return;
     }
 
     if (!aboutCompany.trim() || aboutCompany.length < 10) {
       setErrorMsg("Please tell us briefly what your company does in the 'What You Do & Offer' section.");
+      setMobileStep(1);
       window.scrollTo({ top: 380, behavior: "smooth" });
       return;
     }
 
     if (selectedNeeds.length === 0) {
       setErrorMsg("Please select at least one partner category under 'What You Are Looking For'.");
+      setMobileStep(2);
       window.scrollTo({ top: 380, behavior: "smooth" });
       return;
     }
@@ -831,6 +860,7 @@ function MatchPointContent() {
     setLookingForDetails("");
     setUrgency("Immediate Need");
     setErrorMsg(null);
+    setMobileStep(1);
     setIsCreatingOwnPass(true);
     window.scrollTo({ top: 320, behavior: "smooth" });
   };
@@ -904,6 +934,7 @@ function MatchPointContent() {
         : "Immediate Need"
     );
 
+    setMobileStep(1);
     setIsCreatingOwnPass(true);
     window.scrollTo({ top: 320, behavior: "smooth" });
   };
@@ -1349,9 +1380,11 @@ function MatchPointContent() {
                 <div className="mp-step1-icon">
                   {isProfileComplete ? <CheckCircle2 size={24} /> : <User size={24} />}
                 </div>
-                <div>
+                <div className="mp-step1-info">
                   <div className="mp-step1-tag">
-                    {isProfileComplete ? "Step 1 Completed" : "Step 1 • Required"}
+                    <span className={`mp-step1-badge-pill ${isProfileComplete ? "completed" : "pending"}`}>
+                      {isProfileComplete ? "✓ Step 1 Completed" : "Step 1 • Required"}
+                    </span>
                   </div>
                   <h4 className="mp-step1-title">
                     {isProfileComplete ? (
@@ -1370,7 +1403,7 @@ function MatchPointContent() {
                 </div>
               </div>
 
-              <div style={{ display: "flex", gap: "0.65rem", alignItems: "center", flexWrap: "wrap" }}>
+              <div className="mp-step1-actions-row">
                 <button
                   type="button"
                   className="mp-step1-btn"
@@ -1385,16 +1418,7 @@ function MatchPointContent() {
                   }}
                 >
                   <Edit3 size={15} />
-                  {isProfileComplete ? "Edit Profile" : "Enter Your Details First →"}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handlePreFillExample}
-                  className="mp-btn-autofill"
-                  title="Click to pre-fill the board with F2 Fintech case study"
-                >
-                  <Zap size={14} /> Auto-fill Example
+                  <span>{isProfileComplete ? "Edit Profile" : "Enter Your Details First →"}</span>
                 </button>
               </div>
             </div>
@@ -1407,9 +1431,29 @@ function MatchPointContent() {
             )}
 
             <form onSubmit={handleSubmit}>
+              {/* Mobile 2-Step Wizard Indicator (Visible only on mobile <= 768px) */}
+              <div className="mp-mobile-step-nav">
+                <button
+                  type="button"
+                  className={`mp-mobile-step-tab step-1 ${mobileStep === 1 ? "active" : "completed"}`}
+                  onClick={() => setMobileStep(1)}
+                >
+                  <span className="mp-step-badge">{mobileStep === 2 ? "✓" : "1"}</span>
+                  <span className="mp-step-name">1. What You Offer</span>
+                </button>
+                <button
+                  type="button"
+                  className={`mp-mobile-step-tab step-2 ${mobileStep === 2 ? "active" : ""}`}
+                  onClick={handleNextToStep2}
+                >
+                  <span className="mp-step-badge">2</span>
+                  <span className="mp-step-name">2. What You Need</span>
+                </button>
+              </div>
+
               <div className="mp-side-by-side">
                 {/* ─── LEFT COLUMN: WHAT YOU DO & OFFER ─── */}
-                <div className="mp-col-card offerings">
+                <div className={`mp-col-card offerings ${mobileStep === 1 ? "mobile-active" : "mobile-hidden"}`}>
                   <div className="mp-col-header">
                     <h3 className="mp-col-title">
                       <Building2 size={20} color="#0284c7" />
@@ -1620,10 +1664,22 @@ function MatchPointContent() {
                       })}
                     </div>
                   </div>
+
+                  {/* Mobile Only: Next Step Action */}
+                  <div className="mp-mobile-nav-bar">
+                    <button
+                      type="button"
+                      className="mp-btn-primary mp-mobile-next-btn"
+                      onClick={handleNextToStep2}
+                    >
+                      <span>Next: What You Need</span>
+                      <ArrowRight size={18} />
+                    </button>
+                  </div>
                 </div>
 
                 {/* ─── RIGHT COLUMN: WHAT YOU ARE LOOKING FOR ─── */}
-                <div className="mp-col-card needs">
+                <div className={`mp-col-card needs ${mobileStep === 2 ? "mobile-active" : "mobile-hidden"}`}>
                   <div className="mp-col-header">
                     <h3 className="mp-col-title">
                       <Search size={20} color="#9333ea" />
@@ -1756,11 +1812,49 @@ function MatchPointContent() {
                       })}
                     </div>
                   </div>
+
+                  {/* Mobile Only: Back & Submit Actions */}
+                  <div className="mp-mobile-nav-bar mp-mobile-nav-split">
+                    <button
+                      type="button"
+                      className="mp-btn-secondary mp-mobile-back-btn"
+                      onClick={() => {
+                        setMobileStep(1);
+                        window.scrollTo({ top: 280, behavior: "smooth" });
+                      }}
+                    >
+                      <ArrowLeft size={16} />
+                      <span>Back</span>
+                    </button>
+                    <button
+                      type="submit"
+                      className="mp-btn-primary mp-mobile-submit-btn"
+                      disabled={loading}
+                      onClick={(e) => {
+                        if (!isProfileComplete) {
+                          e.preventDefault();
+                          requireProfileFirst(undefined, "Please complete your profile details first before generating your pass.");
+                        }
+                      }}
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 size={16} className="mp-spinner" />
+                          <span>Matching...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Zap size={16} />
+                          <span>Generate Pass</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              {/* Bottom Submit Bar */}
-              <div className="mp-bottom-cta">
+              {/* Bottom Submit Bar (Desktop Only) */}
+              <div className="mp-bottom-cta mp-desktop-only">
                 <div>
                   <strong style={{ fontSize: "1.05rem", color: "#0f172a", display: "block" }}>
                     Ready to Connect at SFF?
@@ -1959,25 +2053,10 @@ function MatchPointContent() {
           <div className="mp-modal-box" onClick={(e) => e.stopPropagation()}>
             <button
               type="button"
+              className="mp-modal-close-btn"
               onClick={() => {
                 setShowProfileModal(false);
                 setModalErrorMsg(null);
-              }}
-              style={{
-                position: "absolute",
-                top: "1.2rem",
-                right: "1.2rem",
-                border: "none",
-                background: "#f1f5f9",
-                borderRadius: "50%",
-                width: "36px",
-                height: "36px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#64748b",
-                transition: "all 0.2s ease",
               }}
               aria-label="Close"
               title="Close modal"
@@ -1985,48 +2064,35 @@ function MatchPointContent() {
               <X size={18} />
             </button>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
-              <div
-                style={{
-                  width: "44px",
-                  height: "44px",
-                  borderRadius: "14px",
-                  background: "linear-gradient(135deg, #0284c7, #6366f1)",
-                  color: "#ffffff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: 800,
-                  boxShadow: "0 4px 12px rgba(2, 132, 199, 0.25)",
-                }}
-              >
+            <div className="mp-modal-header">
+              <div className="mp-modal-header-icon">
                 <User size={22} />
               </div>
-              <div>
-                <h3 style={{ fontSize: "1.4rem", fontWeight: 900, color: "#0f172a", margin: 0, letterSpacing: "-0.01em" }}>
+              <div className="mp-modal-header-text">
+                <h3 className="mp-modal-title">
                   Who Are You?
                 </h3>
-                <span style={{ fontSize: "0.84rem", color: "#64748b" }}>
+                <p className="mp-modal-subtitle">
                   Tell us who you are & your company details so matching partners at SFF know who they are connecting with.
-                </span>
+                </p>
               </div>
             </div>
 
             {profileModalPrompt && (
-              <div style={{ background: "rgba(2, 132, 199, 0.08)", border: "1px solid rgba(2, 132, 199, 0.25)", color: "#0284c7", padding: "0.6rem 0.85rem", borderRadius: "10px", fontSize: "0.82rem", fontWeight: 600, marginBottom: "1rem" }}>
+              <div className="mp-modal-prompt-banner">
                 {profileModalPrompt}
               </div>
             )}
 
             {modalErrorMsg && (
-              <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#dc2626", borderRadius: "10px", padding: "0.65rem 0.9rem", fontSize: "0.82rem", fontWeight: 600, marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.45rem" }}>
+              <div className="mp-modal-error-banner">
                 <Info size={15} />
                 <span>{modalErrorMsg}</span>
               </div>
             )}
 
             <form onSubmit={handleSaveProfile}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1rem", marginBottom: "1.25rem" }}>
+              <div className="mp-modal-form-grid">
                 
                 {/* ─── 1. Organisation Type (Autocomplete Combobox) ─── */}
                 <div className="mp-field-group" style={{ gridColumn: "1 / -1", position: "relative", zIndex: 100 }}>
@@ -2437,7 +2503,7 @@ function MatchPointContent() {
                 </div>
               </div>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
+              <div className="mp-modal-actions">
                 <button
                   type="button"
                   className="mp-btn-secondary"
@@ -2466,38 +2532,35 @@ function MatchPointContent() {
           className="mp-modal-backdrop"
           onClick={() => setShowLookupModal(false)}
         >
-          <div className="mp-modal-box" style={{ maxWidth: "460px" }} onClick={(e) => e.stopPropagation()}>
+          <div className="mp-modal-box mp-modal-box-sm" onClick={(e) => e.stopPropagation()}>
             <button
+              type="button"
+              className="mp-modal-close-btn"
               onClick={() => setShowLookupModal(false)}
-              style={{
-                position: "absolute",
-                top: "1.2rem",
-                right: "1.2rem",
-                border: "none",
-                background: "#f1f5f9",
-                borderRadius: "50%",
-                width: "32px",
-                height: "32px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#64748b",
-              }}
+              aria-label="Close"
+              title="Close modal"
             >
               <X size={16} />
             </button>
 
-            <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#0f172a", margin: "0 0 0.5rem" }}>
-              Find Your MatchPoint Pass
-            </h3>
-            <p style={{ fontSize: "0.85rem", color: "#64748b", marginBottom: "1.25rem" }}>
-              Enter the email address you registered with or your MatchPoint ID (e.g., MP-26-XXXX).
-            </p>
+            <div className="mp-modal-header">
+              <div className="mp-modal-header-icon" style={{ background: "linear-gradient(135deg, #0284c7, #0ea5e9)" }}>
+                <Search size={20} />
+              </div>
+              <div className="mp-modal-header-text">
+                <h3 className="mp-modal-title" style={{ fontSize: "1.25rem" }}>
+                  Find Your MatchPoint Pass
+                </h3>
+                <p className="mp-modal-subtitle">
+                  Enter the email address you registered with or your MatchPoint ID (e.g., MP-26-XXXX).
+                </p>
+              </div>
+            </div>
 
             {lookupError && (
-              <div style={{ background: "#fef2f2", color: "#dc2626", padding: "0.6rem 0.85rem", borderRadius: "10px", fontSize: "0.82rem", marginBottom: "1rem" }}>
-                {lookupError}
+              <div className="mp-modal-error-banner">
+                <Info size={15} />
+                <span>{lookupError}</span>
               </div>
             )}
 
@@ -2509,10 +2572,10 @@ function MatchPointContent() {
                 placeholder="Enter email or MatchPoint ID..."
                 value={lookupQuery}
                 onChange={(e) => setLookupQuery(e.target.value)}
-                style={{ marginBottom: "1rem" }}
+                style={{ marginBottom: "1.25rem" }}
               />
 
-              <div style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end" }}>
+              <div className="mp-modal-actions">
                 <button
                   type="button"
                   className="mp-btn-secondary"
