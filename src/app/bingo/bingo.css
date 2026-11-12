@@ -486,3 +486,27 @@
   animation: countdownPulse 0.6s ease-in-out infinite;
 }
 
+/* ── Visiting Card Scanner Enhancements ── */
+.card-scanner-shutter-btn {
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.card-scanner-shutter-btn:hover {
+  transform: translateY(-1px) scale(1.02);
+  filter: brightness(1.08);
+}
+.card-scanner-shutter-btn:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+.ocr-scanning-laser {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, #38bdf8 25%, #10b981 50%, #38bdf8 75%, transparent 100%);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.95), 0 0 8px rgba(16, 185, 129, 0.85);
+  animation: laserScan 1.6s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 10;
+}
+

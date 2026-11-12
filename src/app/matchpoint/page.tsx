@@ -39,14 +39,35 @@ import "./matchpoint.css";
 import SFF_ORGANISATIONS_DATA from "@/data/sff_organisations.json";
 
 const ORGANISATION_TYPE_OPTIONS = [
-  { id: "fintech", label: "FinTech & Technology", icon: "💻" },
-  { id: "banks", label: "Banks & Financial Institutions", icon: "🏦" },
-  { id: "investors", label: "Investors", icon: "💰" },
-  { id: "central_banks", label: "Central Banks & Regulators", icon: "🏛️" },
-  { id: "gov", label: "Governments & Multilaterals", icon: "🌐" },
-  { id: "services", label: "Professional Services", icon: "⚖️" },
-  { id: "non_profits", label: "Non-Profits & Associations", icon: "🤝" },
-  { id: "other", label: "Other / Independent Venture", icon: "🚀" },
+  { id: "ai_machine_learning", label: "AI & Machine Learning", icon: "🤖" },
+  { id: "banking_technology", label: "Banking Technology", icon: "🏦" },
+  { id: "payments_wallets_and_cards", label: "Payments, Wallets and Cards", icon: "💳" },
+  { id: "associations_accelerators_and_incubators", label: "Associations, Accelerators and Incubators", icon: "🤝" },
+  { id: "financial_infrastructure", label: "Financial Infrastructure", icon: "🏗️" },
+  { id: "digital_assets", label: "Digital Assets", icon: "₿" },
+  { id: "government_multilateral_agencies", label: "Government / Multilateral Agencies", icon: "🌐" },
+  { id: "blockchain_web3", label: "Blockchain & Web3", icon: "🔗" },
+  { id: "asset_or_wealth_management", label: "Asset or Wealth Management", icon: "💰" },
+  { id: "cybersecurity", label: "Cybersecurity", icon: "🔐" },
+  { id: "regtech", label: "RegTech", icon: "⚖️" },
+  { id: "central_banks_regulators", label: "Central Banks & Regulators", icon: "🏛️" },
+  { id: "embedded_finance_baas", label: "Embedded Finance & BAAS", icon: "🔌" },
+  { id: "lending", label: "Lending", icon: "📄" },
+  { id: "cloud_computing", label: "Cloud Computing", icon: "☁️" },
+  { id: "trading_investments", label: "Trading & Investments", icon: "📈" },
+  { id: "capital_markets", label: "Capital Markets", icon: "📊" },
+  { id: "finance_research_analytics", label: "Finance Research & Analytics", icon: "🔎" },
+  { id: "legal", label: "Legal", icon: "⚖️" },
+  { id: "executive_search_firm_recruitment", label: "Executive Search Firm (Recruitment)", icon: "👥" },
+  { id: "insurtech", label: "InsurTech", icon: "🛡️" },
+  { id: "commercial_or_corporate_bank", label: "Commercial or Corporate Bank", icon: "🏢" },
+  { id: "sustainable_finance", label: "Sustainable Finance", icon: "🌱" },
+  { id: "telecommunications_mobile", label: "Telecommunications & Mobile", icon: "📱" },
+  { id: "financial_training", label: "Financial Training", icon: "🎓" },
+  { id: "industry_association_or_nonprofit", label: "Industry Association or Nonprofit", icon: "🤲" },
+  { id: "trade", label: "Trade", icon: "🌍" },
+  { id: "wholesale_banking", label: "Wholesale Banking", icon: "🏦" },
+  { id: "challenger_or_neobank", label: "Challenger or Neobank", icon: "🏦" }
 ];
 
 const CATEGORY_OPTIONS = [
@@ -520,7 +541,7 @@ function MatchPointContent() {
     setFullName("F2 Fintech Team");
     setEmail("partnerships@f2fintech.in");
     setPhone("+91 98765 43210");
-    setOrganisationType("FinTech & Technology");
+    setOrganisationType("Embedded Finance & BAAS");
     setSelectedOrganisation("F2 Fintech");
     setIsCustomOrg(true);
     setCompanyName("F2 Fintech");
@@ -691,8 +712,8 @@ function MatchPointContent() {
       const cleanUrgency = urgency.includes("Immediate")
         ? "Immediate"
         : urgency.includes("1-2")
-        ? "Next 1-2 Months"
-        : "Exploring Options";
+          ? "Next 1-2 Months"
+          : "Exploring Options";
 
       // Auto-generate keywords directly from top selections (Industries + Looking For Categories)
       const autoKeywords = Array.from(
@@ -898,7 +919,7 @@ function MatchPointContent() {
     setCity(activePass.city || "");
     setLinkedinUrl(activePass.linkedinUrl || "");
     setWebsiteUrl(activePass.websiteUrl || "");
-    
+
     // Extract industries if encoded in aboutCompany
     const rawAbout = activePass.aboutCompany || "";
     const industryMatch = rawAbout.match(/^\[(.*?)\]\s*(.*)$/);
@@ -930,8 +951,8 @@ function MatchPointContent() {
       rawUrg.includes("1-2")
         ? "Next 1-2 Months"
         : rawUrg.includes("Explor")
-        ? "Exploring Options"
-        : "Immediate Need"
+          ? "Exploring Options"
+          : "Immediate Need"
     );
 
     setMobileStep(1);
@@ -952,26 +973,14 @@ function MatchPointContent() {
         {/* ─── Hero Section (Minimal Space + Official SFF Logo) ─── */}
         <header className="mp-hero">
           <div className="mp-hero-brand-row">
-            {/* SFF Official Logo on Black Background */}
-            <div className="mp-sff-logo-badge" title="Singapore FinTech Festival 2026">
-              <img
-                src="https://www.fintechfestival.sg/hubfs/sff2026_logo_revwht-1.webp"
-                alt="Singapore FinTech Festival 2026"
-                className="mp-sff-logo-img"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/images/sff2026_logo_revwht.webp";
-                }}
-              />
-            </div>
 
             <h1 className="mp-title">
-              <span className="mp-title-gradient">MatchPoint</span>
+              <span className="mp-title-gradient">Nexus Founders MatchPoint</span>
             </h1>
-
-            <span className="mp-badge-tag-compact">
-              <Sparkles size={12} /> Interactive Matchmaking
-            </span>
           </div>
+          <span className="mp-badge-tag-compact">
+            <Sparkles size={12} /> Powered by F2fintech
+          </span>
 
           <p className="mp-subtitle">
             <strong>Where Needs Meet Opportunities.</strong> Share what your business offers on the left and what you need on the right to get matched at SFF.
@@ -2093,7 +2102,7 @@ function MatchPointContent() {
 
             <form onSubmit={handleSaveProfile}>
               <div className="mp-modal-form-grid">
-                
+
                 {/* ─── 1. Organisation Type (Autocomplete Combobox) ─── */}
                 <div className="mp-field-group" style={{ gridColumn: "1 / -1", position: "relative", zIndex: 100 }}>
                   <label className="mp-label">
@@ -2236,8 +2245,8 @@ function MatchPointContent() {
                           !organisationType
                             ? "← Select Organisation Type above first..."
                             : availableOrganisations.length > 0
-                            ? `Click to view ${availableOrganisations.length} organisations or search...`
-                            : "Type your organisation / company name..."
+                              ? `Click to view ${availableOrganisations.length} organisations or search...`
+                              : "Type your organisation / company name..."
                         }
                         value={companySearch}
                         onFocus={() => setIsCompanyOpen(true)}

@@ -24,5 +24,8 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    serverComponentsExternalPackages: ["sharp", "tesseract.js"],
+  },
 }
 module.exports = nextConfig
