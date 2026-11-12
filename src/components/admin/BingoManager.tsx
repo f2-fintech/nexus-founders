@@ -151,8 +151,8 @@ export default function BingoManager() {
   const activeSessionId = liveSession?._id
     ? String(liveSession._id)
     : config.activeSessionId
-    ? String(config.activeSessionId)
-    : null;
+      ? String(config.activeSessionId)
+      : null;
 
   const isActiveSessionSelected = Boolean(
     selectedSessionId && activeSessionId && String(selectedSessionId) === activeSessionId
@@ -197,8 +197,8 @@ export default function BingoManager() {
       targetState === "running"
         ? "START & ACTIVATE"
         : targetState === "paused"
-        ? "PAUSE"
-        : "STOP & CLOSE";
+          ? "PAUSE"
+          : "STOP & CLOSE";
     if (!confirm(`Are you sure you want to ${actionLabel} the Nexus Bingo event?`)) return;
 
     setControlLoading(true);
@@ -502,8 +502,8 @@ export default function BingoManager() {
             config.gameState === "running"
               ? "2px solid rgba(16, 185, 129, 0.55)"
               : config.gameState === "paused"
-              ? "2px solid rgba(245, 158, 11, 0.65)"
-              : "2px solid rgba(239, 68, 68, 0.55)",
+                ? "2px solid rgba(245, 158, 11, 0.65)"
+                : "2px solid rgba(239, 68, 68, 0.55)",
           padding: "1.25rem 1.6rem",
           display: "flex",
           alignItems: "center",
@@ -514,8 +514,8 @@ export default function BingoManager() {
             config.gameState === "running"
               ? "0 10px 30px rgba(16, 185, 129, 0.15)"
               : config.gameState === "paused"
-              ? "0 10px 30px rgba(245, 158, 11, 0.18)"
-              : "0 10px 30px rgba(0, 0, 0, 0.4)",
+                ? "0 10px 30px rgba(245, 158, 11, 0.18)"
+                : "0 10px 30px rgba(0, 0, 0, 0.4)",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -528,14 +528,14 @@ export default function BingoManager() {
                 config.gameState === "running"
                   ? "rgba(16, 185, 129, 0.2)"
                   : config.gameState === "paused"
-                  ? "rgba(245, 158, 11, 0.2)"
-                  : "rgba(239, 68, 68, 0.2)",
+                    ? "rgba(245, 158, 11, 0.2)"
+                    : "rgba(239, 68, 68, 0.2)",
               color:
                 config.gameState === "running"
                   ? "#10b981"
                   : config.gameState === "paused"
-                  ? "#f59e0b"
-                  : "#ef4444",
+                    ? "#f59e0b"
+                    : "#ef4444",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -566,8 +566,8 @@ export default function BingoManager() {
                     config.gameState === "running"
                       ? "#10b981"
                       : config.gameState === "paused"
-                      ? "#f59e0b"
-                      : "#ef4444",
+                        ? "#f59e0b"
+                        : "#ef4444",
                   color: "#000",
                   textTransform: "uppercase",
                   letterSpacing: "0.06em",
@@ -576,8 +576,8 @@ export default function BingoManager() {
                 {config.gameState === "running"
                   ? "🟢 RUNNING (LIVE)"
                   : config.gameState === "paused"
-                  ? "⏸️ PAUSED"
-                  : "⏹️ STOPPED (OFFLINE)"}
+                    ? "⏸️ PAUSED"
+                    : "⏹️ STOPPED (OFFLINE)"}
               </span>
               <span style={{ fontSize: "0.85rem", color: "#38bdf8", fontWeight: 700 }}>
                 {liveSession?.title ? `[ ${liveSession.title} ]` : `Round #${config.roundNumber || 1}`}
@@ -587,8 +587,8 @@ export default function BingoManager() {
               {config.gameState === "running"
                 ? "Active in real-time. Players can register and scan visiting cards."
                 : config.gameState === "paused"
-                ? "Game is temporarily PAUSED. Scanning is locked; players see a pause notice."
-                : "Game is STOPPED. Attendees see 'No Game In Progress'."}
+                  ? "Game is temporarily PAUSED. Scanning is locked; players see a pause notice."
+                  : "Game is STOPPED. Attendees see 'No Game In Progress'."}
             </div>
           </div>
         </div>
@@ -932,8 +932,8 @@ export default function BingoManager() {
             {(selectedSession.winners && selectedSession.winners.length > 0
               ? selectedSession.winners
               : selectedSession.winner
-              ? [selectedSession.winner]
-              : []
+                ? [selectedSession.winner]
+                : []
             ).map((w: any, idx: number) => (
               <div
                 key={w.participantId || idx}
@@ -1193,8 +1193,8 @@ export default function BingoManager() {
                       background: selectedPlayerIds.includes(player._id)
                         ? "rgba(2, 132, 199, 0.08)"
                         : player.isWinner
-                        ? "rgba(245, 158, 11, 0.05)"
-                        : undefined,
+                          ? "rgba(245, 158, 11, 0.05)"
+                          : undefined,
                     }}
                   >
                     <td style={{ textAlign: "center" }}>
@@ -1350,8 +1350,8 @@ export default function BingoManager() {
                             player.status === "completed"
                               ? "#10b981"
                               : player.status === "playing"
-                              ? "#f59e0b"
-                              : "#ef4444",
+                                ? "#f59e0b"
+                                : "#ef4444",
                         }}
                       >
                         <option value="playing">Playing</option>
@@ -1503,7 +1503,7 @@ export default function BingoManager() {
             >
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 800 }}>
+                  <h3 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 800, color: "white" }}>
                     {inspectingPlayer.fullName} — Scanned Cards Review
                   </h3>
                   <span

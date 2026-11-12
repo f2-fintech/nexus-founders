@@ -8,9 +8,8 @@ import {
   Upload,
   AlertCircle,
   Sparkles,
-  CheckCircle2,
-  FileText,
   AlertTriangle,
+  FileCheck2,
 } from "lucide-react";
 
 interface BingoCameraModalProps {
@@ -92,6 +91,7 @@ export default function BingoCameraModal({
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [useUploadFallback, setUseUploadFallback] = useState(false);
+  const [manualBypass, setManualBypass] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -238,6 +238,7 @@ export default function BingoCameraModal({
     setContactCompany("");
     setCameraError(null);
     setUseUploadFallback(false);
+    setManualBypass(false);
     onClose();
   };
 
@@ -247,12 +248,14 @@ export default function BingoCameraModal({
   };
 
   /**
-   * Process a captured image blob:
-   * Runs real OCR & card parsing via /api/bingo/scan and pre-fills Contact Name & Company.
+   * Process captured card image:
+   * Runs real OCR & card validation via /api/bingo/scan.
+   * Auto-extracts Contact Name & Company only when a genuine card is detected.
    */
   const processCardScan = async (blob: Blob) => {
     setIsScanning(true);
     setScanResult(null);
+    setManualBypass(false);
 
     try {
       const formData = new FormData();
@@ -279,16 +282,12 @@ export default function BingoCameraModal({
         photoUrl: data.url,
       });
 
-      // Auto-populate name and company fields if detected
-      if (data.contactName) {
-        setContactName(data.contactName);
-      }
-      if (data.contactCompany) {
-        setContactCompany(data.contactCompany);
+      if (data.isValidCard) {
+        if (data.contactName) setContactName(data.contactName);
+        if (data.contactCompany) setContactCompany(data.contactCompany);
       }
     } catch (err: any) {
       console.warn("Scan OCR error:", err);
-      // Even if OCR fails, user can still type manually
       setScanResult({
         isValidCard: false,
       });
@@ -298,10 +297,10 @@ export default function BingoCameraModal({
   };
 
   /**
-   * MANUAL SHUTTER SNAPSHOT:
+   * MANUAL CAPTURE:
+   * User explicitly taps the capture button when the card is aligned in the frame.
    * Maps the guide frame's on-screen bounding rect to the native camera feed
-   * accounting for objectFit: "cover" scale & offset.
-   * Produces a 100% pixel-perfect crop containing ONLY the card in the guide frame.
+   * for a 100% pixel-perfect crop containing ONLY the card in the guide frame.
    */
   const takeSnapshot = useCallback(() => {
     const video = videoRef.current;
@@ -324,7 +323,6 @@ export default function BingoCameraModal({
       const vw = video.videoWidth;
       const vh = video.videoHeight;
 
-      // Calculate video scaling under object-fit: cover
       const scale = Math.max(cw / vw, ch / vh);
       const renderedW = vw * scale;
       const renderedH = vh * scale;
@@ -437,6 +435,7 @@ export default function BingoCameraModal({
     setUploadedUrl(null);
     setContactName("");
     setContactCompany("");
+    setManualBypass(false);
     if (!useUploadFallback) {
       startCamera(facingMode);
     }
@@ -445,6 +444,13 @@ export default function BingoCameraModal({
   // Confirm and complete tile
   const handleConfirmAndUpload = async () => {
     if (!capturedBlob) return;
+
+    // Check if card is valid or user chose to manually bypass
+    const isValid = scanResult?.isValidCard || manualBypass || (contactName.trim() && contactCompany.trim());
+    if (!isValid) {
+      alert("Please ensure a valid visiting card is scanned, or enter both Contact Name and Company Name manually.");
+      return;
+    }
 
     // If already uploaded during OCR scan, complete instantly!
     if (uploadedUrl) {
@@ -487,6 +493,9 @@ export default function BingoCameraModal({
   };
 
   if (!isOpen) return null;
+
+  const isCardVerified = Boolean(scanResult?.isValidCard);
+  const canSubmit = isCardVerified || manualBypass || (contactName.trim().length > 1 && contactCompany.trim().length > 1);
 
   return (
     <div
@@ -629,14 +638,14 @@ export default function BingoCameraModal({
                     borderRadius: "12px",
                     border: isScanning
                       ? "2px solid #38bdf8"
-                      : scanResult?.isValidCard
-                      ? "2px solid #10b981"
-                      : "2px solid rgba(245, 158, 11, 0.7)",
+                      : isCardVerified
+                      ? "2.5px solid #10b981"
+                      : "2px solid #ef4444",
                     boxShadow: isScanning
                       ? "0 0 25px rgba(56, 189, 248, 0.45)"
-                      : scanResult?.isValidCard
-                      ? "0 0 25px rgba(16, 185, 129, 0.4)"
-                      : "0 0 20px rgba(245, 158, 11, 0.25)",
+                      : isCardVerified
+                      ? "0 0 25px rgba(16, 185, 129, 0.45)"
+                      : "0 0 25px rgba(239, 68, 68, 0.35)",
                     display: "block",
                   }}
                 />
@@ -649,13 +658,13 @@ export default function BingoCameraModal({
                     right: "8px",
                     background: isScanning
                       ? "rgba(2, 132, 199, 0.95)"
-                      : scanResult?.isValidCard
+                      : isCardVerified
                       ? "rgba(16, 185, 129, 0.95)"
-                      : "rgba(245, 158, 11, 0.95)",
+                      : "rgba(239, 68, 68, 0.95)",
                     color: "#ffffff",
-                    fontSize: "0.7rem",
+                    fontSize: "0.72rem",
                     fontWeight: 700,
-                    padding: "0.22rem 0.6rem",
+                    padding: "0.22rem 0.65rem",
                     borderRadius: "12px",
                     display: "flex",
                     alignItems: "center",
@@ -665,18 +674,18 @@ export default function BingoCameraModal({
                 >
                   {isScanning ? (
                     <>
-                      <RefreshCw size={11} style={{ animation: "spin 1s linear infinite" }} />
-                      <span>Reading Card Text...</span>
+                      <RefreshCw size={12} style={{ animation: "spin 1s linear infinite" }} />
+                      <span>Verifying Card Text...</span>
                     </>
-                  ) : scanResult?.isValidCard ? (
+                  ) : isCardVerified ? (
                     <>
-                      <Check size={12} strokeWidth={3} />
+                      <Check size={13} strokeWidth={3} />
                       <span>Card Verified</span>
                     </>
                   ) : (
                     <>
-                      <AlertTriangle size={12} />
-                      <span>Card Checked</span>
+                      <X size={13} strokeWidth={3} />
+                      <span>Not a Card</span>
                     </>
                   )}
                 </div>
@@ -758,14 +767,13 @@ export default function BingoCameraModal({
                     aspectRatio: "1.586 / 1",
                     borderRadius: "14px",
                     border: "2px dashed #38bdf8",
-                    boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.52)",
-                    transition: "border-color 0.25s ease, box-shadow 0.25s ease",
+                    boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.55)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  {/* 4 Corner Brackets */}
+                  {/* 4 Corner High-Tech Brackets */}
                   <div className="corner-bracket corner-top-left" />
                   <div className="corner-bracket corner-top-right" />
                   <div className="corner-bracket corner-bottom-left" />
@@ -774,27 +782,27 @@ export default function BingoCameraModal({
                   {/* Animated Subtle Scanner Laser Beam */}
                   <div className="scanner-laser-beam" />
 
-                  {/* Status Badge */}
+                  {/* Guide Status Badge */}
                   <div
                     style={{
                       position: "absolute",
                       bottom: "-35px",
                       left: "50%",
                       transform: "translateX(-50%)",
-                      background: "rgba(2, 132, 199, 0.92)",
+                      background: "rgba(2, 132, 199, 0.95)",
                       color: "#ffffff",
-                      fontSize: "0.74rem",
+                      fontSize: "0.75rem",
                       fontWeight: 700,
-                      padding: "0.26rem 0.9rem",
+                      padding: "0.28rem 0.95rem",
                       borderRadius: "20px",
                       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.45)",
                       whiteSpace: "nowrap",
                       display: "flex",
                       alignItems: "center",
-                      gap: "0.35rem",
+                      gap: "0.4rem",
                     }}
                   >
-                    <span>💳 Align Visiting Card Inside Frame</span>
+                    <span>💳 Align Visiting Card & Tap Capture</span>
                   </div>
                 </div>
               </div>
@@ -981,26 +989,26 @@ export default function BingoCameraModal({
                     display: "flex",
                     alignItems: "center",
                     gap: "0.6rem",
-                    padding: "0.65rem 0.9rem",
-                    borderRadius: "10px",
+                    padding: "0.75rem 0.95rem",
+                    borderRadius: "12px",
                     background: "rgba(56, 189, 248, 0.1)",
                     border: "1px solid rgba(56, 189, 248, 0.3)",
                     color: "#38bdf8",
-                    fontSize: "0.82rem",
+                    fontSize: "0.84rem",
                     fontWeight: 600,
                   }}
                 >
-                  <RefreshCw size={15} style={{ animation: "spin 1s linear infinite", flexShrink: 0 }} />
-                  <span>Scanning card text with OCR & extracting details...</span>
+                  <RefreshCw size={16} style={{ animation: "spin 1s linear infinite", flexShrink: 0 }} />
+                  <span>Analyzing visiting card with OCR... Verifying details...</span>
                 </div>
-              ) : scanResult?.isValidCard ? (
+              ) : isCardVerified ? (
                 <div
                   style={{
                     display: "flex",
-                    alignItems: "center",
+                    alignItems: "flex-start",
                     gap: "0.6rem",
-                    padding: "0.65rem 0.9rem",
-                    borderRadius: "10px",
+                    padding: "0.75rem 0.95rem",
+                    borderRadius: "12px",
                     background: "rgba(16, 185, 129, 0.12)",
                     border: "1px solid rgba(16, 185, 129, 0.35)",
                     color: "#10b981",
@@ -1008,35 +1016,60 @@ export default function BingoCameraModal({
                     fontWeight: 600,
                   }}
                 >
-                  <Sparkles size={16} style={{ flexShrink: 0 }} />
+                  <Sparkles size={17} style={{ flexShrink: 0, marginTop: "2px" }} />
                   <div>
-                    <span>Visiting Card Verified! Contact details extracted below.</span>
-                    {(scanResult.email || scanResult.phone) && (
-                      <div style={{ fontSize: "0.72rem", color: "#6ee7b7", marginTop: "0.15rem" }}>
-                        {[scanResult.email, scanResult.phone].filter(Boolean).join(" • ")}
-                      </div>
-                    )}
+                    <div style={{ fontWeight: 700, fontSize: "0.86rem" }}>
+                      Visiting Card Verified Successfully!
+                    </div>
+                    <div style={{ fontSize: "0.74rem", color: "#6ee7b7", marginTop: "0.2rem" }}>
+                      {[contactName, contactCompany, scanResult?.email, scanResult?.phone]
+                        .filter(Boolean)
+                        .join(" • ")}
+                    </div>
                   </div>
                 </div>
               ) : (
+                /* Card Rejected Banner: Clearly informs user that the captured image is not a visiting card */
                 <div
                   style={{
                     display: "flex",
-                    alignItems: "center",
-                    gap: "0.6rem",
-                    padding: "0.65rem 0.9rem",
-                    borderRadius: "10px",
-                    background: "rgba(245, 158, 11, 0.12)",
-                    border: "1px solid rgba(245, 158, 11, 0.3)",
-                    color: "#fbbf24",
-                    fontSize: "0.8rem",
-                    lineHeight: 1.35,
+                    flexDirection: "column",
+                    gap: "0.4rem",
+                    padding: "0.75rem 0.95rem",
+                    borderRadius: "12px",
+                    background: "rgba(239, 68, 68, 0.12)",
+                    border: "1px solid rgba(239, 68, 68, 0.35)",
+                    color: "#f87171",
+                    fontSize: "0.82rem",
+                    lineHeight: 1.4,
                   }}
                 >
-                  <AlertTriangle size={16} style={{ flexShrink: 0 }} />
-                  <span>
-                    Could not detect text on this card. Make sure the card is in focus, or enter contact details manually.
-                  </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.45rem", fontWeight: 700, color: "#ef4444" }}>
+                    <AlertTriangle size={16} />
+                    <span>No Visiting Card Detected!</span>
+                  </div>
+                  <div>
+                    Is photo mein visiting card ka text ya contact details nahi mili. Kripya visiting card ko theek se frame mein rakh kar dobara photo lein.
+                  </div>
+                  {!manualBypass && (
+                    <button
+                      type="button"
+                      onClick={() => setManualBypass(true)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#38bdf8",
+                        textDecoration: "underline",
+                        fontSize: "0.74rem",
+                        cursor: "pointer",
+                        alignSelf: "flex-start",
+                        padding: 0,
+                        marginTop: "0.2rem",
+                      }}
+                    >
+                      Card details manually type karke proceed karein
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -1052,7 +1085,7 @@ export default function BingoCameraModal({
                       marginBottom: "0.3rem",
                     }}
                   >
-                    Contact Name {contactName ? "(Extracted)" : "(Optional)"}
+                    Contact Name {contactName ? "(Detected)" : ""}
                   </label>
                   <input
                     type="text"
@@ -1082,7 +1115,7 @@ export default function BingoCameraModal({
                       marginBottom: "0.3rem",
                     }}
                   >
-                    Company Name {contactCompany ? "(Extracted)" : "(Optional)"}
+                    Company Name {contactCompany ? "(Detected)" : ""}
                   </label>
                   <input
                     type="text"
@@ -1133,7 +1166,7 @@ export default function BingoCameraModal({
                     }}
                   >
                     <Camera size={19} />
-                    <span>Capture Card</span>
+                    <span>Capture Visiting Card</span>
                   </button>
                 )}
 
@@ -1189,28 +1222,31 @@ export default function BingoCameraModal({
                 <button
                   type="button"
                   onClick={handleConfirmAndUpload}
-                  disabled={uploading || isScanning}
+                  disabled={uploading || isScanning || !canSubmit}
                   style={{
                     flex: 2,
                     padding: "0.8rem",
                     borderRadius: "12px",
-                    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                    background: canSubmit
+                      ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
+                      : "rgba(255, 255, 255, 0.1)",
                     border: "none",
-                    color: "#fff",
+                    color: canSubmit ? "#fff" : "#64748b",
                     fontWeight: 700,
                     fontSize: "0.92rem",
-                    cursor: uploading || isScanning ? "wait" : "pointer",
+                    cursor: canSubmit ? (uploading ? "wait" : "pointer") : "not-allowed",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     gap: "0.5rem",
-                    boxShadow: "0 6px 18px rgba(16, 185, 129, 0.35)",
+                    boxShadow: canSubmit ? "0 6px 18px rgba(16, 185, 129, 0.35)" : "none",
+                    transition: "all 0.2s ease",
                   }}
                 >
                   {uploading || isScanning ? (
                     <>
                       <RefreshCw size={16} style={{ animation: "spin 1s linear infinite" }} />
-                      {isScanning ? "Scanning Card..." : "Saving & Completing..."}
+                      {isScanning ? "Verifying..." : "Saving..."}
                     </>
                   ) : (
                     <>

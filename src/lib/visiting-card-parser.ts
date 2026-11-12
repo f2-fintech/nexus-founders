@@ -142,12 +142,18 @@ export function parseVisitingCardText(text: string): ParsedVisitingCard {
     }
   }
 
-  // Determine if this is a legitimate visiting card with recognizable content
-  // At least one valid field or at least 3 recognizable lines of text
-  const meaningfulLines = lines.filter((l) => l.replace(/[^A-Za-z0-9]/g, "").length >= 3);
-  const isValidCard = Boolean(
-    contactName || contactCompany || email || phone || designation || meaningfulLines.length >= 2
+  // Strict validation: A genuine visiting card must have verifiable business card attributes
+  const hasStrongCardIdentity = Boolean(
+    (contactName && (contactCompany || email || phone || designation)) ||
+    (contactCompany && (email || phone)) ||
+    (email && phone)
   );
+
+  const hasNameAndDetails = Boolean(
+    contactName && (contactCompany || meaningfulLines.length >= 3)
+  );
+
+  const isValidCard = Boolean(hasStrongCardIdentity || hasNameAndDetails);
 
   return {
     isValidCard,
