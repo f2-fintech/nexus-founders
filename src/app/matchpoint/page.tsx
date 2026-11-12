@@ -1558,7 +1558,7 @@ function MatchPointContent() {
                   {/* Row 2: Brief Introduction & Pitch (120px) */}
                   <div className="mp-field-group">
                     <label className="mp-label">
-                      Brief Introduction & Pitch <span style={{ color: "#ef4444" }}>*</span>
+                      Brief Introduction about you and your business <span style={{ color: "#ef4444" }}>*</span>
                     </label>
                     <textarea
                       required
