@@ -39,49 +39,118 @@ function playShutterSound() {
     filter.connect(gain);
     gain.connect(ctx.destination);
     noise.start();
-  } catch (_) {}
+  } catch (_) { }
 }
 
 /**
- * Canvas-based card presence heuristic.
- * Samples a small downscaled region of the live video frame.
- * Returns true when the frame exhibits luminance variance and
- * center-vs-edge brightness contrast consistent with a bright
- * card held in front of a darker background.
+ * Advanced Canvas Card Detector:
+ * 1. Checks motion stability (user holding camera still)
+ * 2. Checks sharp high-frequency details inside the box (text/logos on card)
+ * 3. Checks boundary contrast between the card region and outer background
  */
-function detectCardInFrame(video: HTMLVideoElement, canvas: HTMLCanvasElement): boolean {
+function detectCardInFrame(
+  video: HTMLVideoElement,
+  canvas: HTMLCanvasElement,
+  prevFrameRef: React.MutableRefObject<Float32Array | null>
+): boolean {
   const vw = video.videoWidth;
   const vh = video.videoHeight;
   if (!vw || !vh) return false;
 
   const W = 160, H = 100;
-  canvas.width = W;
-  canvas.height = H;
+  if (canvas.width !== W) canvas.width = W;
+  if (canvas.height !== H) canvas.height = H;
+
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   if (!ctx) return false;
 
   ctx.drawImage(video, 0, 0, vw, vh, 0, 0, W, H);
   const { data } = ctx.getImageData(0, 0, W, H);
 
-  const grays: number[] = [];
-  for (let i = 0; i < data.length; i += 4) {
-    grays.push(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+  const gray = new Float32Array(W * H);
+  for (let i = 0, j = 0; i < data.length; i += 4, j++) {
+    gray[j] = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
   }
 
-  const mean = grays.reduce((a, b) => a + b, 0) / grays.length;
-  const variance = grays.reduce((s, v) => s + (v - mean) ** 2, 0) / grays.length;
+  // ── 1. Motion Check (Wait until camera/card is held steady) ──
+  if (prevFrameRef.current && prevFrameRef.current.length === gray.length) {
+    let diffSum = 0;
+    for (let i = 0; i < gray.length; i++) {
+      diffSum += Math.abs(gray[i] - prevFrameRef.current[i]);
+    }
+    const avgMotion = diffSum / gray.length;
+    prevFrameRef.current.set(gray);
+    // Agar camera hil raha hai (avgMotion > 7), toh false return karo
+    if (avgMotion > 7.5) return false;
+  } else {
+    prevFrameRef.current = new Float32Array(gray);
+    return false;
+  }
 
-  // Card must have moderate contrast and mid luminance range
-  if (variance < 350 || variance > 7000) return false;
-  if (mean < 60 || mean > 240) return false;
+  // Guide Box Coordinates (approx middle 65% width, 60% height)
+  const x1 = Math.floor(W * 0.18), x2 = Math.floor(W * 0.82);
+  const y1 = Math.floor(H * 0.20), y2 = Math.floor(H * 0.80);
 
-  // Centre of frame should be brighter than top/bottom edges
-  const topMean = grays.slice(0, W).reduce((a, b) => a + b, 0) / W;
-  const botMean = grays.slice(-W).reduce((a, b) => a + b, 0) / W;
-  const midS = Math.floor((W * H) / 2) - W / 2;
-  const midMean = grays.slice(midS, midS + W).reduce((a, b) => a + b, 0) / W;
+  // ── 2. Text / Logo Detail Check inside the Card Box ──
+  // Plain surface par sharp pixel jumps nahi hote, visiting card par text ki wajah se hote hain
+  let sharpEdgesInside = 0;
+  let insidePixels = 0;
+  let insideLumSum = 0;
 
-  return midMean - (topMean + botMean) / 2 > 15;
+  for (let y = y1 + 2; y < y2 - 2; y++) {
+    for (let x = x1 + 2; x < x2 - 2; x++) {
+      const idx = y * W + x;
+      const val = gray[idx];
+      insideLumSum += val;
+      insidePixels++;
+
+      const gx = Math.abs(gray[idx + 1] - gray[idx - 1]);
+      const gy = Math.abs(gray[idx + W] - gray[idx - W]);
+      // Agar aas-paas ke pixels mein sharp contrast hai (jaise text ke letters)
+      if (gx + gy > 38) {
+        sharpEdgesInside++;
+      }
+    }
+  }
+
+  const meanLum = insideLumSum / insidePixels;
+  // Bahut andhera ya over-exposed white screen reject karo
+  if (meanLum < 45 || meanLum > 245) return false;
+
+  const textDensity = sharpEdgesInside / insidePixels;
+  // Plain surface ka textDensity ~0.005 hota hai. Card par text/logo hone se 0.035 se 0.35 ke beech hota hai
+  if (textDensity < 0.035 || textDensity > 0.45) return false;
+
+  // ── 3. Card Boundary / Border Contrast Check ──
+  // Card ke edges (top, bottom, left, right) par andar aur bahar contrast hona chahiye
+  let topDiff = 0, botDiff = 0, leftDiff = 0, rightDiff = 0;
+  const pad = 5; // 5 pixels andar vs 5 pixels bahar compare karenge
+
+  for (let x = x1; x <= x2; x++) {
+    topDiff += Math.abs(gray[(y1 + pad) * W + x] - gray[(y1 - pad) * W + x]);
+    botDiff += Math.abs(gray[(y2 - pad) * W + x] - gray[(y2 + pad) * W + x]);
+  }
+  for (let y = y1; y <= y2; y++) {
+    leftDiff += Math.abs(gray[y * W + (x1 + pad)] - gray[y * W + (x1 - pad)]);
+    rightDiff += Math.abs(gray[y * W + (x2 - pad)] - gray[y * W + (x2 + pad)]);
+  }
+
+  const wSpan = x2 - x1 + 1;
+  const hSpan = y2 - y1 + 1;
+
+  const avgTop = topDiff / wSpan;
+  const avgBot = botDiff / wSpan;
+  const avgLeft = leftDiff / hSpan;
+  const avgRight = rightDiff / hSpan;
+
+  // 4 mein se kam se kam 3 sides par clear edge boundary दिखनी chahiye (threshold > 14)
+  let distinctSides = 0;
+  if (avgTop > 14) distinctSides++;
+  if (avgBot > 14) distinctSides++;
+  if (avgLeft > 14) distinctSides++;
+  if (avgRight > 14) distinctSides++;
+
+  return distinctSides >= 3;
 }
 
 export default function BingoCameraModal({
@@ -96,6 +165,7 @@ export default function BingoCameraModal({
   const [isStarting, setIsStarting] = useState(false);
   const [isCameraLive, setIsCameraLive] = useState(false);
   const [shutterFlashing, setShutterFlashing] = useState(false);
+  const prevFrameRef = useRef<Float32Array | null>(null);
 
   // Detection & countdown
   const [cardDetected, setCardDetected] = useState(false);
@@ -125,7 +195,7 @@ export default function BingoCameraModal({
     if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
     if (countdownRef.current) { clearTimeout(countdownRef.current); countdownRef.current = null; }
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => { try { t.stop(); } catch (_) {} });
+      streamRef.current.getTracks().forEach((t) => { try { t.stop(); } catch (_) { } });
       streamRef.current = null;
     }
     if (videoRef.current) videoRef.current.srcObject = null;
@@ -181,7 +251,6 @@ export default function BingoCameraModal({
     } catch (e) { console.error(e); }
   }, [stopStream]);
 
-  // ── Detection RAF loop ───────────────────────────────────────────────────
   const startDetectionLoop = useCallback((video: HTMLVideoElement) => {
     if (!analyzeCanvasRef.current) analyzeCanvasRef.current = document.createElement("canvas");
     const canvas = analyzeCanvasRef.current;
@@ -189,12 +258,16 @@ export default function BingoCameraModal({
 
     const loop = () => {
       if (!streamRef.current) return;
-      const isCard = detectCardInFrame(video, canvas);
+
+      // Pass prevFrameRef here
+      const isCard = detectCardInFrame(video, canvas, prevFrameRef);
+
       stableRef.current = isCard
         ? Math.min(stableRef.current + 1, 999)
-        : Math.max(stableRef.current - 2, 0);
+        : Math.max(stableRef.current - 3, 0); // Drop faster if card moves away
 
-      const stable = stableRef.current >= 8;
+      // 18 frames (~300ms) lagataar detect hone par hi trigger hoga
+      const stable = stableRef.current >= 18;
       setCardDetected(stable);
 
       if (stable && !snapQueued && !countdownRef.current) {
@@ -303,7 +376,7 @@ export default function BingoCameraModal({
 
   const handleClose = () => {
     stopStream();
-    if (capturedPreview) try { URL.revokeObjectURL(capturedPreview); } catch (_) {}
+    if (capturedPreview) try { URL.revokeObjectURL(capturedPreview); } catch (_) { }
     setCapturedBlob(null);
     setCapturedPreview(null);
     setContactName("");
@@ -314,7 +387,7 @@ export default function BingoCameraModal({
   };
 
   const handleRetake = () => {
-    if (capturedPreview) try { URL.revokeObjectURL(capturedPreview); } catch (_) {}
+    if (capturedPreview) try { URL.revokeObjectURL(capturedPreview); } catch (_) { }
     setCapturedBlob(null);
     setCapturedPreview(null);
     setContactName("");
