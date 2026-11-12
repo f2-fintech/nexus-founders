@@ -22,6 +22,7 @@ import {
   Sun,
   Moon,
   Gamepad2,
+  Target,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -79,6 +80,7 @@ export default function Navbar() {
   const baseLinks = [
     { href: "/", label: "Home Page", icon: Home },
     { href: "/directory", label: "Directory", icon: Users },
+    { href: "/matchpoint", label: "MatchPoint", icon: Target },
     { href: "/bingo", label: "Nexus Bingo", icon: Gamepad2 },
     { href: "/join", label: "Join Us", icon: Sparkles },
   ];

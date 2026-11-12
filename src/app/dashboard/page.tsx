@@ -6,10 +6,11 @@ import {
   Users, CalendarCheck, RefreshCw, Trash2,
   CheckCircle, Clock, XCircle, Eye,
   BarChart2, Search, X, ArrowLeft, Sun, Moon,
-  Trophy,
+  Trophy, Sparkles,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import BingoManager from "@/components/admin/BingoManager";
+import MatchPointManager from "@/components/admin/MatchPointManager";
 import "./dashboard.css";
 
 // ─── Types ────────────────────────────────────────────────────
@@ -315,7 +316,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const { isDark, toggleTheme } = useTheme();
 
-  const [activeTab, setActiveTab] = useState<"events" | "joins" | "bingo">("joins");
+  const [activeTab, setActiveTab] = useState<"events" | "joins" | "bingo" | "matchpoint">("matchpoint");
   const [eventRegs, setEventRegs] = useState<EventReg[]>([]);
   const [joinSubs, setJoinSubs] = useState<JoinSub[]>([]);
   const [loadingData, setLoadingData] = useState(false);
@@ -471,6 +472,13 @@ export default function DashboardPage() {
               <span className="db-tab-count">{joinSubs.length}</span>
             </button>
             <button
+              className={"db-tab" + (activeTab === "matchpoint" ? " active" : "")}
+              onClick={() => { setActiveTab("matchpoint"); setSearchQuery(""); }}
+            >
+              <Sparkles size={15} />
+              SFF MatchPoint
+            </button>
+            <button
               className={"db-tab" + (activeTab === "bingo" ? " active" : "")}
               onClick={() => { setActiveTab("bingo"); setSearchQuery(""); }}
             >
@@ -478,6 +486,8 @@ export default function DashboardPage() {
               Nexus Bingo (SFF)
             </button>
           </div>
+
+          {activeTab === "matchpoint" && <MatchPointManager />}
 
           {activeTab === "bingo" && <BingoManager />}
 

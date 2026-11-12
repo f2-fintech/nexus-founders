@@ -159,6 +159,7 @@ export default function Footer() {
             >
               {[
                 { name: "Home Page", href: "/" },
+                { name: "SFF MatchPoint", href: "/matchpoint" },
                 { name: "Members Directory", href: "/directory" },
                 { name: "Join Community", href: "/join" },
                 { name: "Previous Meetups", href: "/#events" },
