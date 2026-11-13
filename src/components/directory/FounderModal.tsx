@@ -351,9 +351,12 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
         position: "fixed", inset: 0,
         background: "rgba(15, 23, 42, 0.6)",
         backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
         zIndex: 2000,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        padding: "1.5rem",
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start",
+        padding: "1rem 0.75rem",
+        overflowY: "auto", overscrollBehavior: "contain",
+        WebkitOverflowScrolling: "touch",
       }}
       onClick={onClose}
     >
@@ -368,11 +371,14 @@ export default function FounderModal({ founder, onSave, onClose, saveError }: Pr
           border: "1px solid rgba(2, 132, 199, 0.2)",
           boxShadow: "0 25px 60px rgba(0, 0, 0, 0.2)",
           borderRadius: "20px",
-          padding: "2rem",
+          padding: "1.75rem 1.4rem",
           width: "100%",
           maxWidth: "560px",
-          maxHeight: "90vh",
+          margin: "auto",
+          maxHeight: "calc(100dvh - 2rem)",
           overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
+          boxSizing: "border-box",
         }}
         onClick={(e) => e.stopPropagation()}
       >

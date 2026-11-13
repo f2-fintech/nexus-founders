@@ -81,11 +81,15 @@ export default function BingoLeaderboardModal({
         zIndex: 9998,
         background: "rgba(10, 15, 29, 0.82)",
         backdropFilter: "blur(6px)",
+        WebkitBackdropFilter: "blur(6px)",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
-        padding: "1rem",
+        justifyContent: "flex-start",
+        padding: "1rem 0.75rem",
+        overflowY: "auto",
         overscrollBehavior: "contain",
+        WebkitOverflowScrolling: "touch",
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -95,15 +99,17 @@ export default function BingoLeaderboardModal({
         style={{
           width: "100%",
           maxWidth: "640px",
+          margin: "auto",
           background: "#0f172a",
           borderRadius: "20px",
           border: "1px solid rgba(255, 255, 255, 0.12)",
           boxShadow: "0 25px 60px rgba(0, 0, 0, 0.6)",
           overflow: "hidden",
           color: "#f8fafc",
-          maxHeight: "90vh",
+          maxHeight: "calc(100dvh - 2rem)",
           display: "flex",
           flexDirection: "column",
+          WebkitOverflowScrolling: "touch",
         }}
       >
         {/* Header */}

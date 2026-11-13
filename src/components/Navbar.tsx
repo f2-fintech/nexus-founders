@@ -23,6 +23,7 @@ import {
   Moon,
   Gamepad2,
   Target,
+  Building2,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -81,6 +82,7 @@ export default function Navbar() {
     { href: "/", label: "Home Page", icon: Home },
     { href: "/directory", label: "Directory", icon: Users },
     { href: "/matchpoint", label: "MatchPoint", icon: Target },
+    { href: "/bankers-connect", label: "Bankers Connect", icon: Building2 },
     { href: "/bingo", label: "Nexus Bingo", icon: Gamepad2 },
     { href: "/join", label: "Join Us", icon: Sparkles },
   ];
@@ -280,7 +282,10 @@ export default function Navbar() {
 
                     <button
                       type="button"
-                      onClick={() => { setEditModeOff(); signOut({ callbackUrl: "/login" }); }}
+                      onClick={() => {
+                        setEditModeOff();
+                        signOut({ callbackUrl: role === "banker" ? "/bankers-connect/login" : "/login" });
+                      }}
                       style={{
                         width: "100%", display: "flex", alignItems: "center", gap: "0.5rem",
                         padding: "0.65rem 0.9rem", borderRadius: "10px",
@@ -473,7 +478,7 @@ export default function Navbar() {
                   onClick={() => {
                     setEditModeOff();
                     setMobileMenuOpen(false);
-                    signOut({ callbackUrl: "/login" });
+                    signOut({ callbackUrl: role === "banker" ? "/bankers-connect/login" : "/login" });
                   }}
                   className="mobile-logout-btn"
                 >

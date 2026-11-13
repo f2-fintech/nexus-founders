@@ -19,7 +19,13 @@ export const authOptions: NextAuthOptions = {
           if (!user) return null;
           const isValid = await user.comparePassword(credentials.password);
           if (!isValid) return null;
-          return { id: user._id.toString(), email: user.email, name: user.name, role: user.role };
+          return {
+            id: user._id.toString(),
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            bankerProfile: user.bankerProfile,
+          };
         } catch (err) {
           console.error("Auth error:", err);
           return null;
@@ -30,11 +36,19 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.role = (user as any).role;
+      if (user) {
+        token.id = (user as any).id;
+        token.role = (user as any).role;
+        token.bankerProfile = (user as any).bankerProfile;
+      }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) (session.user as any).role = token.role;
+      if (session.user) {
+        (session.user as any).id = token.id || token.sub;
+        (session.user as any).role = token.role;
+        (session.user as any).bankerProfile = token.bankerProfile;
+      }
       return session;
     },
   },

@@ -141,18 +141,25 @@ function DetailModal({ item, onClose, type }: {
     <div style={{
       position: "fixed", inset: 0, zIndex: 9999,
       background: "rgba(0,0,0,0.6)", backdropFilter: "blur(5px)",
-      display: "flex", alignItems: "center", justifyContent: "center", padding: "1.25rem",
+      WebkitBackdropFilter: "blur(5px)",
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start",
+      padding: "1rem 0.75rem",
+      overflowY: "auto", overscrollBehavior: "contain",
+      WebkitOverflowScrolling: "touch",
     }} onClick={onClose}>
       <div
         className="no-scrollbar db-modal-content"
         style={{
-          background: "#ffffff", borderRadius: "22px", padding: "2.25rem 2rem",
-          maxWidth: isJoin ? "840px" : "640px", width: "100%", maxHeight: "88vh",
+          background: "#ffffff", borderRadius: "22px", padding: "1.75rem 1.5rem",
+          maxWidth: isJoin ? "840px" : "640px", width: "100%",
+          maxHeight: "calc(100dvh - 2rem)",
+          margin: "auto",
           overflowY: "auto", position: "relative",
           boxShadow: "0 25px 65px rgba(0,0,0,0.25)",
           border: "1px solid rgba(226, 232, 240, 0.9)",
           scrollbarWidth: "none",
           msOverflowStyle: "none",
+          WebkitOverflowScrolling: "touch",
         } as React.CSSProperties}
         onClick={(e) => e.stopPropagation()}
       >

@@ -455,13 +455,13 @@ export default function BingoCameraModal({
   if (!isOpen) return null;
 
   const S: Record<string, React.CSSProperties> = {
-    overlay: { position: "fixed", inset: 0, zIndex: 9999, background: "rgba(10,15,29,0.88)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", overscrollBehavior: "contain" },
-    modal: { width: "100%", maxWidth: "480px", background: "#0f172a", borderRadius: "20px", border: "1.5px solid rgba(255,255,255,0.12)", overflow: "hidden", boxShadow: "0 25px 60px rgba(0,0,0,0.7)", color: "#f8fafc", display: "flex", flexDirection: "column", maxHeight: "92vh" },
+    overlay: { position: "fixed", inset: 0, zIndex: 9999, background: "rgba(10,15,29,0.88)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start", padding: "0.75rem 0.5rem", overflowY: "auto", overscrollBehavior: "contain", WebkitOverflowScrolling: "touch" },
+    modal: { width: "100%", maxWidth: "480px", margin: "auto", background: "#0f172a", borderRadius: "20px", border: "1.5px solid rgba(255,255,255,0.12)", overflowY: "auto", boxShadow: "0 25px 60px rgba(0,0,0,0.7)", color: "#f8fafc", display: "flex", flexDirection: "column", maxHeight: "calc(100dvh - 1.5rem)", WebkitOverflowScrolling: "touch" },
     header: { padding: "0.85rem 1.15rem", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(255,255,255,0.08)", background: "rgba(15,23,42,0.98)" },
     h3: { margin: 0, fontSize: "1rem", fontWeight: 800, color: "#38bdf8", display: "flex", alignItems: "center", gap: "0.45rem" },
     sub: { margin: "0.15rem 0 0", fontSize: "0.78rem", color: "#94a3b8", lineHeight: 1.3 },
     closeBtn: { background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "50%", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center", color: "#cbd5e1", cursor: "pointer", flexShrink: 0 },
-    viewfinder: { position: "relative", background: "#020617", width: "100%", height: "330px", minHeight: "330px", maxHeight: "330px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" },
+    viewfinder: { position: "relative", background: "#020617", width: "100%", height: "min(320px, 35vh)", minHeight: "220px", maxHeight: "330px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" },
     video: { position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block", zIndex: 1 },
     bottom: { padding: "1rem 1.15rem", display: "flex", flexDirection: "column", gap: "0.75rem", background: "#0f172a" },
     input: { width: "100%", padding: "0.5rem 0.7rem", background: "#1e293b", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#f8fafc", fontSize: "0.84rem", outline: "none", boxSizing: "border-box" },

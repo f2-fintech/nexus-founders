@@ -175,10 +175,13 @@ export default function BingoLevelUpModal({
           backdropFilter: "blur(14px)",
           WebkitBackdropFilter: "blur(14px)",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
-          padding: "1rem",
+          justifyContent: "flex-start",
+          padding: "1rem 0.75rem",
           overflowY: "auto",
+          overscrollBehavior: "contain",
+          WebkitOverflowScrolling: "touch",
         }}
         onClick={(e) => {
           if (e.target === e.currentTarget) {
@@ -195,15 +198,18 @@ export default function BingoLevelUpModal({
             position: "relative",
             width: "100%",
             maxWidth: "480px",
+            margin: "auto",
+            maxHeight: "calc(100dvh - 2rem)",
+            overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
             background: "linear-gradient(145deg, #131d33 0%, #0b1120 100%)",
-            borderRadius: "26px",
+            borderRadius: "24px",
             border: `2px solid ${badge.color}`,
             boxShadow: `0 25px 60px rgba(0, 0, 0, 0.65), 0 0 35px ${badge.glow}`,
-            padding: "2.25rem 1.85rem",
+            padding: "1.75rem 1.4rem",
             textAlign: "center",
             color: "#f8fafc",
             boxSizing: "border-box",
-            overflow: "hidden",
           }}
         >
           {/* Confetti Particles */}

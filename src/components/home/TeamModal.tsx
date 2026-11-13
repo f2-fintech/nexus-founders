@@ -207,10 +207,15 @@ export default function TeamModal({ member, onSave, onClose, saveError }: TeamMo
         zIndex: 1100,
         background: "rgba(15, 23, 42, 0.6)",
         backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
-        padding: "1.5rem",
+        justifyContent: "flex-start",
+        padding: "1rem 0.75rem",
+        overflowY: "auto",
+        overscrollBehavior: "contain",
+        WebkitOverflowScrolling: "touch",
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -222,12 +227,15 @@ export default function TeamModal({ member, onSave, onClose, saveError }: TeamMo
           borderRadius: "20px",
           width: "100%",
           maxWidth: "580px",
-          maxHeight: "90vh",
+          margin: "auto",
+          maxHeight: "calc(100dvh - 2rem)",
           overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
           boxShadow: "0 25px 60px rgba(0, 0, 0, 0.2)",
           border: "1px solid rgba(2, 132, 199, 0.2)",
-          padding: "2rem",
+          padding: "1.75rem 1.4rem",
           position: "relative",
+          boxSizing: "border-box",
         }}
       >
         {/* Close Button */}

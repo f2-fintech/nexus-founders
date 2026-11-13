@@ -945,11 +945,15 @@ export default function BingoPage() {
               zIndex: 9998,
               background: "rgba(10, 15, 29, 0.85)",
               backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
-              padding: "1rem",
+              justifyContent: "flex-start",
+              padding: "1rem 0.75rem",
+              overflowY: "auto",
               overscrollBehavior: "contain",
+              WebkitOverflowScrolling: "touch",
             }}
             onClick={(e) => {
               if (e.target === e.currentTarget) setIsRulesModalOpen(false);
@@ -959,14 +963,16 @@ export default function BingoPage() {
               style={{
                 width: "100%",
                 maxWidth: "580px",
+                margin: "auto",
                 background: "#0f172a",
                 borderRadius: "20px",
                 border: "1px solid rgba(255, 255, 255, 0.12)",
                 color: "#f8fafc",
                 overflow: "hidden",
-                maxHeight: "90vh",
+                maxHeight: "calc(100dvh - 2rem)",
                 display: "flex",
                 flexDirection: "column",
+                WebkitOverflowScrolling: "touch",
               }}
             >
               <div
@@ -1116,10 +1122,15 @@ export default function BingoPage() {
               zIndex: 9999,
               background: "rgba(10, 15, 29, 0.88)",
               backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
-              padding: "1.5rem",
+              justifyContent: "flex-start",
+              padding: "1rem 0.75rem",
+              overflowY: "auto",
+              overscrollBehavior: "contain",
+              WebkitOverflowScrolling: "touch",
             }}
             onClick={(e) => {
               if (e.target === e.currentTarget) {
@@ -1133,19 +1144,23 @@ export default function BingoPage() {
               style={{
                 width: "100%",
                 maxWidth: "520px",
+                margin: "auto",
                 background: "linear-gradient(145deg, #1e293b 0%, #0f172a 100%)",
                 borderRadius: "24px",
                 border: "2px solid #f59e0b",
                 boxShadow: "0 25px 60px rgba(245, 158, 11, 0.35)",
-                padding: "2.25rem 2rem",
+                padding: "1.75rem 1.4rem",
                 textAlign: "center",
                 color: "#f8fafc",
+                maxHeight: "calc(100dvh - 2rem)",
+                overflowY: "auto",
+                WebkitOverflowScrolling: "touch",
               }}
             >
               <div
                 style={{
-                  fontSize: "3.5rem",
-                  marginBottom: "0.5rem",
+                  fontSize: "3rem",
+                  marginBottom: "0.35rem",
                 }}
               >
                 🎉 ⏱️ ✉️
@@ -1154,7 +1169,7 @@ export default function BingoPage() {
               <h2
                 style={{
                   margin: "0 0 0.5rem",
-                  fontSize: "1.75rem",
+                  fontSize: "1.6rem",
                   fontWeight: 900,
                   color: "#f59e0b",
                   textTransform: "uppercase",
@@ -1166,7 +1181,7 @@ export default function BingoPage() {
                   : "Challenge Completed!"}
               </h2>
 
-              <p style={{ fontSize: "1rem", color: "#cbd5e1", lineHeight: 1.55, margin: "0.5rem 0 1.25rem" }}>
+              <p style={{ fontSize: "0.95rem", color: "#cbd5e1", lineHeight: 1.55, margin: "0.5rem 0 1.15rem" }}>
                 Outstanding effort, <strong>{participant?.fullName}</strong>! You completed{" "}
                 <strong style={{ color: "#38bdf8" }}>{participant?.completedCount || 0} of 20</strong> networking
                 challenges during your 120-minute round at Singapore FinTech Festival.
@@ -1177,16 +1192,16 @@ export default function BingoPage() {
                   background: "rgba(245, 158, 11, 0.12)",
                   border: "1.5px solid rgba(245, 158, 11, 0.35)",
                   borderRadius: "16px",
-                  padding: "1.1rem 1.2rem",
-                  marginBottom: "1.5rem",
+                  padding: "1rem 1.15rem",
+                  marginBottom: "1.25rem",
                   textAlign: "left",
                 }}
               >
-                <div style={{ fontSize: "0.98rem", fontWeight: 800, color: "#fbbf24", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.4rem" }}>
-                  <span>📢</span> Winner Announcement on 20 November
+                <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#fbbf24", display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.4rem" }}>
+                  <span>📢</span> Winner Announcement & Booth Collection
                 </div>
                 <div style={{ fontSize: "0.85rem", color: "#e2e8f0", lineHeight: 1.55 }}>
-                  The official winners will be announced on <strong>20 November</strong>. If you are among the winners, you will receive an official notification via email at <code style={{ color: "#38bdf8", background: "rgba(0,0,0,0.3)", padding: "2px 6px", borderRadius: "4px" }}>{participant?.email}</code>.
+                  The official winners will be announced on <strong>20 November</strong>. You can collect your exclusive gift hamper at <strong>Hall 5 - Booth 5K33-B (F2 Fintech)</strong>. Winners will also receive an email at <code style={{ color: "#38bdf8", background: "rgba(0,0,0,0.3)", padding: "2px 6px", borderRadius: "4px" }}>{participant?.email}</code>.
                 </div>
               </div>
 

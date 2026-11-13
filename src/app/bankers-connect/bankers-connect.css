@@ -1,0 +1,983 @@
+/* Bankers Connect — Institutional Luxury Theme & Responsive Styles */
+
+:root {
+  --bc-primary: #10b981;
+  --bc-primary-hover: #059669;
+  --bc-primary-light: rgba(16, 185, 129, 0.12);
+  --bc-bg-main: #070d1e;
+  --bc-card-bg: rgba(15, 23, 42, 0.82);
+  --bc-card-border: rgba(255, 255, 255, 0.1);
+  --bc-text-main: #f8fafc;
+  --bc-text-muted: #94a3b8;
+  --bc-accent-blue: #0284c7;
+  --bc-accent-gold: #f59e0b;
+}
+
+.bc-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #070d1e 0%, #0a1329 50%, #060b19 100%);
+  color: var(--bc-text-main);
+  padding: 5.5rem 1.25rem 3rem;
+  box-sizing: border-box;
+  font-family: inherit;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Light Mode Overrides when root has light class or context */
+.light .bc-container,
+[data-theme="light"] .bc-container {
+  background: linear-gradient(180deg, #f8fafc 0%, #edf2f7 50%, #e2e8f0 100%);
+  color: #0f172a;
+  --bc-card-bg: #ffffff;
+  --bc-card-border: rgba(226, 232, 240, 0.9);
+  --bc-text-main: #0f172a;
+  --bc-text-muted: #64748b;
+}
+
+/* Top Banner Header */
+.bc-header-banner {
+  max-width: 1240px;
+  margin: 0 auto 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  background: var(--bc-card-bg);
+  border: 1px solid var(--bc-card-border);
+  border-radius: 20px;
+  padding: 1.5rem 2rem;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.bc-header-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.bc-header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #10b981 0%, #0284c7 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  flex-shrink: 0;
+}
+
+/* Main Layout Grid / Tabs */
+.bc-tabs-nav {
+  max-width: 1240px;
+  margin: 0 auto 1.75rem;
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: none;
+}
+
+.bc-tabs-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.bc-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--bc-card-border);
+  background: var(--bc-card-bg);
+  color: var(--bc-text-muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.bc-tab-btn.active {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #10b981;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.bc-tab-btn:hover:not(.active) {
+  border-color: rgba(16, 185, 129, 0.4);
+  color: var(--bc-text-main);
+}
+
+.bc-badge-count {
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+}
+
+/* Search and Filters Bar */
+.bc-search-filters {
+  max-width: 1240px;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.bc-search-box {
+  flex: 1;
+  min-width: 260px;
+  position: relative;
+}
+
+.bc-search-input {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 2.75rem;
+  background: var(--bc-card-bg);
+  border: 1px solid var(--bc-card-border);
+  border-radius: 14px;
+  color: var(--bc-text-main);
+  outline: none;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.bc-search-input:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* Banker Cards Grid */
+.bc-bankers-grid {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.bc-banker-card {
+  background: var(--bc-card-bg);
+  border: 1px solid var(--bc-card-border);
+  border-radius: 20px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(12px);
+}
+
+.bc-banker-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+}
+
+.bc-banker-header {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.bc-banker-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0284c7 0%, #10b981 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.35rem;
+  font-weight: 800;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+.bc-status-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #0f172a;
+}
+.bc-status-online {
+  background: #10b981;
+}
+.bc-status-offline {
+  background: #94a3b8;
+}
+
+.bc-banker-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.bc-banker-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--bc-text-main);
+  margin: 0 0 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.bc-bank-tag {
+  display: inline-block;
+  background: rgba(2, 132, 199, 0.15);
+  color: #38bdf8;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  border: 1px solid rgba(2, 132, 199, 0.3);
+  margin-bottom: 0.35rem;
+}
+
+.bc-banker-role {
+  font-size: 0.86rem;
+  color: var(--bc-text-muted);
+  margin: 0;
+}
+
+.bc-banker-bio {
+  font-size: 0.86rem;
+  color: var(--bc-text-muted);
+  line-height: 1.5;
+  margin: 0.75rem 0 1.25rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.bc-pills-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.bc-pill {
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--bc-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.bc-actions-row {
+  display: flex;
+  gap: 0.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--bc-card-border);
+}
+
+.bc-btn-primary {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.86rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.bc-btn-primary:hover {
+  background: #059669;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.bc-btn-outline {
+  padding: 0.65rem 1rem;
+  background: transparent;
+  color: var(--bc-text-main);
+  border: 1px solid var(--bc-card-border);
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.86rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.bc-btn-outline:hover {
+  border-color: #0284c7;
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.08);
+}
+
+.bc-btn-disabled {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: #64748b;
+  border: 1px solid var(--bc-card-border);
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.86rem;
+  cursor: not-allowed;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+/* ======================================================== */
+/* REAL-TIME CHAT & CONVERSATION SECTION (LUXURY FINTECH)   */
+/* ======================================================== */
+
+/* ── Real-Time Chat Messenger Section (Pristine White Executive Theme) ───── */
+.bc-chat-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  height: 720px;
+  max-height: calc(100vh - 190px);
+  min-height: 560px;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 24px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+  position: relative;
+  --bc-text-main: #0f172a;
+  --bc-text-muted: #64748b;
+  --bc-card-border: #e2e8f0;
+  color: #0f172a;
+}
+
+.bc-chat-container .bc-status-dot {
+  border-color: #ffffff !important;
+}
+
+/* ── Sidebar (Conversations) ───────────────────────────── */
+.bc-chat-sidebar {
+  width: 360px;
+  border-right: 1px solid #e2e8f0 !important;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc !important;
+  flex-shrink: 0;
+  transition: width 0.2s ease;
+}
+
+.bc-chat-sidebar-header {
+  padding: 1.25rem 1.4rem;
+  border-bottom: 1px solid #e2e8f0 !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff !important;
+}
+
+.bc-chat-sidebar-header span {
+  color: #0f172a !important;
+}
+
+.bc-chat-sidebar-search {
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid #e2e8f0 !important;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #ffffff !important;
+}
+
+.bc-chat-sidebar-search input {
+  color: #0f172a !important;
+}
+
+.bc-chat-sidebar-search input::placeholder {
+  color: #94a3b8 !important;
+}
+
+.bc-conversation-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.6rem 0.5rem;
+  background: #f8fafc !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+.bc-conversation-list::-webkit-scrollbar {
+  width: 5px;
+}
+.bc-conversation-list::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+}
+
+.bc-conversation-item {
+  display: flex;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  margin: 0.25rem 0.35rem;
+  border-radius: 14px;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  background: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  transition: all 0.2s ease;
+  align-items: center;
+  position: relative;
+}
+
+.bc-conversation-item:hover {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  transform: translateX(2px);
+}
+
+.bc-conversation-item.active {
+  background: #ecfdf5 !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.15) !important;
+}
+
+.bc-banker-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.bc-conv-name {
+  font-weight: 700;
+  font-size: 0.94rem;
+  color: #0f172a !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bc-conv-bank-badge {
+  display: inline-block;
+  background: #e0f2fe !important;
+  color: #0369a1 !important;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.12rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #bae6fd !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 170px;
+}
+
+.bc-conv-preview {
+  font-size: 0.8rem;
+  color: #64748b !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 190px;
+}
+
+.bc-conv-empty-state {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: #64748b !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bc-conv-empty-state svg {
+  color: #94a3b8 !important;
+}
+
+/* ── Main Chat Pane (Pristine White Background) ───────────── */
+.bc-chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff !important;
+  position: relative;
+  min-width: 0;
+}
+
+.bc-chat-main-header {
+  padding: 1rem 1.75rem;
+  border-bottom: 1px solid #e2e8f0 !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff !important;
+  gap: 1rem;
+}
+
+.bc-mobile-back-btn {
+  display: none;
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px;
+  color: #0f172a !important;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.bc-chat-header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  color: #334155 !important;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bc-chat-header-btn:hover {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.bc-chat-header-btn.active {
+  background: #ecfdf5 !important;
+  border-color: #10b981 !important;
+  color: #059669 !important;
+}
+
+.bc-chat-header-btn.email-btn:hover {
+  background: #e0f2fe !important;
+  border-color: #0284c7 !important;
+  color: #0369a1 !important;
+}
+
+/* Slide-down Info Banner */
+.bc-chat-info-banner {
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  padding: 1rem 1.75rem;
+  animation: fadeInDown 0.2s ease;
+}
+
+.bc-info-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.15rem;
+}
+
+.bc-info-val {
+  font-size: 0.86rem;
+  color: #0f172a !important;
+  font-weight: 600;
+}
+
+/* Messages Scroll Area */
+.bc-messages-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  background: #fafbfc !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+
+.bc-messages-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.bc-messages-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+}
+
+.bc-chat-date-divider {
+  display: flex;
+  justify-content: center;
+  margin: 0.5rem 0 1rem;
+}
+
+.bc-chat-date-divider span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 0.25rem 0.85rem;
+  border-radius: 9999px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.bc-chat-welcome-prompt {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  margin: auto;
+  max-width: 420px;
+}
+
+.bc-chat-welcome-prompt h4 {
+  color: #0f172a !important;
+}
+
+.bc-chat-welcome-prompt p {
+  color: #64748b !important;
+}
+
+.bc-welcome-icon-box {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: #ecfdf5 !important;
+  border: 1.5px solid #a7f3d0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
+}
+
+.bc-message-bubble {
+  max-width: 65%;
+  padding: 0.85rem 1.15rem;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  word-break: break-word;
+  position: relative;
+  transition: transform 0.15s ease;
+}
+
+.bc-msg-sent {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: #ffffff !important;
+  border-radius: 20px 20px 4px 20px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+}
+
+.bc-msg-sent .bc-msg-time {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.bc-msg-received {
+  align-self: flex-start;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 20px 20px 20px 4px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05) !important;
+}
+
+.bc-msg-received .bc-msg-time {
+  color: #94a3b8 !important;
+}
+
+.bc-msg-text {
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.bc-msg-time {
+  font-size: 0.72rem;
+  margin-top: 0.35rem;
+  display: block;
+  text-align: right;
+  letter-spacing: 0.02em;
+}
+
+/* Quick Suggestion Chips */
+.bc-chat-quick-chips {
+  padding: 0.6rem 1.5rem;
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: #ffffff !important;
+  border-top: 1px solid #f1f5f9 !important;
+}
+.bc-chat-quick-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.bc-quick-chip {
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #475569 !important;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.bc-quick-chip:hover {
+  background: #ecfdf5 !important;
+  border-color: #10b981 !important;
+  color: #059669 !important;
+}
+
+/* Chat Input Bar */
+.bc-chat-input-bar {
+  padding: 0.9rem 1.5rem;
+  border-top: 1px solid #e2e8f0 !important;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  background: #ffffff !important;
+}
+
+.bc-chat-input {
+  flex: 1;
+  padding: 0.85rem 1.35rem;
+  background: #f8fafc !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 14px;
+  color: #0f172a !important;
+  outline: none;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.bc-chat-input::placeholder {
+  color: #94a3b8 !important;
+}
+
+.bc-chat-input:focus {
+  border-color: #10b981 !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12) !important;
+}
+
+.bc-chat-send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: #ffffff !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  transition: transform 0.15s ease, opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.bc-chat-send-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.bc-chat-send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Empty Panel (When no banker conversation is active) */
+.bc-chat-empty-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  background: #ffffff !important;
+}
+
+.bc-chat-empty-panel h3 {
+  color: #0f172a !important;
+}
+
+.bc-chat-empty-panel p {
+  color: #64748b !important;
+}
+
+.bc-empty-shield-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background: #ecfdf5 !important;
+  border: 1.5px solid #a7f3d0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.15);
+}
+
+.bc-quick-start-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #1e293b !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.bc-quick-start-item:hover {
+  background: #ecfdf5 !important;
+  border-color: #10b981 !important;
+  color: #059669 !important;
+  transform: translateY(-2px);
+}
+
+/* Modals - Android & Mobile Safe */
+.bc-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1.25rem 0.75rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.bc-modal-card {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 22px;
+  width: 100%;
+  max-width: 540px;
+  margin: auto;
+  padding: 1.85rem 1.6rem;
+  color: #fff;
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+  max-height: calc(100dvh - 2.5rem);
+  max-height: calc(100vh - 2.5rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .bc-modal-overlay {
+    padding: 0.65rem 0.5rem;
+  }
+  .bc-modal-card {
+    padding: 1.25rem 1rem;
+    border-radius: 18px;
+    max-height: calc(100dvh - 1.25rem);
+    max-height: calc(100vh - 1.25rem);
+  }
+}
+
+/* ── Responsive Media Queries ──────────────────────────── */
+@media (max-width: 860px) {
+  .bc-container {
+    padding: 5rem 0.85rem 2rem;
+  }
+
+  .bc-header-banner {
+    padding: 1.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .bc-bankers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Chat full-screen responsive switch */
+  .bc-chat-container {
+    height: calc(100vh - 190px);
+    min-height: 520px;
+  }
+
+  .bc-chat-sidebar {
+    width: 100%;
+    border-right: none;
+  }
+
+  .bc-chat-sidebar.mobile-hidden {
+    display: none;
+  }
+
+  .bc-chat-main.mobile-hidden {
+    display: none;
+  }
+
+  .bc-mobile-back-btn {
+    display: inline-flex;
+  }
+
+  .desktop-text {
+    display: none;
+  }
+
+  .bc-message-bubble {
+    max-width: 88%;
+  }
+
+  .bc-chat-main-header {
+    padding: 0.85rem 1rem;
+  }
+
+  .bc-messages-scroll {
+    padding: 1rem;
+  }
+
+  .bc-chat-input-bar {
+    padding: 0.75rem 1rem;
+  }
+}
+

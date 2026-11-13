@@ -40,13 +40,31 @@ export async function connectDB() {
       serverSelectionTimeoutMS: 5000, // Fail fast if Atlas is unreachable
       socketTimeoutMS: 45000,       // Disconnect idle sockets after 45s
     };
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {
-      cached.conn = m;
-      return m;
-    }).catch((err) => {
-      cached.promise = null;
-      throw err;
-    });
+    const DIRECT_REPLICA_URI =
+      "mongodb://f2fintech-hrms:f2fintechltshrms@ac-4fl1shv-shard-00-00.1exq3rs.mongodb.net:27017,ac-4fl1shv-shard-00-01.1exq3rs.mongodb.net:27017,ac-4fl1shv-shard-00-02.1exq3rs.mongodb.net:27017/nexus-founders?ssl=true&replicaSet=atlas-tnenik-shard-0&authSource=admin";
+
+    cached.promise = mongoose
+      .connect(MONGODB_URI, opts)
+      .then((m) => {
+        cached.conn = m;
+        return m;
+      })
+      .catch(async (err) => {
+        // If Windows DNS querySrv ECONNREFUSED occurs, fallback seamlessly to direct replica set hosts
+        if (err?.message?.includes("querySrv") || err?.message?.includes("ECONNREFUSED")) {
+          console.warn("[MongoDB] SRV lookup issue detected. Retrying with direct replica set hosts...");
+          try {
+            const fallbackConn = await mongoose.connect(DIRECT_REPLICA_URI, opts);
+            cached.conn = fallbackConn;
+            return fallbackConn;
+          } catch (fallbackErr) {
+            cached.promise = null;
+            throw fallbackErr;
+          }
+        }
+        cached.promise = null;
+        throw err;
+      });
   }
 
   try {

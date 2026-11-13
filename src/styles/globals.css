@@ -2112,4 +2112,27 @@ html.dark .join-exit-btn:hover {
   background: rgba(56, 189, 248, 0.1) !important;
 }
 
+/* ── ANDROID & MOBILE MODAL TOUCH SCROLL SAFETY ── */
+@media (max-width: 640px) {
+  .db-modal-content {
+    padding: 1.25rem 1rem !important;
+    border-radius: 18px !important;
+    max-height: calc(100dvh - 1.25rem) !important;
+    max-height: calc(100vh - 1.25rem) !important;
+  }
+  .founder-modal-dialog {
+    padding: 1.25rem 1rem !important;
+    border-radius: 18px !important;
+    max-height: calc(100dvh - 1.25rem) !important;
+    max-height: calc(100vh - 1.25rem) !important;
+  }
+  .bingo-winner-modal {
+    padding: 1.25rem 1rem !important;
+    border-radius: 18px !important;
+    max-height: calc(100dvh - 1.25rem) !important;
+    max-height: calc(100vh - 1.25rem) !important;
+  }
+}
+
+
 

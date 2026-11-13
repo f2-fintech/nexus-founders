@@ -80,11 +80,15 @@ export default function BingoRegistrationModal({
           zIndex: 9998,
           background: "rgba(10, 15, 29, 0.8)",
           backdropFilter: "blur(6px)",
+          WebkitBackdropFilter: "blur(6px)",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
-          padding: "1rem",
+          justifyContent: "flex-start",
+          padding: "1rem 0.75rem",
+          overflowY: "auto",
           overscrollBehavior: "contain",
+          WebkitOverflowScrolling: "touch",
         }}
         onClick={(e) => {
           if (e.target === e.currentTarget && !loading) onClose();
@@ -94,14 +98,16 @@ export default function BingoRegistrationModal({
           style={{
             width: "100%",
             maxWidth: "480px",
+            margin: "auto",
             background: "#ffffff",
             borderRadius: "20px",
             boxShadow: "0 25px 60px rgba(0, 0, 0, 0.25)",
             overflow: "hidden",
             color: "#0f172a",
-            maxHeight: "92vh",
+            maxHeight: "calc(100dvh - 2rem)",
             display: "flex",
             flexDirection: "column",
+            WebkitOverflowScrolling: "touch",
           }}
         >
           {/* Header */}
