@@ -357,7 +357,7 @@ export default function BankersLoginPage() {
                     marginBottom: "0.45rem",
                   }}
                 >
-                  Official Email Address
+                  Email Address
                 </label>
                 <div style={{ position: "relative" }}>
                   <Mail
@@ -579,7 +579,7 @@ export default function BankersLoginPage() {
                 {/* Email */}
                 <div>
                   <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#cbd5e1", marginBottom: "0.35rem", textTransform: "uppercase" }}>
-                    Official Email *
+                   Email *
                   </label>
                   <div style={{ position: "relative" }}>
                     <Mail size={16} style={{ position: "absolute", left: "0.9rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
