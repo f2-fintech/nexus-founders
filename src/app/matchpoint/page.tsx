@@ -726,6 +726,11 @@ function MatchPointContent() {
       const industryString = selectedIndustries.join(", ");
       const finalAboutCompany = industryString ? `[${industryString}] ${aboutCompany}` : aboutCompany;
 
+      const formatHttps = (urlStr: string) => {
+        const trimmed = (urlStr || "").trim().replace(/^https?:\/\//i, "");
+        return trimmed ? `https://${trimmed}` : "";
+      };
+
       const payload = {
         fullName,
         email,
@@ -735,8 +740,8 @@ function MatchPointContent() {
         designation,
         category,
         city,
-        linkedinUrl,
-        websiteUrl,
+        linkedinUrl: formatHttps(linkedinUrl),
+        websiteUrl: formatHttps(websiteUrl),
         aboutCompany: finalAboutCompany,
         usps: allUsps,
         offeringsDescription: aboutCompany,
@@ -755,7 +760,7 @@ function MatchPointContent() {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Failed to submit MatchPoint registration");
+        throw new Error(data.error || "Failed to submit Match-Point registration");
       }
 
       setMyOwnPass(data.submission);
@@ -794,7 +799,7 @@ function MatchPointContent() {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "No MatchPoint registration found.");
+        throw new Error(data.error || "No Match-Point registration found.");
       }
 
       setMyOwnPass(data.submission);
@@ -833,8 +838,8 @@ function MatchPointContent() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `SFF MatchPoint Pass - ${activePass.fullName} (${activePass.companyName})`,
-          text: `Check out ${activePass.companyName}'s SFF MatchPoint Card! Let's connect at Singapore FinTech Festival.`,
+          title: `SFF Match-Point Pass - ${activePass.fullName} (${activePass.companyName})`,
+          text: `Check out ${activePass.companyName}'s SFF Match-Point Card! Let's connect at Singapore FinTech Festival.`,
           url: shareUrl,
         });
         return;
@@ -917,8 +922,8 @@ function MatchPointContent() {
     setDesignation(activePass.designation || "");
     setCategory(activePass.category || "Founder / Co-Founder");
     setCity(activePass.city || "");
-    setLinkedinUrl(activePass.linkedinUrl || "");
-    setWebsiteUrl(activePass.websiteUrl || "");
+    setLinkedinUrl((activePass.linkedinUrl || "").replace(/^https?:\/\//i, ""));
+    setWebsiteUrl((activePass.websiteUrl || "").replace(/^https?:\/\//i, ""));
 
     // Extract industries if encoded in aboutCompany
     const rawAbout = activePass.aboutCompany || "";
@@ -975,7 +980,7 @@ function MatchPointContent() {
           <div className="mp-hero-brand-row">
 
             <h1 className="mp-title">
-              <span className="mp-title-gradient">Nexus Founders MatchPoint</span>
+              <span className="mp-title-gradient">Nexus Founders Match-Point</span>
             </h1>
           </div>
           <span className="mp-badge-tag-compact">
@@ -1002,7 +1007,7 @@ function MatchPointContent() {
                   <div className="mp-shared-banner-info">
                     <Sparkles size={16} color="#0284c7" />
                     <span>
-                      You are viewing <strong>{activePass.fullName}</strong>'s SFF MatchPoint Card ({activePass.companyName})
+                      You are viewing <strong>{activePass.fullName}</strong>'s SFF Match-Point Card ({activePass.companyName})
                     </span>
                   </div>
                   <button
@@ -1016,13 +1021,13 @@ function MatchPointContent() {
               ) : (
                 <div className="mp-owner-welcome-badge">
                   <CheckCircle2 size={15} color="#059669" />
-                  <span>Your SFF MatchPoint Pass is active & saved in your device cache</span>
+                  <span>Your SFF Match-Point Pass is active & saved in your device cache</span>
                 </div>
               )}
 
               {isUpdateNotice && !isViewingShared && (
                 <div style={{ background: "rgba(16, 185, 129, 0.12)", color: "#059669", padding: "0.6rem 1rem", borderRadius: "12px", marginBottom: "1.25rem", fontSize: "0.86rem", fontWeight: 700, display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <CheckCircle2 size={16} /> Details successfully updated for your SFF MatchPoint registration!
+                  <CheckCircle2 size={16} /> Details successfully updated for your SFF Match-Point registration!
                 </div>
               )}
 
@@ -1059,7 +1064,7 @@ function MatchPointContent() {
                 </div>
 
                 <div style={{ textAlign: "right" }}>
-                  <span style={{ fontSize: "0.72rem", color: "#94a3b8", display: "block", marginBottom: "0.2rem" }}>MATCHPOINT ID</span>
+                  <span style={{ fontSize: "0.72rem", color: "#94a3b8", display: "block", marginBottom: "0.2rem" }}>MATCH-POINT ID</span>
                   <div className="mp-pass-id" style={{ display: "inline-flex", alignItems: "center", gap: "0.45rem" }}>
                     <span>{activePass.matchPointId}</span>
                     <button
@@ -1280,7 +1285,7 @@ function MatchPointContent() {
                   </div>
                   <div>
                     <strong style={{ fontSize: "0.85rem", color: "#0f172a", display: "block" }}>1. Registration Recorded</strong>
-                    <span style={{ fontSize: "0.78rem", color: "#64748b" }}>Profile and requirements are securely captured in the SFF MatchPoint registry.</span>
+                    <span style={{ fontSize: "0.78rem", color: "#64748b" }}>Profile and requirements are securely captured in the SFF Match-Point registry.</span>
                   </div>
                 </div>
 
@@ -1354,7 +1359,7 @@ function MatchPointContent() {
                     <div className="mp-add-yours-text">
                       <h3>Connect with Opportunities at SFF 🚀</h3>
                       <p>
-                        Want potential clients, investors, vendors, or partners to discover your business? Create your own SFF MatchPoint Pass in 1 minute!
+                        Want potential clients, investors, vendors, or partners to discover your business? Create your own SFF Match-Point Pass in 1 minute!
                       </p>
                     </div>
                     <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", alignItems: "center" }}>
@@ -1428,7 +1433,7 @@ function MatchPointContent() {
                 <div style={{ fontSize: "0.88rem", color: "#0369a1", fontWeight: 600 }}>
                   {isViewingShared
                     ? `Adding your own pass • Currently viewing ${activePass.fullName}'s shared card`
-                    : "Editing your SFF MatchPoint registration"}
+                    : "Editing your SFF Match-Point registration"}
                 </div>
                 <button
                   type="button"
@@ -1938,7 +1943,7 @@ function MatchPointContent() {
                     {isProfileComplete ? (
                       <>Profile set for <strong>{fullName}</strong> ({companyName}). Click below to generate your pass.</>
                     ) : (
-                      "Please fill your profile details first before generating your MatchPoint Pass."
+                      "Please fill your profile details first before generating your Match-Point Pass."
                     )}
                   </span>
                 </div>
@@ -1960,7 +1965,7 @@ function MatchPointContent() {
                     </>
                   ) : (
                     <>
-                      <Zap size={18} /> Generate My MatchPoint Pass
+                      <Zap size={18} /> Generate My Match-Point Pass
                     </>
                   )}
                 </button>
@@ -1977,7 +1982,7 @@ function MatchPointContent() {
                 <Building2 size={13} /> Case Study
               </span>
               <h3 style={{ fontSize: "1.15rem", fontWeight: 800, margin: 0, color: "#0f172a" }}>
-                How F2 Fintech Uses MatchPoint
+                How F2 Fintech Uses Match-Point
               </h3>
             </div>
 
@@ -2051,7 +2056,7 @@ function MatchPointContent() {
           <div className="mp-match-arrow">
             <CheckCircle2 size={18} color="#059669" />
             <span>
-              <strong>How MatchPoint Helps:</strong> The F2 Fintech team finds another attendee offering HR Recruitment, and connects both parties via a personalized email on the 20th–21st!
+              <strong>How Match-Point Helps:</strong> The F2 Fintech team finds another attendee offering HR Recruitment, and connects both parties via a personalized email on the 20th–21st!
             </span>
           </div>
         </div>
@@ -2111,7 +2116,7 @@ function MatchPointContent() {
               gap: "0.4rem",
             }}
           >
-            <Search size={14} /> Find My MatchPoint Pass
+            <Search size={14} /> Find My Match-Point Pass
           </button>
         </div>
       </div>
@@ -2554,11 +2559,14 @@ function MatchPointContent() {
                     <span className="mp-label-hint">Optional</span>
                   </label>
                   <input
-                    type="url"
+                    type="text"
                     className="mp-input"
-                    placeholder="https://linkedin.com/in/username (Optional)"
+                    placeholder="linkedin.com/in/username (Optional)"
                     value={linkedinUrl}
-                    onChange={(e) => setLinkedinUrl(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/^https?:\/\//i, "");
+                      setLinkedinUrl(val);
+                    }}
                   />
                 </div>
 
@@ -2569,11 +2577,14 @@ function MatchPointContent() {
                     <span className="mp-label-hint">Optional</span>
                   </label>
                   <input
-                    type="url"
+                    type="text"
                     className="mp-input"
-                    placeholder="https://yourcompany.com (Optional)"
+                    placeholder="yourcompany.com (Optional)"
                     value={websiteUrl}
-                    onChange={(e) => setWebsiteUrl(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/^https?:\/\//i, "");
+                      setWebsiteUrl(val);
+                    }}
                   />
                 </div>
               </div>
@@ -2624,10 +2635,10 @@ function MatchPointContent() {
               </div>
               <div className="mp-modal-header-text">
                 <h3 className="mp-modal-title" style={{ fontSize: "1.25rem" }}>
-                  Find Your MatchPoint Pass
+                  Find Your Match-Point Pass
                 </h3>
                 <p className="mp-modal-subtitle">
-                  Enter the email address you registered with or your MatchPoint ID (e.g., MP-26-XXXX).
+                  Enter the email address you registered with or your Match-Point ID (e.g., MP-26-XXXX).
                 </p>
               </div>
             </div>
@@ -2644,7 +2655,7 @@ function MatchPointContent() {
                 type="text"
                 required
                 className="mp-input"
-                placeholder="Enter email or MatchPoint ID..."
+                placeholder="Enter email or Match-Point ID..."
                 value={lookupQuery}
                 onChange={(e) => setLookupQuery(e.target.value)}
                 style={{ marginBottom: "1.25rem" }}
@@ -2684,7 +2695,7 @@ export default function MatchPointPage() {
         <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc" }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
             <Loader2 size={44} style={{ color: "#0284c7" }} className="spin" />
-            <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "#64748b" }}>Loading SFF MatchPoint...</span>
+            <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "#64748b" }}>Loading SFF Match-Point...</span>
           </div>
         </div>
       }

@@ -140,7 +140,6 @@ export default function BankersManager() {
       "Department",
       "Experience",
       "The Average Ticket Size Deal In",
-      "Minimum Ticket Size",
       "City / Location",
       "Country",
       "Phone",
@@ -160,7 +159,6 @@ export default function BankersManager() {
         `"${(p.department || "").replace(/"/g, '""')}"`,
         `"${(p.experience || "").replace(/"/g, '""')}"`,
         `"${(p.ticketSizeMax || "").replace(/"/g, '""')}"`,
-        `"${(p.ticketSizeMin || "").replace(/"/g, '""')}"`,
         `"${(p.city || "").replace(/"/g, '""')}"`,
         `"${(p.country || "India").replace(/"/g, '""')}"`,
         `"${(p.phone || "").replace(/"/g, '""')}"`,
@@ -435,7 +433,7 @@ export default function BankersManager() {
                           }}
                         >
                           <Banknote size={13} />
-                          {p.ticketSizeMax || p.ticketSizeMin || "Flexible"}
+                          {p.ticketSizeMax || "Flexible"}
                         </span>
                       </td>
 
@@ -670,7 +668,7 @@ function BankerDetailModal({
           <div style={{ background: "rgba(16, 185, 129, 0.05)", border: "1px solid rgba(16, 185, 129, 0.15)", borderRadius: "12px", padding: "0.85rem 1rem" }}>
             <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Average Ticket Size (Deals In)</div>
             <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "#10b981", marginTop: "0.2rem" }}>
-              {p.ticketSizeMax || p.ticketSizeMin || "Flexible"}
+              {p.ticketSizeMax || "Flexible"}
             </div>
           </div>
 

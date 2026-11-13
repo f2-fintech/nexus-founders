@@ -484,7 +484,7 @@ export default function DashboardPage() {
               onClick={() => { setActiveTab("matchpoint"); setSearchQuery(""); }}
             >
               <Sparkles size={15} />
-              SFF MatchPoint
+              SFF Match-Point
             </button>
             <button
               className={"db-tab" + (activeTab === "bingo" ? " active" : "")}

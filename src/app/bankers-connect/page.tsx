@@ -38,6 +38,7 @@ import {
   Smile,
   FileText,
   ChevronRight,
+  Share2,
 } from "lucide-react";
 import "./bankers-connect.css";
 
@@ -153,6 +154,48 @@ export default function BankersConnectPage() {
   });
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileSuccessMsg, setProfileSuccessMsg] = useState("");
+  const [copiedProfileLink, setCopiedProfileLink] = useState(false);
+
+  // Handle Share Profile
+  const handleShareProfile = async () => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const shareUrl = `${origin}/bankers-connect?banker=${currentUserId || ""}`;
+    const shareTitle = `${profileForm.name || currentUserName} - Institutional Banker Profile`;
+    const shareText = `Connect with ${profileForm.name || currentUserName} (${profileForm.designation || "Banker"} at ${profileForm.bankName || currentUserBank}) on Nexus Bankers Connect!`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        });
+        return;
+      } catch (err) {
+        // Fallback to clipboard if share modal is dismissed or unsupported
+      }
+    }
+
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopiedProfileLink(true);
+      setTimeout(() => setCopiedProfileLink(false), 3000);
+    }
+  };
+
+  // If page opened with ?banker=ID, highlight in directory
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const targetBankerId = params.get("banker");
+    if (targetBankerId && bankers.length > 0) {
+      const found = bankers.find((b) => b._id === targetBankerId);
+      if (found) {
+        setSelectedBankFilter("all");
+        setSearchQuery(found.name);
+      }
+    }
+  }, [bankers]);
 
   // Route protection
   useEffect(() => {
@@ -680,10 +723,10 @@ export default function BankersConnectPage() {
                               {banker.bankerProfile.department}
                             </span>
                           )}
-                          {(banker.bankerProfile.ticketSizeMin || banker.bankerProfile.ticketSizeMax) && (
+                          {banker.bankerProfile.ticketSizeMax && (
                             <span className="bc-pill" style={{ color: "#34d399", background: "rgba(16, 185, 129, 0.1)" }}>
                               <Banknote size={12} />
-                              {banker.bankerProfile.ticketSizeMin || "₹10L"} - {banker.bankerProfile.ticketSizeMax || "₹50Cr"}
+                              {banker.bankerProfile.ticketSizeMax}
                             </span>
                           )}
                         </div>
@@ -1173,7 +1216,7 @@ export default function BankersConnectPage() {
                         <div>
                           <div className="bc-info-label">Average Ticket Size</div>
                           <div className="bc-info-val" style={{ color: "#34d399", fontWeight: 700 }}>
-                            {activeChatBanker.bankerProfile.ticketSizeMax || activeChatBanker.bankerProfile.ticketSizeMin || "₹25L - ₹50Cr"}
+                            {activeChatBanker.bankerProfile.ticketSizeMax || "Flexible"}
                           </div>
                         </div>
 
@@ -1352,28 +1395,74 @@ export default function BankersConnectPage() {
               padding: "2.5rem 2rem",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.75rem" }}>
-              <div
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", marginBottom: "1.75rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <div
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "14px",
+                    background: "linear-gradient(135deg, #10b981 0%, #0284c7 100%)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#fff",
+                  }}
+                >
+                  <ShieldCheck size={26} />
+                </div>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 800 }}>My Institutional Banker Profile</h2>
+                  <span style={{ fontSize: "0.85rem", color: "var(--bc-text-muted)" }}>
+                    Visible to other registered bankers across the network
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleShareProfile}
                 style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "14px",
-                  background: "linear-gradient(135deg, #10b981 0%, #0284c7 100%)",
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  color: "#fff",
+                  gap: "0.5rem",
+                  padding: "0.65rem 1.25rem",
+                  borderRadius: "12px",
+                  fontSize: "0.88rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  background: "#ffffff",
+                  border: "1.5px solid #cbd5e1",
+                  color: "#0f172a",
+                  boxShadow: "0 2px 5px rgba(0,0,0,0.04)",
+                  transition: "all 0.2s ease",
                 }}
               >
-                <ShieldCheck size={26} />
-              </div>
-              <div>
-                <h2 style={{ margin: 0, fontSize: "1.35rem", fontWeight: 800 }}>My Institutional Banker Profile</h2>
-                <span style={{ fontSize: "0.85rem", color: "var(--bc-text-muted)" }}>
-                  Visible to other registered bankers across the network
-                </span>
-              </div>
+                <Share2 size={16} color="#0284c7" />
+                {copiedProfileLink ? "✓ Link Copied!" : "Share Profile"}
+              </button>
             </div>
+
+            {copiedProfileLink && (
+              <div
+                style={{
+                  background: "rgba(16, 185, 129, 0.12)",
+                  border: "1px solid rgba(16, 185, 129, 0.35)",
+                  borderRadius: "12px",
+                  padding: "0.75rem 1rem",
+                  color: "#059669",
+                  fontSize: "0.9rem",
+                  marginBottom: "1.25rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  fontWeight: 700,
+                }}
+              >
+                <Check size={18} />
+                <span>Profile link copied to clipboard! Anyone opening this link can view your profile directly.</span>
+              </div>
+            )}
 
             {profileSuccessMsg && (
               <div
@@ -1419,10 +1508,15 @@ export default function BankersConnectPage() {
                     value={profileForm.institutionType}
                     onChange={(e) => setProfileForm({ ...profileForm, institutionType: e.target.value })}
                     className="bc-search-input"
-                    style={{ padding: "0.75rem 1rem", background: "#0f172a", color: "#fff" }}
+                    style={{
+                      padding: "0.75rem 1rem",
+                      background: "#ffffff",
+                      color: "#0f172a",
+                      cursor: "pointer",
+                    }}
                   >
                     {INSTITUTION_TYPES.map((t) => (
-                      <option key={t} value={t}>{t}</option>
+                      <option key={t} value={t} style={{ background: "#ffffff", color: "#0f172a" }}>{t}</option>
                     ))}
                   </select>
                 </div>
@@ -1449,10 +1543,15 @@ export default function BankersConnectPage() {
                     value={profileForm.experience}
                     onChange={(e) => setProfileForm({ ...profileForm, experience: e.target.value })}
                     className="bc-search-input"
-                    style={{ padding: "0.75rem 1rem", background: "#0f172a", color: "#fff" }}
+                    style={{
+                      padding: "0.75rem 1rem",
+                      background: "#ffffff",
+                      color: "#0f172a",
+                      cursor: "pointer",
+                    }}
                   >
                     {EXPERIENCE_OPTIONS.map((exp) => (
-                      <option key={exp} value={exp}>{exp}</option>
+                      <option key={exp} value={exp} style={{ background: "#ffffff", color: "#0f172a" }}>{exp}</option>
                     ))}
                   </select>
                 </div>
@@ -1524,19 +1623,6 @@ export default function BankersConnectPage() {
                   />
                 </div>
 
-                <div>
-                  <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, color: "var(--bc-text-muted)", marginBottom: "0.35rem", textTransform: "uppercase" }}>
-                    Minimum Ticket Size
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. ₹50 Lakhs"
-                    value={profileForm.ticketSizeMin}
-                    onChange={(e) => setProfileForm({ ...profileForm, ticketSizeMin: e.target.value })}
-                    className="bc-search-input"
-                    style={{ padding: "0.75rem 1rem" }}
-                  />
-                </div>
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, color: "var(--bc-text-muted)", marginBottom: "0.35rem", textTransform: "uppercase" }}>
@@ -1566,14 +1652,37 @@ export default function BankersConnectPage() {
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={savingProfile}
-                className="bc-btn-primary"
-                style={{ padding: "0.85rem", alignSelf: "flex-end", minWidth: "180px", borderRadius: "12px" }}
-              >
-                {savingProfile ? "Saving Details..." : "Save Profile Changes"}
-              </button>
+              <div style={{ display: "flex", gap: "0.85rem", flexWrap: "wrap", justifyContent: "flex-end", alignItems: "center", marginTop: "0.5rem" }}>
+                <button
+                  type="button"
+                  onClick={handleShareProfile}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    padding: "0.85rem 1.4rem",
+                    borderRadius: "12px",
+                    fontWeight: 700,
+                    fontSize: "0.92rem",
+                    background: "#ffffff",
+                    border: "1.5px solid #cbd5e1",
+                    color: "#0f172a",
+                    cursor: "pointer",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.03)",
+                  }}
+                >
+                  <Share2 size={16} color="#0284c7" />
+                  {copiedProfileLink ? "✓ Link Copied!" : "Share Profile"}
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingProfile}
+                  className="bc-btn-primary"
+                  style={{ padding: "0.85rem 1.5rem", minWidth: "180px", borderRadius: "12px" }}
+                >
+                  {savingProfile ? "Saving Details..." : "Save Profile Changes"}
+                </button>
+              </div>
             </form>
           </div>
         )}

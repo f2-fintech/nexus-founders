@@ -181,7 +181,7 @@ export async function sendMatchIntroductionEmail(
   const from = process.env.EMAIL_FROM || `"F2 Fintech Partnerships" <${process.env.SMTP_USER}>`;
   const { seeker, provider, matchedCategory, matchPercentage, matchReason, customNotes } = opts;
 
-  const subject = `🤝 SFF MatchPoint Introduction: ${seeker.companyName} & ${provider.companyName} [${matchPercentage}% Synergy Match]`;
+  const subject = `🤝 SFF Match-Point Introduction: ${seeker.companyName} & ${provider.companyName} [${matchPercentage}% Synergy Match]`;
 
   const recipients = [seeker.email.trim(), provider.email.trim()].filter(Boolean);
 
@@ -190,7 +190,7 @@ export async function sendMatchIntroductionEmail(
 <html>
 <head>
   <meta charset="utf-8">
-  <title>SFF MatchPoint Business Introduction</title>
+  <title>SFF Match-Point Business Introduction</title>
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f5f9; color: #1e293b; padding: 24px 12px; margin: 0;">
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 650px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px; overflow: hidden; box-shadow: 0 12px 36px rgba(15, 23, 42, 0.08);">
@@ -202,7 +202,7 @@ export async function sendMatchIntroductionEmail(
           <tr>
             <td>
               <div style="display: inline-block; padding: 6px 14px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 9999px; color: #34d399; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px;">
-                Singapore FinTech Festival 2026 &bull; Hall 5 - Booth 5K33-B &bull; Executive MatchPoint
+                Singapore FinTech Festival 2026 &bull; Hall 5 - Booth 5K33-B &bull; Executive Match-Point
               </div>
               <h1 style="color: #ffffff; font-size: 24px; font-weight: 800; margin: 0 0 6px; letter-spacing: -0.02em;">
                 Executive Business Introduction
@@ -231,7 +231,7 @@ export async function sendMatchIntroductionEmail(
       <td style="padding: 24px 32px 16px; font-size: 14px; line-height: 1.6; color: #334155;">
         <p style="margin-top: 0;">Dear <strong>${seeker.fullName}</strong> and <strong>${provider.fullName}</strong>,</p>
         <p>
-          Following your participation and profile registration with <strong>SFF MatchPoint</strong> (curated by F2 Fintech), our matchmaking system has identified a strong strategic alignment between your business capabilities and current objectives.
+          Following your participation and profile registration with <strong>SFF Match-Point</strong> (curated by F2 Fintech), our matchmaking system has identified a strong strategic alignment between your business capabilities and current objectives.
         </p>
 
         <!-- Category & Alignment Pill -->
@@ -359,11 +359,11 @@ export async function sendMatchIntroductionEmail(
     <tr>
       <td style="padding: 24px 32px; background: #0f172a; color: #94a3b8; font-size: 12px; text-align: center; line-height: 1.6;">
         <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">
-          F2 Fintech &bull; Hall 5 - Booth 5K33-B &bull; SFF MatchPoint Team
+          F2 Fintech &bull; Hall 5 - Booth 5K33-B &bull; SFF Match-Point Team
         </div>
         <div>Facilitating High-Value Partnerships across the Global FinTech Ecosystem</div>
         <div style="margin-top: 8px; color: #64748b; font-size: 11px;">
-          This official introduction was generated via Singapore FinTech Festival MatchPoint &bull; All details shared with verified attendee consent.
+          This official introduction was generated via Singapore FinTech Festival Match-Point &bull; All details shared with verified attendee consent.
         </div>
       </td>
     </tr>

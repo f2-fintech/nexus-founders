@@ -142,6 +142,13 @@ export async function POST(req: NextRequest) {
       ? "Exploring Options"
       : "Immediate";
 
+    const cleanUrl = (val?: string) => {
+      const trimmed = (val || "").trim().replace(/^https?:\/\//i, "");
+      return trimmed ? `https://${trimmed}` : "";
+    };
+    const cleanLinkedinUrl = cleanUrl(linkedinUrl);
+    const cleanWebsiteUrl = cleanUrl(websiteUrl);
+
     // Auto-extract keywords for fast keyword matchmaking
     const uspArray = Array.isArray(usps) ? usps.filter((u: string) => Boolean(u?.trim())) : [];
     const needArray = Array.isArray(needCategories) ? needCategories : [];
@@ -164,8 +171,8 @@ export async function POST(req: NextRequest) {
       submission.designation = designation.trim();
       submission.category = category;
       submission.city = city.trim();
-      submission.linkedinUrl = linkedinUrl.trim();
-      submission.websiteUrl = websiteUrl.trim();
+      submission.linkedinUrl = cleanLinkedinUrl;
+      submission.websiteUrl = cleanWebsiteUrl;
       submission.aboutCompany = aboutCompany.trim();
       submission.usps = uspArray;
       submission.offeringsDescription = offeringsDescription.trim();
@@ -202,8 +209,8 @@ export async function POST(req: NextRequest) {
       designation: designation.trim(),
       category,
       city: city.trim(),
-      linkedinUrl: linkedinUrl.trim(),
-      websiteUrl: websiteUrl.trim(),
+      linkedinUrl: cleanLinkedinUrl,
+      websiteUrl: cleanWebsiteUrl,
       aboutCompany: aboutCompany.trim(),
       usps: uspArray,
       offeringsDescription: offeringsDescription.trim(),

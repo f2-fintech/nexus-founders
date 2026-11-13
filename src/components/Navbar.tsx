@@ -81,7 +81,7 @@ export default function Navbar() {
   const baseLinks = [
     { href: "/", label: "Home Page", icon: Home },
     { href: "/directory", label: "Directory", icon: Users },
-    { href: "/matchpoint", label: "MatchPoint", icon: Target },
+    { href: "/matchpoint", label: "Match-Point", icon: Target },
     { href: "/bankers-connect", label: "Bankers Connect", icon: Building2 },
     { href: "/bingo", label: "Nexus Bingo", icon: Gamepad2 },
     { href: "/join", label: "Join Us", icon: Sparkles },

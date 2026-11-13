@@ -315,7 +315,7 @@ export default function MatchPointManager() {
     }
 
     const headers = [
-      "MatchPoint ID",
+      "Match-Point ID",
       "Full Name",
       "Email",
       "Phone",
@@ -379,7 +379,7 @@ export default function MatchPointManager() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `SFF_MatchPoint_Registrations_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute("download", `SFF_Match-Point_Registrations_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -573,7 +573,7 @@ export default function MatchPointManager() {
         <div style={{ background: "#ffffff", borderRadius: "18px", padding: "4rem 2rem", textAlign: "center", border: "1px dashed #cbd5e1" }}>
           <Building2 size={40} color="#94a3b8" style={{ margin: "0 auto 1rem" }} />
           <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#334155", margin: 0 }}>
-            No MatchPoint Submissions Found
+            No Match-Point Submissions Found
           </h4>
           <p style={{ fontSize: "0.85rem", color: "#64748b", margin: "0.4rem 0 0" }}>
             {searchQuery || statusFilter !== "all" || needFilter !== "all"

@@ -68,7 +68,6 @@ export default function BankersLoginPage() {
     city: "",
     country: "India",
     phone: "",
-    ticketSizeMin: "₹50 Lakhs",
     ticketSizeMax: "₹25 Crores",
     bio: "",
   });
