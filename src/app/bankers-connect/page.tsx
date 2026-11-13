@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ConnectModal from "@/components/bankers/ConnectModal";
 import EmailModal from "@/components/bankers/EmailModal";
+import EmailChooserModal from "@/components/bankers/EmailChooserModal";
 import { useBankerSocket } from "@/lib/useBankerSocket";
 import {
   Building2,
@@ -131,6 +132,7 @@ export default function BankersConnectPage() {
   // Modals
   const [connectModalBanker, setConnectModalBanker] = useState<BankerItem | null>(null);
   const [emailModalBanker, setEmailModalBanker] = useState<BankerItem | null>(null);
+  const [emailChooserBanker, setEmailChooserBanker] = useState<BankerItem | null>(null);
 
   // Profile Edit Form State
   const [profileForm, setProfileForm] = useState({
@@ -736,16 +738,19 @@ export default function BankersConnectPage() {
                           </button>
                         )}
 
-                        {/* Direct mailto Email link */}
-                        <a
-                          href={getBankerMailtoUrl(banker)}
+                        {/* Email Chooser button */}
+                        <button
+                          type="button"
                           className="bc-btn-outline"
                           title={`Email ${banker.name}`}
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEmailChooserBanker(banker);
+                          }}
                         >
                           <Mail size={15} />
                           <span>Email</span>
-                        </a>
+                        </button>
                       </div>
                     </div>
                   );
@@ -903,15 +908,18 @@ export default function BankersConnectPage() {
                             <MessageSquare size={15} />
                             <span>Chat</span>
                           </button>
-                          <a
-                            href={getBankerMailtoUrl(otherUser)}
+                          <button
+                            type="button"
                             className="bc-btn-outline"
                             title={`Email ${otherUser.name}`}
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEmailChooserBanker(otherUser);
+                            }}
                           >
                             <Mail size={15} />
                             <span>Email</span>
-                          </a>
+                          </button>
                         </div>
                       </div>
                     );
@@ -1140,16 +1148,17 @@ export default function BankersConnectPage() {
                         <span className="desktop-text">Banker Info</span>
                       </button>
 
-                      <a
-                        href={getBankerMailtoUrl(activeChatBanker)}
+                      <button
+                        type="button"
                         className="bc-chat-header-btn email-btn"
                         title={activeChatBanker ? `Email ${activeChatBanker.name}` : "Email"}
-                        style={{ textDecoration: "none" }}
-                        onClick={(e) => { if (!activeChatBanker?.email) e.preventDefault(); }}
+                        onClick={() => {
+                          if (activeChatBanker) setEmailChooserBanker(activeChatBanker);
+                        }}
                       >
                         <Mail size={15} />
                         <span className="desktop-text">Email</span>
-                      </a>
+                      </button>
                     </div>
                   </div>
 
@@ -1165,9 +1174,9 @@ export default function BankersConnectPage() {
                         </div>
 
                         <div>
-                          <div className="bc-info-label">Lending Ticket Size</div>
+                          <div className="bc-info-label">Average Ticket Size</div>
                           <div className="bc-info-val" style={{ color: "#34d399", fontWeight: 700 }}>
-                            {activeChatBanker.bankerProfile.ticketSizeMin || "₹25L"} - {activeChatBanker.bankerProfile.ticketSizeMax || "₹50Cr"}
+                            {activeChatBanker.bankerProfile.ticketSizeMax || activeChatBanker.bankerProfile.ticketSizeMin || "₹25L - ₹50Cr"}
                           </div>
                         </div>
 
@@ -1517,7 +1526,7 @@ export default function BankersConnectPage() {
 
                 <div>
                   <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, color: "var(--bc-text-muted)", marginBottom: "0.35rem", textTransform: "uppercase" }}>
-                    Maximum Ticket Size
+                    The average ticket size that you deal in
                   </label>
                   <input
                     type="text"
@@ -1573,6 +1582,14 @@ export default function BankersConnectPage() {
           currentBankerBank={currentUserBank}
           onClose={() => setEmailModalBanker(null)}
         />
+
+        {/* Modal: Email Application Chooser (Gmail vs Default Mail vs Copy) */}
+        {emailChooserBanker && (
+          <EmailChooserModal
+            banker={emailChooserBanker}
+            onClose={() => setEmailChooserBanker(null)}
+          />
+        )}
       </main>
 
       <Footer />

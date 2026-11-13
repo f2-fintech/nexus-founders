@@ -6,11 +6,12 @@ import {
   Users, CalendarCheck, RefreshCw, Trash2,
   CheckCircle, Clock, XCircle, Eye,
   BarChart2, Search, X, ArrowLeft, Sun, Moon,
-  Trophy, Sparkles,
+  Trophy, Sparkles, Building2,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import BingoManager from "@/components/admin/BingoManager";
 import MatchPointManager from "@/components/admin/MatchPointManager";
+import BankersManager from "@/components/admin/BankersManager";
 import "./dashboard.css";
 
 // ─── Types ────────────────────────────────────────────────────
@@ -323,7 +324,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const { isDark, toggleTheme } = useTheme();
 
-  const [activeTab, setActiveTab] = useState<"events" | "joins" | "bingo" | "matchpoint">("matchpoint");
+  const [activeTab, setActiveTab] = useState<"events" | "joins" | "bingo" | "matchpoint" | "bankers">("bankers");
   const [eventRegs, setEventRegs] = useState<EventReg[]>([]);
   const [joinSubs, setJoinSubs] = useState<JoinSub[]>([]);
   const [loadingData, setLoadingData] = useState(false);
@@ -492,7 +493,16 @@ export default function DashboardPage() {
               <Trophy size={15} />
               Nexus Bingo (SFF)
             </button>
+            <button
+              className={"db-tab" + (activeTab === "bankers" ? " active" : "")}
+              onClick={() => { setActiveTab("bankers"); setSearchQuery(""); }}
+            >
+              <Building2 size={15} />
+              Bankers Connect
+            </button>
           </div>
+
+          {activeTab === "bankers" && <BankersManager />}
 
           {activeTab === "matchpoint" && <MatchPointManager />}
 

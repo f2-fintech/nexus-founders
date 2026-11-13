@@ -12,8 +12,14 @@ export async function GET(req: Request) {
     const currentUserId = (session?.user as any)?.id;
 
     // Fetch all bankers
-    const bankers = await User.find({ role: { $in: ["banker", "admin"] } })
+    const bankers = await User.find({
+      $or: [
+        { role: { $in: ["banker", "admin"] } },
+        { "bankerProfile.bankName": { $exists: true, $ne: "" } },
+      ],
+    })
       .select("-password")
+      .sort({ createdAt: -1 })
       .lean();
 
     // If logged in, fetch connection statuses

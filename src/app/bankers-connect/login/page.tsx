@@ -42,23 +42,6 @@ const EXPERIENCE_OPTIONS = [
   "15+ Years",
 ];
 
-const TOP_BANKS = [
-  "HDFC Bank",
-  "ICICI Bank",
-  "State Bank of India (SBI)",
-  "Axis Bank",
-  "Kotak Mahindra Bank",
-  "Bank of Baroda",
-  "Punjab National Bank",
-  "IndusInd Bank",
-  "Yes Bank",
-  "Standard Chartered",
-  "HSBC India",
-  "IDFC FIRST Bank",
-  "Federal Bank",
-  "RBL Bank",
-  "Other Bank",
-];
 
 export default function BankersLoginPage() {
   const router = useRouter();
@@ -78,7 +61,6 @@ export default function BankersLoginPage() {
     password: "",
     institutionType: "Bank",
     bankName: "",
-    customBankName: "",
     experience: "3 - 5 Years",
     designation: "",
     department: "Startup & SME Banking",
@@ -125,21 +107,13 @@ export default function BankersLoginPage() {
     setSignupError("");
     setSignupSuccess("");
 
-    let bankNameFinal = "";
-    if (signupForm.institutionType === "Bank") {
-      bankNameFinal =
-        signupForm.bankName === "Other Bank"
-          ? signupForm.customBankName.trim()
-          : signupForm.bankName.trim();
-    } else {
-      bankNameFinal = signupForm.customBankName.trim() || signupForm.bankName.trim();
-    }
+    const bankNameFinal = signupForm.bankName.trim();
 
     if (!signupForm.name.trim()) return setSignupError("Full name is required");
     if (!signupForm.email.trim()) return setSignupError("Official email address is required");
     if (!signupForm.password || signupForm.password.length < 6)
       return setSignupError("Password must be at least 6 characters long");
-    if (!bankNameFinal) return setSignupError(`Please enter or select your ${signupForm.institutionType} name`);
+    if (!bankNameFinal) return setSignupError(`Please enter your ${signupForm.institutionType === "Bank" ? "Bank" : signupForm.institutionType} name`);
     if (!signupForm.designation.trim()) return setSignupError("Designation / Title is required");
     if (!signupForm.experience.trim()) return setSignupError("Please select your experience level");
 
@@ -631,11 +605,9 @@ export default function BankersLoginPage() {
                       required
                       value={signupForm.institutionType}
                       onChange={(e) => {
-                        const newType = e.target.value;
                         setSignupForm({
                           ...signupForm,
-                          institutionType: newType,
-                          bankName: newType === "Bank" ? signupForm.bankName : newType,
+                          institutionType: e.target.value,
                         });
                       }}
                       style={{
@@ -656,77 +628,40 @@ export default function BankersLoginPage() {
                   </div>
                 </div>
 
-                {/* Institution Name (Bank dropdown or Text Input for NBFC / Fintech / Other) */}
-                {signupForm.institutionType === "Bank" ? (
-                  <div>
-                    <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#cbd5e1", marginBottom: "0.35rem", textTransform: "uppercase" }}>
-                      Bank Name *
-                    </label>
-                    <div style={{ position: "relative" }}>
-                      <Building2 size={16} style={{ position: "absolute", left: "0.9rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
-                      <select
-                        required
-                        value={signupForm.bankName}
-                        onChange={(e) => setSignupForm({ ...signupForm, bankName: e.target.value })}
-                        style={{
-                          width: "100%",
-                          padding: "0.75rem 0.85rem 0.75rem 2.5rem",
-                          background: "#0f172a",
-                          border: "1.5px solid rgba(255, 255, 255, 0.14)",
-                          borderRadius: "10px",
-                          color: signupForm.bankName ? "#fff" : "#94a3b8",
-                          outline: "none",
-                          boxSizing: "border-box",
-                        }}
-                      >
-                        <option value="">Select Your Bank</option>
-                        {TOP_BANKS.map((b) => (
-                          <option key={b} value={b}>{b}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#cbd5e1", marginBottom: "0.35rem", textTransform: "uppercase" }}>
-                      {signupForm.institutionType} Name *
-                    </label>
-                    <div style={{ position: "relative" }}>
-                      <Building2 size={16} style={{ position: "absolute", left: "0.9rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
-                      <input
-                        type="text"
-                        required
-                        placeholder={
-                          signupForm.institutionType === "NBFC"
-                            ? "e.g. InCred Financial, Tata Capital, Bajaj Finance"
-                            : signupForm.institutionType === "Fintech"
-                            ? "e.g. Razorpay, Pine Labs, Cred, Lendingkart"
-                            : "e.g. SIDBI, EXIM Bank, Venture Debt Fund"
-                        }
-                        value={signupForm.customBankName}
-                        onChange={(e) => setSignupForm({ ...signupForm, customBankName: e.target.value })}
-                        style={{ width: "100%", padding: "0.75rem 0.85rem 0.75rem 2.5rem", background: "rgba(15, 23, 42, 0.6)", border: "1.5px solid rgba(255, 255, 255, 0.14)", borderRadius: "10px", color: "#fff", outline: "none", boxSizing: "border-box" }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Custom Bank Name if "Other Bank" selected */}
-                {signupForm.institutionType === "Bank" && signupForm.bankName === "Other Bank" && (
-                  <div>
-                    <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#cbd5e1", marginBottom: "0.35rem", textTransform: "uppercase" }}>
-                      Specify Bank Name *
-                    </label>
+                {/* Institution / Bank Name - Text field as requested */}
+                <div>
+                  <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#cbd5e1", marginBottom: "0.35rem", textTransform: "uppercase" }}>
+                    {signupForm.institutionType === "Bank" ? "Bank Name *" : `${signupForm.institutionType} Name *`}
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <Building2 size={16} style={{ position: "absolute", left: "0.9rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
                     <input
                       type="text"
                       required
-                      placeholder="Enter bank name"
-                      value={signupForm.customBankName}
-                      onChange={(e) => setSignupForm({ ...signupForm, customBankName: e.target.value })}
-                      style={{ width: "100%", padding: "0.75rem 0.85rem", background: "rgba(15, 23, 42, 0.6)", border: "1.5px solid rgba(255, 255, 255, 0.14)", borderRadius: "10px", color: "#fff", outline: "none", boxSizing: "border-box" }}
+                      placeholder={
+                        signupForm.institutionType === "Bank"
+                          ? "e.g. HDFC Bank, ICICI Bank, SBI, Axis Bank"
+                          : signupForm.institutionType === "NBFC"
+                          ? "e.g. InCred Financial, Tata Capital, Bajaj Finance"
+                          : signupForm.institutionType === "Fintech"
+                          ? "e.g. Razorpay, Pine Labs, Cred, Lendingkart"
+                          : "e.g. SIDBI, EXIM Bank, Venture Debt Fund"
+                      }
+                      value={signupForm.bankName}
+                      onChange={(e) => setSignupForm({ ...signupForm, bankName: e.target.value })}
+                      style={{
+                        width: "100%",
+                        padding: "0.75rem 0.85rem 0.75rem 2.5rem",
+                        background: "rgba(15, 23, 42, 0.6)",
+                        border: "1.5px solid rgba(255, 255, 255, 0.14)",
+                        borderRadius: "10px",
+                        color: "#fff",
+                        outline: "none",
+                        boxSizing: "border-box",
+                      }}
                     />
                   </div>
-                )}
+                </div>
 
                 {/* Total Experience */}
                 <div>
@@ -845,6 +780,23 @@ export default function BankersLoginPage() {
                     >
                       {showSignupPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
+                  </div>
+                </div>
+
+                {/* The average ticket size that you deal in */}
+                <div>
+                  <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#cbd5e1", marginBottom: "0.35rem", textTransform: "uppercase" }}>
+                    The average ticket size that you deal in
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <Banknote size={16} style={{ position: "absolute", left: "0.9rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
+                    <input
+                      type="text"
+                      placeholder="e.g. ₹25 Crores (or ₹50L - ₹25Cr)"
+                      value={signupForm.ticketSizeMax}
+                      onChange={(e) => setSignupForm({ ...signupForm, ticketSizeMax: e.target.value })}
+                      style={{ width: "100%", padding: "0.75rem 0.85rem 0.75rem 2.5rem", background: "rgba(15, 23, 42, 0.6)", border: "1.5px solid rgba(255, 255, 255, 0.14)", borderRadius: "10px", color: "#fff", outline: "none", boxSizing: "border-box" }}
+                    />
                   </div>
                 </div>
               </div>
