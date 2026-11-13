@@ -651,12 +651,6 @@ export default function BankersConnectPage() {
                           </div>
                         </div>
 
-                        {/* Bio */}
-                        <p className="bc-banker-bio">
-                          {banker.bankerProfile.bio ||
-                            "Specializing in structured debt, startup lines of credit, and co-lending syndication."}
-                        </p>
-
                         {/* Pills */}
                         <div className="bc-pills-row">
                           {banker.bankerProfile.institutionType && (
