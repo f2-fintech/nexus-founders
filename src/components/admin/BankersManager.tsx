@@ -34,6 +34,7 @@ interface BankerDoc {
     experience?: string;
     department?: string;
     city?: string;
+    country?: string;
     phone?: string;
     ticketSizeMin?: string;
     ticketSizeMax?: string;
@@ -141,6 +142,7 @@ export default function BankersManager() {
       "The Average Ticket Size Deal In",
       "Minimum Ticket Size",
       "City / Location",
+      "Country",
       "Phone",
       "LinkedIn URL",
       "Bio",
@@ -160,6 +162,7 @@ export default function BankersManager() {
         `"${(p.ticketSizeMax || "").replace(/"/g, '""')}"`,
         `"${(p.ticketSizeMin || "").replace(/"/g, '""')}"`,
         `"${(p.city || "").replace(/"/g, '""')}"`,
+        `"${(p.country || "India").replace(/"/g, '""')}"`,
         `"${(p.phone || "").replace(/"/g, '""')}"`,
         `"${(p.linkedinUrl || "").replace(/"/g, '""')}"`,
         `"${(p.bio || "").replace(/"/g, '""')}"`,
@@ -440,7 +443,7 @@ export default function BankersManager() {
                       <td>
                         <span style={{ display: "inline-flex", alignItems: "center", gap: "0.3rem", fontSize: "0.82rem" }}>
                           <MapPin size={12} color="#64748b" />
-                          {p.city || "Pan-India"}
+                          {p.city || "Pan-India"}{p.country ? `, ${p.country}` : ""}
                         </span>
                       </td>
 
@@ -686,9 +689,9 @@ function BankerDetailModal({
           </div>
 
           <div style={{ background: "rgba(99, 102, 241, 0.05)", border: "1px solid rgba(99, 102, 241, 0.15)", borderRadius: "12px", padding: "0.85rem 1rem" }}>
-            <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Location / City</div>
+            <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Location / City & Country</div>
             <div style={{ fontSize: "0.95rem", fontWeight: 700, marginTop: "0.2rem" }}>
-              {p.city || "Pan-India"}
+              {p.city || "Pan-India"}{p.country ? `, ${p.country}` : ""}
             </div>
           </div>
 

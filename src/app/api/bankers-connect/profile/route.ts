@@ -48,6 +48,7 @@ export async function PATCH(req: Request) {
       experience,
       department,
       city,
+      country,
       phone,
       ticketSizeMin,
       ticketSizeMax,
@@ -74,6 +75,7 @@ export async function PATCH(req: Request) {
     if (designation !== undefined) user.bankerProfile.designation = designation.trim();
     if (department !== undefined) user.bankerProfile.department = department.trim();
     if (city !== undefined) user.bankerProfile.city = city.trim();
+    if (country !== undefined) user.bankerProfile.country = country.trim();
     if (phone !== undefined) user.bankerProfile.phone = phone.trim();
     if (ticketSizeMin !== undefined) user.bankerProfile.ticketSizeMin = ticketSizeMin.trim();
     if (ticketSizeMax !== undefined) user.bankerProfile.ticketSizeMax = ticketSizeMax.trim();

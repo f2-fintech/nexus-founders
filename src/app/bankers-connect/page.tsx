@@ -70,6 +70,7 @@ interface BankerItem {
     experience?: string;
     department?: string;
     city?: string;
+    country?: string;
     phone?: string;
     ticketSizeMin?: string;
     ticketSizeMax?: string;
@@ -143,6 +144,7 @@ export default function BankersConnectPage() {
     experience: "3 - 5 Years",
     department: "",
     city: "",
+    country: "India",
     phone: "",
     ticketSizeMin: "",
     ticketSizeMax: "",
@@ -272,6 +274,7 @@ export default function BankersConnectPage() {
           experience: u.bankerProfile?.experience || "3 - 5 Years",
           department: u.bankerProfile?.department || "",
           city: u.bankerProfile?.city || "",
+          country: u.bankerProfile?.country || "India",
           phone: u.bankerProfile?.phone || "",
           ticketSizeMin: u.bankerProfile?.ticketSizeMin || "",
           ticketSizeMax: u.bankerProfile?.ticketSizeMax || "",
@@ -668,7 +671,7 @@ export default function BankersConnectPage() {
                           {banker.bankerProfile.city && (
                             <span className="bc-pill">
                               <MapPin size={12} />
-                              {banker.bankerProfile.city}
+                              {banker.bankerProfile.city}{banker.bankerProfile.country ? `, ${banker.bankerProfile.country}` : ""}
                             </span>
                           )}
                           {banker.bankerProfile.department && (
@@ -1176,7 +1179,10 @@ export default function BankersConnectPage() {
 
                         <div>
                           <div className="bc-info-label">Location / City</div>
-                          <div className="bc-info-val">{activeChatBanker.bankerProfile.city || "Pan-India"}</div>
+                          <div className="bc-info-val">
+                            {activeChatBanker.bankerProfile.city || "Pan-India"}
+                            {activeChatBanker.bankerProfile.country ? ` (${activeChatBanker.bankerProfile.country})` : ""}
+                          </div>
                         </div>
 
                         {activeChatBanker.bankerProfile.phone && (
@@ -1486,6 +1492,20 @@ export default function BankersConnectPage() {
                     type="text"
                     value={profileForm.city}
                     onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
+                    className="bc-search-input"
+                    style={{ padding: "0.75rem 1rem" }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, color: "var(--bc-text-muted)", marginBottom: "0.35rem", textTransform: "uppercase" }}>
+                    Country
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. India, UAE, Singapore"
+                    value={profileForm.country}
+                    onChange={(e) => setProfileForm({ ...profileForm, country: e.target.value })}
                     className="bc-search-input"
                     style={{ padding: "0.75rem 1rem" }}
                   />

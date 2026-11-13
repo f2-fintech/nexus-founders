@@ -22,6 +22,7 @@ import {
   CheckCircle2,
   Clock,
   Award,
+  Globe,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -65,6 +66,7 @@ export default function BankersLoginPage() {
     designation: "",
     department: "Startup & SME Banking",
     city: "",
+    country: "India",
     phone: "",
     ticketSizeMin: "₹50 Lakhs",
     ticketSizeMax: "₹25 Crores",
@@ -736,6 +738,23 @@ export default function BankersLoginPage() {
                       placeholder="e.g. Mumbai, Delhi NCR, Bengaluru"
                       value={signupForm.city}
                       onChange={(e) => setSignupForm({ ...signupForm, city: e.target.value })}
+                      style={{ width: "100%", padding: "0.75rem 0.85rem 0.75rem 2.5rem", background: "rgba(15, 23, 42, 0.6)", border: "1.5px solid rgba(255, 255, 255, 0.14)", borderRadius: "10px", color: "#fff", outline: "none", boxSizing: "border-box" }}
+                    />
+                  </div>
+                </div>
+
+                {/* Country */}
+                <div>
+                  <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#cbd5e1", marginBottom: "0.35rem", textTransform: "uppercase" }}>
+                    Country
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <Globe size={16} style={{ position: "absolute", left: "0.9rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
+                    <input
+                      type="text"
+                      placeholder="e.g. India, UAE, Singapore, UK"
+                      value={signupForm.country}
+                      onChange={(e) => setSignupForm({ ...signupForm, country: e.target.value })}
                       style={{ width: "100%", padding: "0.75rem 0.85rem 0.75rem 2.5rem", background: "rgba(15, 23, 42, 0.6)", border: "1.5px solid rgba(255, 255, 255, 0.14)", borderRadius: "10px", color: "#fff", outline: "none", boxSizing: "border-box" }}
                     />
                   </div>

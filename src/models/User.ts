@@ -8,6 +8,7 @@ export interface IBankerProfile {
   experience?: string;
   department?: string;
   city?: string;
+  country?: string;
   phone?: string;
   ticketSizeMin?: string;
   ticketSizeMax?: string;
@@ -42,6 +43,7 @@ const UserSchema = new Schema<IUser>(
       experience: { type: String, trim: true },
       department: { type: String, trim: true },
       city: { type: String, trim: true },
+      country: { type: String, trim: true, default: "India" },
       phone: { type: String, trim: true },
       ticketSizeMin: { type: String, trim: true },
       ticketSizeMax: { type: String, trim: true },

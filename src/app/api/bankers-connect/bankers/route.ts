@@ -64,6 +64,7 @@ export async function GET(req: Request) {
           experience: b.bankerProfile?.experience || "",
           department: b.bankerProfile?.department || "Corporate & Startup Banking",
           city: b.bankerProfile?.city || "National",
+          country: b.bankerProfile?.country || "India",
           phone: b.bankerProfile?.phone || "",
           ticketSizeMin: b.bankerProfile?.ticketSizeMin || "₹25L",
           ticketSizeMax: b.bankerProfile?.ticketSizeMax || "₹50Cr",
