@@ -374,6 +374,9 @@ export default function BankersLoginPage() {
                   />
                   <input
                     type="email"
+                    name="email"
+                    id="login-email"
+                    autoComplete="username email"
                     required
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
@@ -424,6 +427,9 @@ export default function BankersLoginPage() {
                   />
                   <input
                     type={showLoginPassword ? "text" : "password"}
+                    name="password"
+                    id="login-password"
+                    autoComplete="current-password"
                     required
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
@@ -568,6 +574,9 @@ export default function BankersLoginPage() {
                     <User size={16} style={{ position: "absolute", left: "0.9rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
                     <input
                       type="text"
+                      name="name"
+                      id="signup-name"
+                      autoComplete="name"
                       required
                       placeholder="e.g. Rahul Sharma"
                       value={signupForm.name}
@@ -586,6 +595,9 @@ export default function BankersLoginPage() {
                     <Mail size={16} style={{ position: "absolute", left: "0.9rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
                     <input
                       type="email"
+                      name="email"
+                      id="signup-email"
+                      autoComplete="username email"
                       required
                       placeholder="rahul.s@hdfcbank.com"
                       value={signupForm.email}
@@ -768,6 +780,11 @@ export default function BankersLoginPage() {
                     <Phone size={16} style={{ position: "absolute", left: "0.9rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
                     <input
                       type="tel"
+                      name="phone"
+                      id="signup-phone"
+                      autoComplete="tel"
+                      data-lpignore="true"
+                      data-form-type="phone"
                       placeholder="+91 98765 43210"
                       value={signupForm.phone}
                       onChange={(e) => setSignupForm({ ...signupForm, phone: e.target.value })}
@@ -782,9 +799,23 @@ export default function BankersLoginPage() {
                     Set Password (min 6 chars) *
                   </label>
                   <div style={{ position: "relative" }}>
+                    {/* Hidden username anchor to prevent browser from mistakenly pairing password with phone */}
+                    <input
+                      type="text"
+                      name="username"
+                      autoComplete="username"
+                      value={signupForm.email}
+                      readOnly
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      style={{ position: "absolute", opacity: 0, height: 0, width: 0, pointerEvents: "none" }}
+                    />
                     <Lock size={16} style={{ position: "absolute", left: "0.9rem", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
                     <input
                       type={showSignupPassword ? "text" : "password"}
+                      name="new-password"
+                      id="signup-password"
+                      autoComplete="new-password"
                       required
                       placeholder="••••••••"
                       value={signupForm.password}
